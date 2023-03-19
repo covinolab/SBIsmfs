@@ -1,6 +1,3 @@
-import os, sys
-sys.path.insert(0, os.path.abspath("../scr"))
-
 from gls_random cimport *
 cimport numpy as cnp
 import numpy as np

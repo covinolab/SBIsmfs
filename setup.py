@@ -5,19 +5,19 @@ import numpy as np
 extensions = [
     Extension(
         'brownian_integrator',
-        ['brownian_integrator.pyx'],
+        ['scr/simulator/brownian_integrator.pyx'],
         include_dirs=[np.get_include()],
         libraries=['gsl']
     ),
     Extension(
         'gls_random_gen',
-        ['gls_random_gen.pyx'],
+        ['scr/utils/gls_random_gen.pyx'],
         include_dirs=[np.get_include()],
         libraries=['gsl']
     ),
     Extension(
         'gls_spline',
-        ['gls_spline.pyx'],
+        ['scr/utils/gls_spline.pyx'],
         include_dirs=[np.get_include()],
         libraries=['gsl']
     )
