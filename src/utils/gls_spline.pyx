@@ -4,6 +4,7 @@ from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as cnp
 
+
 def gls_spline(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
@@ -40,6 +41,7 @@ def gls_spline(
     free(y_k)
 
     return y_eval
+
 
 def gls_spline_der(
         cnp.ndarray[double] x_knots,
