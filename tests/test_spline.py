@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath("../scr"))
 
-from gls_spline import *
+from gls_spline import gls_spline_der, gls_spline
 import numpy as np
 import scipy.interpolate as ip
 import matplotlib.pyplot as plt 
