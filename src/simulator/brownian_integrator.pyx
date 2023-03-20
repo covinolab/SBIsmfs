@@ -3,8 +3,8 @@ import numpy as np
 
 from libc.math cimport sqrt
 cimport numpy as cnp
-from utils.gls_spline cimport *
-from utils.gls_random cimport *
+from src.utils.gls_spline cimport *
+from src.utils.gls_random cimport *
 from libc.stdlib cimport malloc, free
 from libc.time cimport time
 
