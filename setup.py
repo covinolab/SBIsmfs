@@ -8,21 +8,21 @@ path_to_gsl_lib = '/opt/homebrew/Cellar/gsl/2.7.1/lib'
 extensions = [
     Extension(
         'sbi_smfs.utils.gls_random_gen',
-        ['src/utils/gls_random_gen.pyx'],
+        ['sbi_smfs/utils/gls_random_gen.pyx'],
         include_dirs=[np.get_include(), path_to_gsl_include],
         library_dirs=[path_to_gsl_lib],
         libraries=['gsl', 'gslcblas']
          ),
     Extension(
         'sbi_smfs.utils.gls_spline',
-        ['src/utils/gls_spline.pyx'],
+        ['sbi_smfs/utils/gls_spline.pyx'],
         include_dirs=[np.get_include(), path_to_gsl_include],
         library_dirs=[path_to_gsl_lib],
         libraries=['gsl', 'gslcblas']
     ),
     Extension(
         'sbi_smfs.simulator.brownian_integrator',
-        ['src/simulator/brownian_integrator.pyx'],
+        ['sbi_smfs/simulator/brownian_integrator.pyx'],
         include_dirs=[np.get_include(), path_to_gsl_include],
         library_dirs=[path_to_gsl_lib],
         libraries=['gsl', 'gslcblas']
