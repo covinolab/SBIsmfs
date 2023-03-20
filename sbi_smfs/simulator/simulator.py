@@ -1,13 +1,29 @@
 import torch
 import numpy as np
+from functools import partial
+import configparser
+from sbi_smfs.utils.stats_utils import bin_trajectory, build_transition_matrix
+from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
-from stats_utils import featurize_trajectory, bin_trajectory, build_transition_matrix
-from brownian_integrator import brownian_integrator
 
-import config_real_data as config
-
-
-def smfe_simulator(parameters: torch.Tensor):
+def smfe_simulator_mm(
+    parameters: torch.Tensor,
+    dt,
+    N,
+    saving_freq,
+    Dx,
+    N_knots,
+    min_x,
+    max_x,
+    max_G_0,
+    max_G_1,
+    init_xq_range,
+    min_bin, 
+    max_bin,
+    num_bins,
+    lag_times,
+    ):
+    print('Im simulator')
     '''
     Simulator for single-molecule force-spectroscopy experiments.
     The molecular free energy surface is described by a cubic spline
@@ -15,7 +31,38 @@ def smfe_simulator(parameters: torch.Tensor):
     Parameters
     ----------
     parameters : torch.Tensor
-        Parameters of the simulator.
+        Changeable_parameters of the simulator.
+        parameters[0] : log10(Dq/Dx)
+        parameters[1] : log10(kappa_l)
+        parameters[2:]: G(x_i) of splines.
+    dt : float
+        Integration timestep
+    N : int
+        Totoal number of steps.
+    saving_freq : int
+        Saving frequency during integration.
+    Dx : float
+        Diffusion coefficient in x direction.
+    N_knots : int
+        Number of knots in spline potential.
+    min_x : float
+        Minimal x value of spline potenital.
+    max_x : float
+        Maximal x value of spline potenital.
+    max_G_0 : float
+        Additional barrier at the end of spline for first and last node.
+    max_G_1 : float
+        Additional barrier at the end of spline for seconf and second last node.
+    init_xq_range: tuple[float, float]
+        Range of inital positions.
+    min_bin : float
+        Outer left bin edge.
+    max_bin:
+        Outer right bin edge.
+    num_bins: int
+        Number of bins for transition matrix.
+    lag_times: List[Int]:
+        List of lag times for which a transition matrix is generated.
 
     Returns
     -------
@@ -23,90 +70,13 @@ def smfe_simulator(parameters: torch.Tensor):
         Summary statistics of simulation perform with parameters.
     '''
 
-    # Define integration constants
-    dt = config.dt
-    N = config.N
-    saving_freq = config.saving_freq
-    Dx = np.random.uniform(0.28, 0.48) #config.Dx
-    N_knots = config.N_knots
-    min_x = config.min_x
-    max_x = config.max_x
-    max_G = config.max_G_0
-    init_xq_range = (-2, 2)
-
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
     y_knots = np.zeros(N_knots)
-    y_knots[0] = y_knots[-1] = config.max_G_0
-    y_knots[1] = y_knots[-2] = config.max_G_1
-
-    for idx, difference in enumerate(parameters[2:].numpy()):
-        y_knots[2 + idx + 1] = y_knots[2 + idx] + difference
-        y_knots[2: -2] -= y_knots[2: -2].mean()
-
-    # Select random initial position for x and q
-    x_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
-    q_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
-
-    # Select integration constants from parameters
-    Dq = 10 ** parameters[0].item()
-    k = parameters[1].item()
-
-    # Call integrator
-    q = brownian_integrator(
-            x0=x_init,
-            q0=q_init,
-            Dx=Dx,
-            Dq=Dq,
-            x_knots=x_knots,
-            y_knots=y_knots,
-            k=k,
-            N=N,
-            dt=dt,
-            fs=saving_freq
-    )
-
-    # Compute summary statistics
-    lag_times = np.unique(np.logspace(0, 5, 20, dtype=int))
-    summary_stats = featurize_trajectory(q, lag_times=lag_times)
-
-    return torch.tensor(summary_stats)
-
-
-def smfe_simulator_mm(parameters: torch.Tensor):
-    '''
-    Simulator for single-molecule force-spectroscopy experiments.
-    The molecular free energy surface is described by a cubic spline
-
-    Parameters
-    ----------
-    parameters : torch.Tensor
-        Parameters of the simulator.
-
-    Returns
-    -------
-    summary_stats : torch.Tensor
-        Summary statistics of simulation perform with parameters.
-    '''
-    
-    # Define integration constants
-    dt = config.dt
-    N = config.N
-    saving_freq = config.saving_freq
-    Dx = config.Dx
-    N_knots = config.N_knots
-    min_x = config.min_x
-    max_x = config.max_x
-    max_G = config.max_G_0
-    init_xq_range = config.init_xq_range
-
-    # Select spline knots from parameters
-    x_knots = np.linspace(min_x, max_x, N_knots)
-    y_knots = np.zeros(N_knots)
-    y_knots[0] = config.max_G_0 + parameters[2].numpy()
-    y_knots[-1] = config.max_G_0 + parameters[-1].numpy()
-    y_knots[1] = config.max_G_1 + parameters[2].numpy()
-    y_knots[-2] = config.max_G_1 + parameters[-1].numpy()
+    y_knots[0] = max_G_0 + parameters[2].numpy()
+    y_knots[-1] = max_G_0 + parameters[-1].numpy()
+    y_knots[1] = max_G_1 + parameters[2].numpy()
+    y_knots[-2] = max_G_1 + parameters[-1].numpy()
     y_knots[2:-2] = parameters[2:].numpy()
 
     # Select random initial position for x and q
@@ -132,13 +102,57 @@ def smfe_simulator_mm(parameters: torch.Tensor):
     )
 
     # Compute markov matricies
-    bins = np.linspace(config.min_bin, config.max_bin, config.num_bins + 1)
+    bins = np.linspace(min_bin, max_bin, num_bins + 1)
     binned_q = bin_trajectory(q, bins)
     matricies = np.array([
         build_transition_matrix(binned_q, len(bins) - 1, t=lag_time)
-        for lag_time in config.lag_times
+        for lag_time in lag_times
     ])
 
     matricies = np.float32(matricies)
 
     return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()
+
+
+def get_simulator_from_config(config_file):
+    '''
+    Initiates SMFS-Simulatr with integration constants from config file.
+
+    Parameters
+    ----------
+     config_file: str
+        Config file with entries for simualtion.
+
+    Returns
+    -------
+    summary_stats : torch.Tensor
+        Summary statistics of simulation perform with parameters.
+    '''
+
+    config = configparser.ConfigParser(
+        converters={
+        'listint': lambda x: [int(i.strip()) for i in x.split(',')],
+        'listfloat': lambda x: [float(i.strip()) for i in x.split(',')]
+        }
+    )
+    config.read(config_file)
+    print(config.sections())
+
+    return partial(
+        smfe_simulator_mm,
+        dt=config.getfloat('SIMULATOR', 'dt'),
+        N=config.getint('SIMULATOR', 'num_steps'),
+        saving_freq=config.getint('SIMULATOR', 'saving_freq'),
+        Dx=config.getfloat('SIMULATOR', 'Dx'),
+        N_knots=config.getint('SIMULATOR', 'num_knots'),
+        min_x=config.getfloat('SIMULATOR', 'min_x'),
+        max_x=config.getfloat('SIMULATOR', 'max_x'),
+        max_G_0=config.getfloat('SIMULATOR', 'max_G_0'),
+        max_G_1=config.getfloat('SIMULATOR', 'max_G_1'),
+        init_xq_range=config.getlistfloat('SIMULATOR', 'init_xq_range'),
+        min_bin=config.getfloat('SUMMARY_STATS', 'min_bin'),
+        max_bin=config.getfloat('SUMMARY_STATS', 'max_bin'),
+        num_bins=config.getint('SUMMARY_STATS', 'num_bins'),
+        lag_times=config.getlistint('SUMMARY_STATS', 'lag_times')
+        )
+

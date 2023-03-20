@@ -1,6 +1,11 @@
+import configparser
+
+config = configparser.ConfigParser()
+config.read('../tests/test.config')
+
 '''Spline parameters'''
-N_knots = 15
-N_const_knots = 4
+N_knots = config.getint('SIMULATOR', 'N_knots')
+N_const_knots = config.getint('SIMULATOR', 'N_const_knots')
 N_knots_prior = N_knots - N_const_knots
 
 '''Prior parameters (lower limit, upper limit)'''
@@ -14,7 +19,6 @@ dt = 5e-4
 N = int(T / dt)
 saving_freq = 100
 Dx = 1
-N_knots = 15
 min_x = -6
 max_x = 6
 max_G_0 = 70

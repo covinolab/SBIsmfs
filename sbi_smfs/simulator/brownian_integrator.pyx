@@ -4,7 +4,7 @@ import numpy as np
 from libc.math cimport sqrt
 cimport numpy as cnp
 from sbi_smfs.utils.gls_spline cimport *
-from sbi_smfs.utils.gls_random cimport *
+from gsl_random_numbers cimport *
 from libc.stdlib cimport malloc, free
 from libc.time cimport time
 
