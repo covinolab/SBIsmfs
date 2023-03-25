@@ -23,7 +23,6 @@ def smfe_simulator_mm(
     num_bins,
     lag_times,
     ):
-    print('Im simulator')
     '''
     Simulator for single-molecule force-spectroscopy experiments.
     The molecular free energy surface is described by a cubic spline
@@ -136,7 +135,6 @@ def get_simulator_from_config(config_file):
         }
     )
     config.read(config_file)
-    print(config.sections())
 
     return partial(
         smfe_simulator_mm,

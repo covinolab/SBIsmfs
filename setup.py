@@ -11,14 +11,16 @@ extensions = [
         ['sbi_smfs/utils/gls_spline.pyx'],
         include_dirs=[np.get_include(), path_to_gsl_include],
         library_dirs=[path_to_gsl_lib],
-        libraries=['gsl', 'gslcblas']
+        libraries=['gsl', 'gslcblas'],
+        language_level=3
     ),
     Extension(
         'sbi_smfs.simulator.brownian_integrator',
         ['sbi_smfs/simulator/brownian_integrator.pyx'],
         include_dirs=[np.get_include(), path_to_gsl_include],
         library_dirs=[path_to_gsl_lib],
-        libraries=['gsl', 'gslcblas']
+        libraries=['gsl', 'gslcblas'],
+        language_level=3
     )
 ]
 
