@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from functools import partial
 import configparser
-from sbi_smfs.utils.stats_utils import bin_trajectory, build_transition_matrix
+from sbi_smfs.utils.summary_stats import build_transition_matricies
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
 
@@ -100,17 +100,8 @@ def smfe_simulator_mm(
             fs=saving_freq
     )
 
-    # Compute markov matricies
-    bins = np.linspace(min_bin, max_bin, num_bins + 1)
-    binned_q = bin_trajectory(q, bins)
-    matricies = np.array([
-        build_transition_matrix(binned_q, len(bins) - 1, t=lag_time)
-        for lag_time in lag_times
-    ])
-
-    matricies = np.float32(matricies)
-
-    return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()
+    matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
+    return matrices
 
 
 def get_simulator_from_config(config_file):
