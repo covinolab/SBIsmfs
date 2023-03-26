@@ -26,6 +26,7 @@ class SplinePrior(MultipleIndependent):
 
 def get_priors_from_config(config_file, device="cpu"):
 
+    # TODO : Add option to not use SplinePrior
     config = configparser.ConfigParser(
         converters={
             "listint": lambda x: [int(i.strip()) for i in x.split(",")],
