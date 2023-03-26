@@ -123,7 +123,7 @@ def transition_count(x):
 
     freq = 0
     for i in range(len(x)):
-        if np.sign(x[i]) == -np.sign(x[i+1]):
+        if np.sign(x[i]) == -np.sign(x[i + 1]):
             freq += 1
     return freq
 

@@ -4,8 +4,8 @@ import configparser
 def get_config_parser(config_file):
     config = configparser.ConfigParser(
         converters={
-        'listint': lambda x: [int(i.strip()) for i in x.split(',')],
-        'listfloat': lambda x: [float(i.strip()) for i in x.split(',')]
+            "listint": lambda x: [int(i.strip()) for i in x.split(",")],
+            "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
         }
     )
     config.read(config_file)
@@ -14,7 +14,7 @@ def get_config_parser(config_file):
 
 
 def validate_config(config):
-    '''
+    """
     Chacks that all parameters are contained in config file.
 
     Parameters
@@ -25,12 +25,12 @@ def validate_config(config):
     Returns
     -------
         None.
-    '''
+    """
 
     config = configparser.ConfigParser(
         converters={
-        'listint': lambda x: [int(i.strip()) for i in x.split(',')],
-        'listfloat': lambda x: [float(i.strip()) for i in x.split(',')]
+            "listint": lambda x: [int(i.strip()) for i in x.split(",")],
+            "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
         }
     )
     config.read(config)

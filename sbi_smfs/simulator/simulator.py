@@ -18,12 +18,12 @@ def smfe_simulator_mm(
     max_G_0,
     max_G_1,
     init_xq_range,
-    min_bin, 
+    min_bin,
     max_bin,
     num_bins,
     lag_times,
-    ):
-    '''
+):
+    """
     Simulator for single-molecule force-spectroscopy experiments.
     The molecular free energy surface is described by a cubic spline
 
@@ -67,7 +67,7 @@ def smfe_simulator_mm(
     -------
     summary_stats : torch.Tensor
         Summary statistics of simulation perform with parameters.
-    '''
+    """
 
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
@@ -88,16 +88,16 @@ def smfe_simulator_mm(
 
     # Call integrator
     q = brownian_integrator(
-            x0=x_init,
-            q0=q_init,
-            Dx=Dx,
-            Dq=Dq,
-            x_knots=x_knots,
-            y_knots=y_knots,
-            k=k,
-            N=N,
-            dt=dt,
-            fs=saving_freq
+        x0=x_init,
+        q0=q_init,
+        Dx=Dx,
+        Dq=Dq,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=N,
+        dt=dt,
+        fs=saving_freq,
     )
 
     matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
@@ -105,7 +105,7 @@ def smfe_simulator_mm(
 
 
 def get_simulator_from_config(config_file):
-    '''
+    """
     Initiates SMFS-Simulatr with integration constants from config file.
 
     Parameters
@@ -117,31 +117,30 @@ def get_simulator_from_config(config_file):
     -------
     summary_stats : torch.Tensor
         Summary statistics of simulation perform with parameters.
-    '''
+    """
 
     config = configparser.ConfigParser(
         converters={
-        'listint': lambda x: [int(i.strip()) for i in x.split(',')],
-        'listfloat': lambda x: [float(i.strip()) for i in x.split(',')]
+            "listint": lambda x: [int(i.strip()) for i in x.split(",")],
+            "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
         }
     )
     config.read(config_file)
 
     return partial(
         smfe_simulator_mm,
-        dt=config.getfloat('SIMULATOR', 'dt'),
-        N=config.getint('SIMULATOR', 'num_steps'),
-        saving_freq=config.getint('SIMULATOR', 'saving_freq'),
-        Dx=config.getfloat('SIMULATOR', 'Dx'),
-        N_knots=config.getint('SIMULATOR', 'num_knots'),
-        min_x=config.getfloat('SIMULATOR', 'min_x'),
-        max_x=config.getfloat('SIMULATOR', 'max_x'),
-        max_G_0=config.getfloat('SIMULATOR', 'max_G_0'),
-        max_G_1=config.getfloat('SIMULATOR', 'max_G_1'),
-        init_xq_range=config.getlistfloat('SIMULATOR', 'init_xq_range'),
-        min_bin=config.getfloat('SUMMARY_STATS', 'min_bin'),
-        max_bin=config.getfloat('SUMMARY_STATS', 'max_bin'),
-        num_bins=config.getint('SUMMARY_STATS', 'num_bins'),
-        lag_times=config.getlistint('SUMMARY_STATS', 'lag_times')
-        )
-
+        dt=config.getfloat("SIMULATOR", "dt"),
+        N=config.getint("SIMULATOR", "num_steps"),
+        saving_freq=config.getint("SIMULATOR", "saving_freq"),
+        Dx=config.getfloat("SIMULATOR", "Dx"),
+        N_knots=config.getint("SIMULATOR", "num_knots"),
+        min_x=config.getfloat("SIMULATOR", "min_x"),
+        max_x=config.getfloat("SIMULATOR", "max_x"),
+        max_G_0=config.getfloat("SIMULATOR", "max_G_0"),
+        max_G_1=config.getfloat("SIMULATOR", "max_G_1"),
+        init_xq_range=config.getlistfloat("SIMULATOR", "init_xq_range"),
+        min_bin=config.getfloat("SUMMARY_STATS", "min_bin"),
+        max_bin=config.getfloat("SUMMARY_STATS", "max_bin"),
+        num_bins=config.getint("SUMMARY_STATS", "num_bins"),
+        lag_times=config.getlistint("SUMMARY_STATS", "lag_times"),
+    )
