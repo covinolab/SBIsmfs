@@ -79,3 +79,42 @@ def test_integrator_pmf():
     y_proj = y_proj - min(y_proj)
     average_error = np.mean(y_proj-pmf_sim)
     assert np.isclose(average_error, 0, atol=0.1)
+
+
+def test_integrator_rng_generator():
+    deltaG = 6
+    k = 3
+    delta_x = 1.5
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots/delta_x)
+
+    num_steps = 1e2
+    saving_freq = 1
+
+    q1 = brownian_integrator(
+            x0=1,
+            q0=1,
+            Dx=1,
+            Dq=1,
+            x_knots=x_knots,
+            y_knots=y_knots,
+            k=k,
+            N=num_steps,
+            dt=5e-4,
+            fs=saving_freq
+    )
+
+    q2 = brownian_integrator(
+            x0=1,
+            q0=1,
+            Dx=1,
+            Dq=1,
+            x_knots=x_knots,
+            y_knots=y_knots,
+            k=k,
+            N=num_steps,
+            dt=5e-4,
+            fs=saving_freq
+    )
+
+    assert not (q1 == q2).all()

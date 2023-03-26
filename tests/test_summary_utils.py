@@ -1,16 +1,17 @@
 import numpy as np
 import torch
+from sbi_smfs.utils.summary_stats import build_transition_matricies, featurize_trajectory
 
 
 def test_build_transition_matrices():
-    pass
-'''    bins = np.linspace(min_bin, max_bin, num_bins + 1)
-    binned_q = bin_trajectory(q, bins)
-    matricies = np.array([
-        build_transition_matrix(binned_q, len(bins) - 1, t=lag_time)
-        for lag_time in lag_times
-    ])
+    traj = np.random.standard_normal(size=(1000,))
+    lag_times = [1, 3, 10]
+    matricies = build_transition_matricies(traj, lag_times, -2, 2, 4)
+    assert matricies.shape[0] == 3 * (4 ** 2)
 
-    matricies = np.float32(matricies)
 
-    return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()'''
+def test_featurize_trajectory():
+    traj = np.random.standard_normal(size=(1000,))
+    lag_times = [1, 3, 10]
+    features = featurize_trajectory(traj, lag_times)
+    assert len(features) == (4 + 3 * 4)
