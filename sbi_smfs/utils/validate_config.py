@@ -14,4 +14,11 @@ def validate_config(config):
         None.
     '''
 
-    pass
+    config = configparser.ConfigParser(
+        converters={
+        'listint': lambda x: [int(i.strip()) for i in x.split(',')],
+        'listfloat': lambda x: [float(i.strip()) for i in x.split(',')]
+        }
+    )
+    config.read(config)
+    # TODO: Write valication function
