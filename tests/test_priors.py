@@ -15,3 +15,6 @@ def test_get_prior_from_config():
     assert (
         torch.isclose(samples[:, 2:].mean(axis=1), torch.zeros(num_samples), atol=1e-5)
     ).all()
+
+
+# TODO : Add test for non spline prior

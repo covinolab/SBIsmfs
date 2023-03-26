@@ -3,6 +3,8 @@ import torch
 from sbi.utils import MultipleIndependent
 import torch.distributions as dists
 
+from sbi_smfs.utils.config_utils import get_config_parser
+
 
 PRIORS = {"GAUSSIAN": dists.Normal, "UNIFORM": dists.Uniform}
 
@@ -26,14 +28,7 @@ class SplinePrior(MultipleIndependent):
 
 def get_priors_from_config(config_file, device="cpu"):
 
-    # TODO : Add option to not use SplinePrior
-    config = configparser.ConfigParser(
-        converters={
-            "listint": lambda x: [int(i.strip()) for i in x.split(",")],
-            "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
-        }
-    )
-    config.read(config_file)
+    config = get_config_parser(config_file)
 
     dq_dist_params = config.getlistfloat("PRIORS", "parameters_Dq")
     prior_dq = PRIORS[config.get("PRIORS", "type_Dq")](
@@ -56,4 +51,7 @@ def get_priors_from_config(config_file, device="cpu"):
 
     priors = [prior_dq, prior_k, *prior_splines]
 
-    return SplinePrior(priors)
+    if config.getboolean("PRIORS", "norm_spline_nodes"):
+        return SplinePrior(priors)
+    else:
+        return MultipleIndependent(priors)
