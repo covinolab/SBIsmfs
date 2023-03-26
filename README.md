@@ -6,5 +6,7 @@ Download code at : https://github.com/Dingel321/SBIsmfs.git
 
 Install with `python3 setup.py install`
 
-## Installation can be tested with (requires pytest):
-`pytest tests/`
+## Installation can be tested with:
+Install pytest with `pip install pytest` 
+
+Run test with `pytest tests/`
