@@ -9,4 +9,4 @@ Install with `python3 setup.py install`
 ## Installation can be tested with:
 Install pytest with `pip install pytest` 
 
-Run test with `pytest tests/`
+Run tests with `pytest tests/`
