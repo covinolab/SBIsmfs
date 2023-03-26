@@ -22,3 +22,5 @@ def validate_config(config):
     )
     config.read(config)
     # TODO: Write valication function
+    # Should contain simualtion settings, summary stats settings, prior settings, nn settings
+    # Test wether Dx is in prior or simulator

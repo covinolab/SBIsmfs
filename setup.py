@@ -24,13 +24,26 @@ extensions = [
     )
 ]
 
+requirements = [
+    "bottleneck",
+    "torch",
+    "sbi",
+    "matplotlib",
+    "cython",
+    "numpy",
+    "numba",
+    "setuptools"
+]
+
 setup(
     name='SBIsmfs',
     version='0.0.1',
+    author='Lars Dingeldein',
+    author_email='dingeldein@fias.uni-frankfurt.de',
     description='Simulation-based inference for single-molecule force-spectroscopy',
     url='https://github.com/Dingel321/SBIsmfs.git',
     ext_modules=cythonize(extensions),
     packages=find_packages(),
-    install_requires=['numpy', 'torch', 'scipy', 'numba'],
+    install_requires=requirements,
     zip_safe=False
 )

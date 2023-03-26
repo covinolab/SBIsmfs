@@ -3,39 +3,34 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class CNN(nn.Module):
-    def __init__(self):
-        super(CNN, self).__init__()
+class SimpleCNN(nn.Module):
+    """Simple single layer CNN with ReLU activation."""
+    def __init__(
+            self,
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride,
+            num_bins,
+            num_lags,
+            activation=nn.ReLU
+        ):
+        super(SimpleCNN, self).__init__()
 
         self.conv1 = nn.Conv2d(
-            in_channels=6,
-            out_channels=6,
-            kernel_size=4,
-            stride=2
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=stride
         )
+        self.num_bins = num_bins
+        self.num_lags = num_lags
+        self.activation = activation()
 
     def forward(self, x):
         # Check the original matrix size and lag times!!!
-        x = x.view(-1, 6, 20, 20)
-        x = F.relu(self.conv1(x))
-
-        return x.flatten(start_dim=1)
-
-
-class CNN2(nn.Module):
-    def __init__(self):
-        super(CNN2, self).__init__()
-
-        self.sequential = nn.Sequential(
-            nn.Conv2d(6, 32, 3, stride=2, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(32, 12, 3, stride=2, padding=1),
-            nn.LeakyReLU(0.1)
+        x = x.view(
+            -1, self.num_lags, self.num_bins, self.num_bins
         )
-
-    def forward(self, x):
-        # Check the original matrix size and lag times!!!
-        x = x.view(-1, 6, 20, 20)
-        x = self.sequential(x)
-
+        x = self.activation(self.conv1(x))
         return x.flatten(start_dim=1)
