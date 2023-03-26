@@ -1,0 +1,13 @@
+utils.plots
+    plot spline ensemble
+    plot spline mean with error
+    plot marginals
+
+analysis
+    split_in_folded_unfolded
+    autocorreltation
+    pmf_comparison
+
+priors
+    implement dx dq to be seperate
+    implement different number of fixed nodes
