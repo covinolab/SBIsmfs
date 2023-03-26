@@ -6,8 +6,8 @@ import sbi_smfs.utils.stats_utils as tutils
 def test_transition_matrix():
     binned_traj = np.array([0, 0, 1, 1, 1, 0, 0])
     bins = np.array([-2, 0, 2])
-    transition_matrix = np.array([[2/3, 1/3], [1/3 , 2/3]])
-    test_matrix = tutils.build_transition_matrix(binned_traj, len(bins) - 1 )
+    transition_matrix = np.array([[2 / 3, 1 / 3], [1 / 3, 2 / 3]])
+    test_matrix = tutils.build_transition_matrix(binned_traj, len(bins) - 1)
     assert np.isclose(test_matrix - transition_matrix, 0, atol=0.0001).all()
 
 
@@ -45,7 +45,7 @@ def test_propagator():
 
 def test_transition_count():
     trajectory = np.array([-1, -2, 2, 6, 7, 10])
-    transitions = tutils.transition_count(trajectory, )
+    transitions = tutils.transition_count(trajectory,)
     assert transitions == 1
 
 
@@ -57,4 +57,3 @@ def test_prop_stats():
     test_prop_m = tutils.prop_stats(trajectory, t=1)
 
     assert (m1, m2, m3, m4) == test_prop_m
-

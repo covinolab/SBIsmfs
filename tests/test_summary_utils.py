@@ -1,6 +1,9 @@
 import numpy as np
 import torch
-from sbi_smfs.utils.summary_stats import build_transition_matricies, featurize_trajectory
+from sbi_smfs.utils.summary_stats import (
+    build_transition_matricies,
+    featurize_trajectory,
+)
 
 
 def test_build_transition_matrices():
