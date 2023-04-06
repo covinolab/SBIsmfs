@@ -1,24 +1,48 @@
 from setuptools import Extension, setup, find_packages
+import subprocess
+import os
 from Cython.Build import cythonize
 import numpy as np
 
-path_to_gsl_include = "/opt/homebrew/Cellar/gsl/2.7.1/include"
-path_to_gsl_lib = "/opt/homebrew/Cellar/gsl/2.7.1/lib"
+
+def get_gsl_config(args):
+    try:
+        cmd = ["gsl-config1"] + args
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+        )
+        return result.stdout.decode().strip().split(" ")[0][2:]
+    except subprocess.CalledProcessError:
+        return None
+
+
+try:
+    gsl_include_dir = get_gsl_config(["--cflags"])
+    gsl_lib_dir = get_gsl_config(["--libs"])
+except FileNotFoundError:
+    print(
+        "Could not find GSL, set the enviromental variables GSL_INCLUDE_DIR,GSL_LIB_DIR "
+    )
+    gsl_include_dir = os.environ.get("GSL_INCLUDE_DIR")
+    gsl_lib_dir = os.environ.get("GSL_LIB_DIR")
+
+if gsl_include_dir is None or gsl_lib_dir is None:
+    raise FileNotFoundError("GSL not found!")
 
 extensions = [
     Extension(
         "sbi_smfs.utils.gls_spline",
         ["sbi_smfs/utils/gls_spline.pyx"],
-        include_dirs=[np.get_include(), path_to_gsl_include],
-        library_dirs=[path_to_gsl_lib],
+        include_dirs=[np.get_include(), gsl_include_dir],
+        library_dirs=[gsl_lib_dir],
         libraries=["gsl", "gslcblas"],
         language_level=3,
     ),
     Extension(
         "sbi_smfs.simulator.brownian_integrator",
         ["sbi_smfs/simulator/brownian_integrator.pyx"],
-        include_dirs=[np.get_include(), path_to_gsl_include],
-        library_dirs=[path_to_gsl_lib],
+        include_dirs=[np.get_include(), gsl_include_dir],
+        library_dirs=[gsl_lib_dir],
         libraries=["gsl", "gslcblas"],
         language_level=3,
     ),
@@ -30,9 +54,7 @@ requirements = [
     "sbi",
     "matplotlib",
     "cython",
-    "numpy",
     "numba",
-    "setuptools",
 ]
 
 setup(
