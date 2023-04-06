@@ -1,44 +1,40 @@
 import argparse
 import pickle
-import dill
-import torch
 
+import torch
 from sbi.inference import SNPE
-import sbi.utils as utils
+
+from sbi.utils.user_input_checks import get_batch_loop_simulator
+from sbi.simulators.simutils import simulate_in_batches
 from sbi.utils.get_nn_models import posterior_nn
 
-import config
-from embedding_net import CNN
+from sbi_smfs.simulator import get_simulator_from_config
+from sbi_smfs.inference.priors import get_priors_from_config
+from sbi_smfs.inference.embedding_net import SimpleCNN
+from sbi_smfs.utils.config_utils import get_config_parser
 
 
-def main(training_file_name: str, posterior_file_name: str):
+def train_posterior(
+    config_file: str,
+    train_data,
+    posterior_file=None,
+    device="cpu",
+):
+    config = get_config_parser(config_file)
 
-    device = "cpu"
-
-    lower_limits = [
-        config.logD_lims[0],
-        config.k_lims[0],
-        *(config.spline_lims[0] for i in range(config.N_knots_prior)),
-    ]
-
-    upper_limits = [
-        config.logD_lims[1],
-        config.k_lims[1],
-        *(config.spline_lims[1] for i in range(config.N_knots_prior)),
-    ]
-
-    prior = utils.BoxUniform(
-        low=torch.tensor(lower_limits), high=torch.tensor(upper_limits), device=device
+    print("Building neural network on :", device)
+    cnn_net = SimpleCNN(
+        len(config.getlistint("SIMULATOR", "lag_times")),
+        4,
+        2,
+        config.getlistint("SIMULATOR", "num_bins"),
+        len(config.getlistint("SIMULATOR", "lag_times")),
     )
-
-    x_file_name = f"{training_file_name}_x.pt"
-    theta_file_name = f"{training_file_name}_theta.pt"
-
-    theta = torch.load(theta_file_name, map_location=torch.device(device))
-    x = torch.load(x_file_name, map_location=torch.device(device))
-
-    print("Buld Neural Network ...")
-    cnn_net = CNN()
+    kwargs_flow = {
+        "num_blocks": 2,
+        "dropout_probability": 0.0,
+        "use_batch_norm": False,
+    }
 
     neural_posterior = posterior_nn(
         model="nsf",
@@ -46,33 +42,51 @@ def main(training_file_name: str, posterior_file_name: str):
         num_transforms=5,
         num_bins=10,
         embedding_net=cnn_net,
+        z_score_x="none",
+        **kwargs_flow,
     )
 
-    inference = SNPE(prior=prior, density_estimator=neural_posterior, device=device)
+    inference = SNPE(density_estimator=neural_posterior, device=device)
 
-    inference = inference.append_simulations(theta, x)
+    if isinstance(train_data, str):
+        x_file_name = f"{train_data}_x.pt"
+        theta_file_name = f"{train_data}_theta.pt"
+        theta = torch.load(theta_file_name)
+        x = torch.load(x_file_name)
+
+    inference = inference.append_simulations(theta, x, data_device='cpu')
     density_estimator = inference.train(
         show_train_summary=True,
         validation_fraction=0.15,
-        training_batch_size=1500,
+        training_batch_size=500,
         learning_rate=0.0005,
         stop_after_epochs=20,
     )
 
     posterior = inference.build_posterior(density_estimator)
 
-    with open(f"{posterior_file_name}_NN.pkl", "wb") as handle:
-        dill.dump(inference, handle)
-
-    with open(f"{posterior_file_name}.pkl", "wb") as handle:
-        pickle.dump(posterior, handle)
+    if not isinstance(posterior_file, str):
+        return posterior
+    elif isinstance(posterior_file, str):
+        with open(f"{posterior_file}.pkl", "wb") as handle:
+            pickle.dump(posterior, handle)
+    else:
+        raise NotImplementedError('posterior_file needs to be either None or a string!')
+    
 
 
 if __name__ == "__main__":
 
     cl_parser = argparse.ArgumentParser()
-    cl_parser.add_argument("--train_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--train_data", action="store", type=str, required=True)
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--device", action="store", type=str, required=False, default='cpu')
     args = cl_parser.parse_args()
 
-    main(args.train_file, args.posterior_file)
+    train_posterior(
+        args.config_file,
+        args.train_data,
+        args.posterior_file,
+        args.device
+    )

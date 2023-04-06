@@ -1,54 +1,48 @@
 import argparse
 import pickle
-import dill
-import torch
-import torch.distributions as dists
 
-import sbi.utils as utils
+import torch
 from sbi.inference import SNPE
+
 import sbi.utils as utils
 from sbi.utils.user_input_checks import get_batch_loop_simulator
 from sbi.simulators.simutils import simulate_in_batches
 from sbi.utils.get_nn_models import posterior_nn
 
+from sbi_smfs.simulator import get_simulator_from_config
+from sbi_smfs.inference.priors import get_priors_from_config
+from sbi_smfs.inference.embedding_net import SimpleCNN
+from sbi_smfs.utils.config_utils import get_config_parser
 
-from simulator import smfe_simulator_mm
-from embedding_net import CNN
-import config_real_data as config
-from priors import SplinePrior
 
-
-def main(
-    N_rounds: int,
-    N_sim_per_round: int,
-    N_workers: int,
-    observation_file: str,
-    posterior_file: str,
+def train_truncated_posterior(
+    config_file: str,
+    num_rounds: int,
+    num_sim_per_round: int,
+    num_workers: int,
+    observation,
+    posterior_file=None,
+    device="cpu",
 ):
-
-    device = "cuda"
-
-    observation = torch.load(observation_file)
-
-    priors = [
-        dists.Uniform(
-            torch.tensor([-0.5], device=device), torch.tensor([0.5], device=device)
-        ),
-        dists.Uniform(
-            torch.tensor([-1.5], device=device), torch.tensor([-0.5], device=device)
-        ),
-        *(
-            dists.Normal(
-                torch.tensor([0.0], device=device), torch.tensor([5.0], device=device)
-            )
-            for i in range(config.N_knots_prior - 1)
-        ),
-    ]
-
-    prior = SplinePrior(priors)
+    if isinstance(observation, str):
+        observation = torch.load(observation)
+    prior = get_priors_from_config(config_file)
+    simulator = get_simulator_from_config(config_file)
+    config = get_config_parser(config_file)
 
     print("Building neural network on :", device)
-    cnn_net = CNN()
+    cnn_net = SimpleCNN(
+        len(config.getlistint("SIMULATOR", "lag_times")),
+        4,
+        2,
+        config.getlistint("SIMULATOR", "num_bins"),
+        len(config.getlistint("SIMULATOR", "lag_times")),
+    )
+    kwargs_flow = {
+        "num_blocks": 2,
+        "dropout_probability": 0.0,
+        "use_batch_norm": False,
+    }
 
     neural_posterior = posterior_nn(
         model="nsf",
@@ -56,24 +50,23 @@ def main(
         num_transforms=5,
         num_bins=10,
         embedding_net=cnn_net,
+        z_score_x="none",
+        **kwargs_flow,
     )
 
     inference = SNPE(prior=prior, density_estimator=neural_posterior, device=device)
-
-    dataloader_kwargs = {"num_workers": 10, "pin_memory": True}
-
-    simulator = get_batch_loop_simulator(smfe_simulator_mm)
+    simulator = get_batch_loop_simulator(simulator)
     proposal = prior
 
-    for idx_round in range(N_rounds):
+    for idx_round in range(num_rounds):
 
         if idx_round > 0:
-            theta = proposal.sample((N_sim_per_round,), max_sampling_batch_size=500000)
+            theta = proposal.sample((num_sim_per_round,), max_sampling_batch_size=500000)
         else:
-            theta = proposal.sample((N_sim_per_round,))
+            theta = proposal.sample((num_sim_per_round,))
 
         x = simulate_in_batches(
-            simulator, theta.cpu(), sim_batch_size=20, num_workers=N_workers
+            simulator, theta.cpu(), sim_batch_size=20, num_workers=num_workers
         )
 
         inference = inference.append_simulations(
@@ -84,41 +77,49 @@ def main(
             force_first_round_loss=True,
             show_train_summary=True,
             validation_fraction=0.15,
-            training_batch_size=64,
+            training_batch_size=50,
             learning_rate=0.0005,
-            stop_after_epochs=20,
-            dataloader_kwargs=dataloader_kwargs,
+            stop_after_epochs=20
         )
 
         posterior = inference.build_posterior(density_estimator).set_default_x(
             observation
         )
-
-        with open(f"{posterior_file}_round={idx_round}.pkl", "wb") as handle:
-            pickle.dump(posterior, handle)
+        if isinstance(posterior_file, str):
+            with open(f"{posterior_file}_round={idx_round}.pkl", "wb") as handle:
+                pickle.dump(posterior, handle)
 
         accept_reject_fn = utils.get_density_thresholder(posterior, quantile=1e-3)
         proposal = utils.RestrictedPrior(
             prior, accept_reject_fn, sample_with="rejection"
         )
 
+    if not isinstance(posterior_file, str):
+        return posterior
+
 
 if __name__ == "__main__":
 
     cl_parser = argparse.ArgumentParser()
-    cl_parser.add_argument("--N_rounds", action="store", type=int, required=True)
-    cl_parser.add_argument("--N_sim_per_round", action="store", type=int, required=True)
-    cl_parser.add_argument("--N_workers", action="store", type=int, required=True)
+    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--num_rounds", action="store", type=int, required=True)
+    cl_parser.add_argument(
+        "--num_sim_per_round", action="store", type=int, required=True
+    )
+    cl_parser.add_argument("--num_workers", action="store", type=int, required=True)
     cl_parser.add_argument(
         "--observation_file", action="store", type=str, required=True
     )
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--device", action="store", type=str, required=False, default='cpu')
     args = cl_parser.parse_args()
 
-    main(
-        args.N_rounds,
-        args.N_sim_per_round,
-        args.N_workers,
+    train_truncated_posterior(
+        args.config_file
+        args.num_rounds,
+        args.num_sim_per_round,
+        args.num_workers,
         args.observation_file,
         args.posterior_file,
+        args.device
     )

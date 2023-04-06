@@ -90,6 +90,7 @@ def train_sequential_posterior(
 if __name__ == "__main__":
 
     cl_parser = argparse.ArgumentParser()
+    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--num_rounds", action="store", type=int, required=True)
     cl_parser.add_argument(
         "--num_sim_per_round", action="store", type=int, required=True
@@ -99,12 +100,15 @@ if __name__ == "__main__":
         "--observation_file", action="store", type=str, required=True
     )
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
+    cl_parser.add_argument("--device", action="store", type=str, required=False, default='cpu')
     args = cl_parser.parse_args()
 
     train_sequential_posterior(
+        args.config_file,
         args.num_rounds,
         args.num_sim_per_round,
         args.num_workers,
         args.observation_file,
         args.posterior_file,
+        args.device,
     )
