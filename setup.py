@@ -7,7 +7,7 @@ import numpy as np
 
 def get_gsl_config(args):
     try:
-        cmd = ["gsl-config1"] + args
+        cmd = ["gsl-config"] + args
         result = subprocess.run(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
         )
