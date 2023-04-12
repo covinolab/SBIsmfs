@@ -2,6 +2,9 @@ import configparser
 
 
 def get_config_parser(config_file):
+    if isinstance(config_file, configparser.ConfigParser):
+        return config_file
+
     config = configparser.ConfigParser(
         converters={
             "listint": lambda x: [int(i.strip()) for i in x.split(",")],
