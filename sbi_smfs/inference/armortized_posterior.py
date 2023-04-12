@@ -14,7 +14,7 @@ from sbi_smfs.inference.embedding_net import SimpleCNN
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
-def train_posterior(
+def train_armortized_posterior(
     config_file: str,
     train_data,
     posterior_file=None,
@@ -78,7 +78,7 @@ def train_posterior(
         raise NotImplementedError("posterior_file needs to be either None or a string!")
 
 
-if __name__ == "__main__":
+def main():
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--train_data", action="store", type=str, required=True)
@@ -87,5 +87,8 @@ if __name__ == "__main__":
         "--device", action="store", type=str, required=False, default="cpu"
     )
     args = cl_parser.parse_args()
-
     train_posterior(args.config_file, args.train_data, args.posterior_file, args.device)
+
+
+if __name__ == "__main__":
+    main()

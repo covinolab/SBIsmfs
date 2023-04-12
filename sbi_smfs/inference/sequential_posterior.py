@@ -88,7 +88,7 @@ def train_sequential_posterior(
         return posterior
 
 
-if __name__ == "__main__":
+def main():
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--num_rounds", action="store", type=int, required=True)
@@ -114,3 +114,7 @@ if __name__ == "__main__":
         args.posterior_file,
         args.device,
     )
+
+
+if __name__ == "__main__":
+    main()

@@ -68,4 +68,11 @@ setup(
     packages=find_packages(),
     install_requires=requirements,
     zip_safe=False,
+    entry_points={
+        "console_scripts": [
+            "train_armortized_posterior=sbi_smfs.inference.armortized_posterior:main",
+            "train_sequential_posterior=sbi_smfs.inference.sequential_posterior:main",
+            "train_truncated_posterior=sbi_smfs.inference.truncated_posterior:main",
+        ],
+    },
 )

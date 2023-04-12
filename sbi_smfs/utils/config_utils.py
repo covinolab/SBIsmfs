@@ -32,25 +32,50 @@ def validate_config(config_file):
     elif isinstance(config_file, configparser.ConfigParser):
         config = config_file
     else:
-        raise NotImplementedError('config not properly specified!')
+        raise NotImplementedError("config not properly specified!")
 
-    expected_sections = ['SIMULATOR', 'PRIORS', 'SUMMARY_STATS']
-    expected_keys = {'SIMULATOR': ['dt', 'num_steps', 'num_knots', 'saving_freq', 'min_x', 'max_x', 'max_G_0', 'max_G_1', 'init_xq_range'], 'PRIORS': ['type_spline', 'parameters_spline', 'norm_spline_nodes', 'type_Dq' , 'parameters_Dq', 'type_k', 'parameters_k'] , 'SUMMARY_STATS': ['min_bin', 'max_bin', 'num_bins', 'lag_times']}
+    expected_sections = ["SIMULATOR", "PRIORS", "SUMMARY_STATS"]
+    expected_keys = {
+        "SIMULATOR": [
+            "dt",
+            "num_steps",
+            "num_knots",
+            "saving_freq",
+            "min_x",
+            "max_x",
+            "max_G_0",
+            "max_G_1",
+            "init_xq_range",
+        ],
+        "PRIORS": [
+            "type_spline",
+            "parameters_spline",
+            "norm_spline_nodes",
+            "type_Dq",
+            "parameters_Dq",
+            "type_k",
+            "parameters_k",
+        ],
+        "SUMMARY_STATS": ["min_bin", "max_bin", "num_bins", "lag_times"],
+    }
 
     # Check sections
     for sec in expected_sections:
         if sec not in config.sections():
-            raise KeyError(f'Missing {sec} in config')
-    
+            raise KeyError(f"Missing {sec} in config")
+
     for sec, keys in expected_keys.items():
         for key in keys:
             if key not in config[sec]:
-                raise KeyError(f'Missing {key} in {sec}')
-            
-    if 'Dx' in config['SIMULATOR']:
-        if 'type_Dx' in config['PRIORS'] or 'parameters_Dx' in config['PRIORS']:
-            raise KeyError('Dx specified in prior and simulator!')
-    elif 'Dx' not in config['SIMULATOR']:
-        if 'type_Dx' not in config['PRIORS'] and 'parameters_Dx' not in config['PRIORS']:
-            raise KeyError('Dx needs to be specified in simualtor or prior!')
+                raise KeyError(f"Missing {key} in {sec}")
+
+    if "Dx" in config["SIMULATOR"]:
+        if "type_Dx" in config["PRIORS"] or "parameters_Dx" in config["PRIORS"]:
+            raise KeyError("Dx specified in prior and simulator!")
+    elif "Dx" not in config["SIMULATOR"]:
+        if (
+            "type_Dx" not in config["PRIORS"]
+            and "parameters_Dx" not in config["PRIORS"]
+        ):
+            raise KeyError("Dx needs to be specified in simualtor or prior!")
     return True
