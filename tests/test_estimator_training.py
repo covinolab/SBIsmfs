@@ -11,7 +11,7 @@ def test_armortized_training():
     data_set_size = 10
     test_data = (torch.randn((10, 13)), torch.randn((10, 2400)))
     test_config = "tests/test.config"
-    posterior = train_posterior(test_config, test_data)
+    posterior = train_armortized_posterior(test_config, test_data)
     assert isinstance(posterior, DirectPosterior)
 
 
