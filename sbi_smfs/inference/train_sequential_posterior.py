@@ -31,12 +31,13 @@ def train_sequential_posterior(
 
     print("Building neural network on :", device)
     cnn_net = SimpleCNN(
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
         4,
         2,
-        config.getlistint("SIMULATOR", "num_bins"),
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        config.getint("SUMMARY_STATS", "num_bins"),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
     )
+
     kwargs_flow = {
         "num_blocks": 2,
         "dropout_probability": 0.0,

@@ -24,11 +24,11 @@ def train_posterior(
 
     print("Building neural network on :", device)
     cnn_net = SimpleCNN(
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
         4,
         2,
-        config.getlistint("SIMULATOR", "num_bins"),
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        config.getint("SUMMARY_STATS", "num_bins"),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
     )
     kwargs_flow = {
         "num_blocks": 2,
@@ -53,6 +53,10 @@ def train_posterior(
         theta_file_name = f"{train_data}_theta.pt"
         theta = torch.load(theta_file_name)
         x = torch.load(x_file_name)
+    elif isinstance(train_data, tuple):
+        theta, x = train_data
+    else:
+        raise NotImplementedError
 
     inference = inference.append_simulations(theta, x, data_device='cpu')
     density_estimator = inference.train(

@@ -32,11 +32,11 @@ def train_truncated_posterior(
 
     print("Building neural network on :", device)
     cnn_net = SimpleCNN(
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
         4,
         2,
-        config.getlistint("SIMULATOR", "num_bins"),
-        len(config.getlistint("SIMULATOR", "lag_times")),
+        config.getint("SUMMARY_STATS", "num_bins"),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),
     )
     kwargs_flow = {
         "num_blocks": 2,
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     args = cl_parser.parse_args()
 
     train_truncated_posterior(
-        args.config_file
+        args.config_file,
         args.num_rounds,
         args.num_sim_per_round,
         args.num_workers,

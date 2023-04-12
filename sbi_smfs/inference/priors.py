@@ -46,7 +46,7 @@ def get_priors_from_config(config_file, device="cpu"):
             torch.tensor([spline_dist_params[0]], device=device),
             torch.tensor([spline_dist_params[1]], device=device),
         )
-        for _ in range(config.getint("SIMULATOR", "num_knots"))
+        for _ in range(config.getint("SIMULATOR", "num_knots") - 4)
     ]
 
     priors = [prior_dq, prior_k, *prior_splines]

@@ -23,6 +23,6 @@ class SimpleCNN(nn.Module):
 
     def forward(self, x):
         # Check the original matrix size and lag times!!!
-        x = x.view(-1, self.num_lags, self.num_bins, self.num_bins)
+        x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
         x = self.activation(self.conv1(x))
         return x.flatten(start_dim=1)
