@@ -70,6 +70,7 @@ setup(
     zip_safe=False,
     entry_points={
         "console_scripts": [
+            "generate_simulations=sbi_smfs.inference.generate_simulations:main",
             "train_armortized_posterior=sbi_smfs.inference.armortized_posterior:main",
             "train_sequential_posterior=sbi_smfs.inference.sequential_posterior:main",
             "train_truncated_posterior=sbi_smfs.inference.truncated_posterior:main",

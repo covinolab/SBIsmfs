@@ -8,7 +8,7 @@ def G0(x):
     if np.abs(x) > 0.5:
         return 2 * (np.abs(x) - 1) ** 2 - 1
     else:
-        return -2 * x**2
+        return -2 * x ** 2
 
 
 def G(x, q, dG=4, k=2, delta_x=1):

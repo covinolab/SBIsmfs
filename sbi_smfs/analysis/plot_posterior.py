@@ -60,7 +60,9 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.5):
     )
     y_knots_err = np.zeros((2, config.getint("SIMULATOR", "num_knots")))
     y_knots_err[:, 2:-2] = np.abs(
-        np.quantile(posterior_samples.cpu().numpy(), [alpha, 1 - alpha], axis=0)[:, num_ind_var:]
+        np.quantile(posterior_samples.cpu().numpy(), [alpha, 1 - alpha], axis=0)[
+            :, num_ind_var:
+        ]
         - mean_posterior[num_ind_var:].numpy()
     )
     y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
@@ -69,8 +71,16 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.5):
     y_knots[2:-2] = mean_posterior[num_ind_var:].numpy()
     y_axis = gls_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis - np.min(y_axis), alpha=1, color='blue')
-    plt.errorbar(x_knots, y_knots - np.min(y_axis), yerr=y_knots_err, linestyle='', marker='o', color='blue', label='posterior mean')
-    plt.xlabel(r'Molecular extension x', fontsize=18)
-    plt.ylabel(r'$G_0(x)$', fontsize=18)
+    plt.plot(x_axis, y_axis - np.min(y_axis), alpha=1, color="blue")
+    plt.errorbar(
+        x_knots,
+        y_knots - np.min(y_axis),
+        yerr=y_knots_err,
+        linestyle="",
+        marker="o",
+        color="blue",
+        label="posterior mean",
+    )
+    plt.xlabel(r"Molecular extension x", fontsize=18)
+    plt.ylabel(r"$G_0(x)$", fontsize=18)
     plt.grid(True)
