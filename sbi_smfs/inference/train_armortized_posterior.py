@@ -58,7 +58,7 @@ def train_posterior(
     else:
         raise NotImplementedError
 
-    inference = inference.append_simulations(theta, x, data_device='cpu')
+    inference = inference.append_simulations(theta, x, data_device="cpu")
     density_estimator = inference.train(
         show_train_summary=True,
         validation_fraction=0.15,
@@ -75,22 +75,17 @@ def train_posterior(
         with open(f"{posterior_file}.pkl", "wb") as handle:
             pickle.dump(posterior, handle)
     else:
-        raise NotImplementedError('posterior_file needs to be either None or a string!')
-    
+        raise NotImplementedError("posterior_file needs to be either None or a string!")
 
 
 if __name__ == "__main__":
-
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--train_data", action="store", type=str, required=True)
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
-    cl_parser.add_argument("--device", action="store", type=str, required=False, default='cpu')
+    cl_parser.add_argument(
+        "--device", action="store", type=str, required=False, default="cpu"
+    )
     args = cl_parser.parse_args()
 
-    train_posterior(
-        args.config_file,
-        args.train_data,
-        args.posterior_file,
-        args.device
-    )
+    train_posterior(args.config_file, args.train_data, args.posterior_file, args.device)

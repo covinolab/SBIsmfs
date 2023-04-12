@@ -42,7 +42,6 @@ def generate_simulation(
 
 
 if __name__ == "__main__":
-
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--num_sim", action="store", type=int, required=True)

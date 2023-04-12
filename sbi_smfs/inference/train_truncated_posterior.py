@@ -59,9 +59,10 @@ def train_truncated_posterior(
     proposal = prior
 
     for idx_round in range(num_rounds):
-
         if idx_round > 0:
-            theta = proposal.sample((num_sim_per_round,), max_sampling_batch_size=500000)
+            theta = proposal.sample(
+                (num_sim_per_round,), max_sampling_batch_size=500000
+            )
         else:
             theta = proposal.sample((num_sim_per_round,))
 
@@ -79,7 +80,7 @@ def train_truncated_posterior(
             validation_fraction=0.15,
             training_batch_size=50,
             learning_rate=0.0005,
-            stop_after_epochs=20
+            stop_after_epochs=20,
         )
 
         posterior = inference.build_posterior(density_estimator).set_default_x(
@@ -99,7 +100,6 @@ def train_truncated_posterior(
 
 
 if __name__ == "__main__":
-
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--num_rounds", action="store", type=int, required=True)
@@ -111,7 +111,9 @@ if __name__ == "__main__":
         "--observation_file", action="store", type=str, required=True
     )
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
-    cl_parser.add_argument("--device", action="store", type=str, required=False, default='cpu')
+    cl_parser.add_argument(
+        "--device", action="store", type=str, required=False, default="cpu"
+    )
     args = cl_parser.parse_args()
 
     train_truncated_posterior(
@@ -121,5 +123,5 @@ if __name__ == "__main__":
         args.num_workers,
         args.observation_file,
         args.posterior_file,
-        args.device
+        args.device,
     )

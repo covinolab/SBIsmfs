@@ -1,5 +1,3 @@
-
-
 def split_trajectory():
     pass
 

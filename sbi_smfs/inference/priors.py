@@ -12,23 +12,26 @@ PRIORS = {"GAUSSIAN": dists.Normal, "UNIFORM": dists.Uniform}
 class SplinePrior(MultipleIndependent):
     """Class which defines a prior for simulations on a spline potential"""
 
-    def __init__(self, dists):
+    def __init__(self, dists, indipendent_vars=2):
         super().__init__(dists, validate_args=False)
+        self._ind_vars = indipendent_vars
 
     def sample(self, sample_shape=torch.Size([])):
         samples = super().sample(sample_shape)
         if sample_shape == torch.Size():
-            samples[2:] = samples[2:] - torch.mean(samples[2:]).reshape(-1, 1)
+            samples[self._ind_vars :] = samples[self._ind_vars :] - torch.mean(
+                samples[self._ind_vars :]
+            ).reshape(-1, 1)
         else:
-            samples[:, 2:] = samples[:, 2:] - torch.mean(samples[:, 2:], dim=1).reshape(
-                -1, 1
-            )
+            samples[:, self._ind_vars :] = samples[:, self._ind_vars :] - torch.mean(
+                samples[:, self._ind_vars :], dim=1
+            ).reshape(-1, 1)
         return samples
 
 
 def get_priors_from_config(config_file, device="cpu"):
-
     config = get_config_parser(config_file)
+    indipendent_vars = 2
 
     dq_dist_params = config.getlistfloat("PRIORS", "parameters_Dq")
     prior_dq = PRIORS[config.get("PRIORS", "type_Dq")](
@@ -51,7 +54,16 @@ def get_priors_from_config(config_file, device="cpu"):
 
     priors = [prior_dq, prior_k, *prior_splines]
 
+    if "type_dx" in config["PRIORS"] and "parameters_dx" in config["PRIORS"]:
+        dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")
+        prior_dx = PRIORS[config.get("PRIORS", "type_Dx")](
+            torch.tensor([dx_dist_params[0]], device=device),
+            torch.tensor([dx_dist_params[1]], device=device),
+        )
+        priors.insert(0, prior_dx)
+        indipendent_vars += 1
+
     if config.getboolean("PRIORS", "norm_spline_nodes"):
-        return SplinePrior(priors)
+        return SplinePrior(priors, indipendent_vars)
     else:
         return MultipleIndependent(priors)

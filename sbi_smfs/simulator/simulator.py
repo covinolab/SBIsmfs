@@ -31,9 +31,7 @@ def smfe_simulator_mm(
     ----------
     parameters : torch.Tensor
         Changeable_parameters of the simulator.
-        parameters[0] : log10(Dq/Dx)
-        parameters[1] : log10(kappa_l)
-        parameters[2:]: G(x_i) of splines.
+        (Dx, Dq, k, spline_nodes)
     dt : float
         Integration timestep
     N : int
@@ -69,6 +67,19 @@ def smfe_simulator_mm(
         Summary statistics of simulation perform with parameters.
     """
 
+    # Select integration constants from parameters
+    if Dx is None:
+        num_ind_params = 3
+        Dx = 10 ** parameters[0].item()
+        Dq = 10 ** parameters[1].item()
+        k = 10 ** parameters[2].item()
+    elif isinstance(Dx, (float, int)):
+        num_ind_params = 2
+        Dq = Dx * (10 ** parameters[0].item())
+        k = 10 ** parameters[1].item()
+    else:
+        raise NotImplementedError("Dx should be either float or None")
+
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
     y_knots = np.zeros(N_knots)
@@ -76,15 +87,11 @@ def smfe_simulator_mm(
     y_knots[-1] = max_G_0 + parameters[-1].numpy()
     y_knots[1] = max_G_1 + parameters[2].numpy()
     y_knots[-2] = max_G_1 + parameters[-1].numpy()
-    y_knots[2:-2] = parameters[2:].numpy()
+    y_knots[2:-2] = parameters[num_ind_params:].numpy()
 
     # Select random initial position for x and q
     x_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
     q_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
-
-    # Select integration constants from parameters
-    Dq = Dx * (10 ** parameters[0].item())
-    k = 10 ** parameters[1].item()
 
     # Call integrator
     q = brownian_integrator(
@@ -126,13 +133,19 @@ def get_simulator_from_config(config_file):
         }
     )
     config.read(config_file)
+    if "Dx" in config["SIMULATOR"]:
+        Dx = config.getfloat("SIMULATOR", "Dx")
+    elif "type_Dx" in config["PRIORS"] and "parameters_Dx" in config["PRIORS"]:
+        Dx = None
+    else:
+        raise NotImplementedError("Dx not properly specified in config file!")
 
     return partial(
         smfe_simulator_mm,
         dt=config.getfloat("SIMULATOR", "dt"),
         N=config.getint("SIMULATOR", "num_steps"),
         saving_freq=config.getint("SIMULATOR", "saving_freq"),
-        Dx=config.getfloat("SIMULATOR", "Dx"),
+        Dx=Dx,
         N_knots=config.getint("SIMULATOR", "num_knots"),
         min_x=config.getfloat("SIMULATOR", "min_x"),
         max_x=config.getfloat("SIMULATOR", "max_x"),
