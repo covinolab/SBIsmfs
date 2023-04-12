@@ -40,5 +40,3 @@ def test_truncated_training():
         test_config, 2, 50, 1, test_observation
     )
     assert isinstance(posterior, DirectPosterior)
-
-test_sequential_training_with_Dx()

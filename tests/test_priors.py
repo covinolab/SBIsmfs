@@ -31,10 +31,10 @@ def test_get_prior_from_config_with_dx():
     samples = prior.sample((num_samples,))
 
     assert torch.isclose(
-        samples[:, 0].mean(), torch.tensor(-1.0), atol=0.1
-    ).item(), "mean Dq"
+        samples[:, 0].mean(), torch.tensor(-3.0), atol=0.1
+    ).item(), "mean Dx"
     assert torch.isclose(
-        samples[:, 0].std(), torch.tensor(2.0), atol=0.1
+        samples[:, 0].std(), torch.tensor(0.5), atol=0.1
     ).item(), "std Dq"
     assert torch.isclose(
         samples[:, 1].mean(), torch.tensor(-1.5), atol=0.1
