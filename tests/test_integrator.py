@@ -1,6 +1,6 @@
 import numpy as np
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
-from sbi_smfs.utils.gls_spline import gls_spline
+from sbi_smfs.utils.gsl_spline import c_spline
 
 
 @np.vectorize
