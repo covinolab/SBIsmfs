@@ -25,7 +25,7 @@ def train_sequential_posterior(
 ):
     if isinstance(observation, str):
         observation = torch.load(observation)
-    prior = get_priors_from_config(config_file)
+    prior = get_priors_from_config(config_file, device=device)
     simulator = get_simulator_from_config(config_file)
     config = get_config_parser(config_file)
 

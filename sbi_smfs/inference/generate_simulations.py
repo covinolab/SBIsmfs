@@ -2,6 +2,7 @@ import argparse
 import torch
 
 from sbi.inference import simulate_for_sbi
+from sbi.utils.user_input_checks import get_batch_loop_simulator
 from sbi_smfs.inference.priors import get_priors_from_config
 from sbi_smfs.simulator import get_simulator_from_config
 
@@ -22,7 +23,7 @@ def generate_simulations(
         ), "You need to specify a filename if save_as_file=True"
 
     prior = get_priors_from_config(config_file)
-    simulator = get_simulator_from_config(config_file)
+    simulator = get_batch_loop_simulator(get_simulator_from_config(config_file))
 
     theta, x = simulate_for_sbi(
         simulator,
@@ -38,7 +39,7 @@ def generate_simulations(
         torch.save(x, x_file_name)
         torch.save(theta, theta_file_name)
     else:
-        return x, theta
+        return theta, x
 
 
 def main():
@@ -49,7 +50,9 @@ def main():
     cl_parser.add_argument("--file_name", action="store", type=str, required=True)
     args = cl_parser.parse_args()
 
-    generate_simulation(args.config_file, args.num_sim, args.num_workers, True, args.file_name)
+    generate_simulations(
+        args.config_file, args.num_sim, args.num_workers, True, args.file_name
+    )
 
 
 if __name__ == "__main__":

@@ -48,9 +48,11 @@ extensions = [
     ),
 ]
 
+
 def get_requirements():
-    with open('requirements.txt') as f:
+    with open("requirements.txt") as f:
         return f.read().splitlines()
+
 
 setup(
     name="SBIsmfs",

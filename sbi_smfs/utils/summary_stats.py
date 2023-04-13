@@ -6,7 +6,7 @@ from sbi_smfs.utils.stats_utils import (
     bin_trajectory,
     build_transition_matrix,
 )
-
+from sbi_smfs.utils.config_utils import get_config_parser
 
 def featurize_trajectory(q, lag_times):
     """
@@ -55,3 +55,16 @@ def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
     matricies = np.float32(matricies)
 
     return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()
+
+
+def compute_stats(trajectory, config):
+    config = get_config_parser(config)
+
+    summary_stats = build_transition_matricies(
+        trajectory,
+        len(config.getintlist("SUMMARY_STATS", "lag_times")),
+        config.getfloat("SUMMARY_STATS", "min_bin"),
+        config.getfloat("SUMMARY_STATS", "max_bin"),
+        config.getint("SUMMARY_STATS", "num_bins"),
+    )
+    return summary_stats

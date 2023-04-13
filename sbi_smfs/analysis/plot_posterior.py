@@ -91,3 +91,38 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-1
     plt.xlabel(r"Molecular extension x", fontsize=18)
     plt.ylabel(r"$G_0(x)$", fontsize=18)
     plt.grid(True)
+
+
+def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
+    """Plot a ensemble of splines from the posterior."""
+    config = get_config_parser(config)
+
+    x_axis = np.linspace(
+        config.getfloat("SIMULATOR", "min_x"),
+        config.getfloat("SIMULATOR", "max_x"),
+        1000,
+    )
+    x_knots = np.linspace(
+        config.getfloat("SIMULATOR", "min_x"),
+        config.getfloat("SIMULATOR", "max_x"),
+        config.getint("SIMULATOR", "num_knots"),
+    )
+
+    y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
+    y_knots[1] = y_knots[-2] = config.getint("SIMULATOR", "max_G_1")
+    y_knots[0] = y_knots[-1] = config.getint("SIMULATOR", "max_G_0")
+    if isinstance(spline_nodes, torch.Tensor):
+        print('True')
+        y_knots[2:-2] = spline_nodes.numpy()
+    else:
+        y_knots[2:-2] = spline_nodes
+    y_axis = c_spline(x_knots, y_knots, x_axis)
+
+    plt.plot(x_axis, y_axis, alpha=1, color=color)
+    plt.ylim(ylims)
+    plt.xlim(
+        config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
+    )
+    plt.xlabel(r"Molecular extension x", fontsize=18)
+    plt.ylabel(r"$G_0(x)$", fontsize=18)
+    plt.grid(True)
