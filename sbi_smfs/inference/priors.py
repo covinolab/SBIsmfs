@@ -10,7 +10,7 @@ PRIORS = {"GAUSSIAN": dists.Normal, "UNIFORM": dists.Uniform}
 
 
 class SplinePrior(MultipleIndependent):
-    """Class which defines a prior for simulations on a spline potential"""
+    """""Class which defines a prior for simulations on a spline potential"""""
 
     def __init__(self, dists, indipendent_vars=2):
         super().__init__(dists, validate_args=False)

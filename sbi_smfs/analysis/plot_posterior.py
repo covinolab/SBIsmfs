@@ -1,11 +1,12 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from sbi_smfs.utils.gls_spline import c_spline
+from sbi_smfs.utils.gsl_spline import c_spline
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
 def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)):
+    """Plot a ensemble of splines from the posterior."""
     config = get_config_parser(config)
 
     random_idx = torch.randperm(posterior_samples.shape[0])
@@ -42,6 +43,8 @@ def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)
 
 
 def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-10, 10)):
+    """Plot the posterior mean of the spline nodes with error bars."""
+
     config = get_config_parser(config)
     if "Dx" in config["SIMULATOR"]:
         num_ind_var = 2

@@ -7,7 +7,13 @@ class SimpleCNN(nn.Module):
     """Simple single layer CNN with ReLU activation."""
 
     def __init__(
-        self, out_channels, kernel_size, stride, num_bins, num_lags, activation=nn.ReLU,
+        self,
+        out_channels,
+        kernel_size,
+        stride,
+        num_bins,
+        num_lags,
+        activation=nn.ReLU,
     ):
         super(SimpleCNN, self).__init__()
 
