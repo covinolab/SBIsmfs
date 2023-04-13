@@ -48,14 +48,9 @@ extensions = [
     ),
 ]
 
-requirements = [
-    "bottleneck",
-    "torch",
-    "sbi",
-    "matplotlib",
-    "cython",
-    "numba",
-]
+def get_requirements():
+    with open('requirements.txt') as f:
+        return f.read().splitlines()
 
 setup(
     name="SBIsmfs",
@@ -66,7 +61,7 @@ setup(
     url="https://github.com/Dingel321/SBIsmfs.git",
     ext_modules=cythonize(extensions),
     packages=find_packages(),
-    install_requires=requirements,
+    install_requires=get_requirements(),
     zip_safe=False,
     entry_points={
         "console_scripts": [
