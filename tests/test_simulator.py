@@ -42,7 +42,7 @@ def test_simulator():
         lag_times=lag_times,
     )
 
-    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2)
+    assert summary_stats.shape[0] == len(lag_times) * (num_bins ** 2)
 
 
 def test_simulator_from_config():
@@ -66,7 +66,7 @@ def test_simulator_from_config():
 
     simulator = get_simulator_from_config("tests/test.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20**2)
+    assert summary_stats.shape[0] == 6 * (20 ** 2)
 
 
 def test_simulator_from_config_with_Dx():
@@ -91,7 +91,7 @@ def test_simulator_from_config_with_Dx():
 
     simulator = get_simulator_from_config("tests/test_2.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20**2)
+    assert summary_stats.shape[0] == 6 * (20 ** 2)
 
 
 test_simulator_from_config()

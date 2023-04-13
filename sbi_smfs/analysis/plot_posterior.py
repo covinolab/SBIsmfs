@@ -83,8 +83,4 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-1
     )
     plt.xlabel(r"Molecular extension x", fontsize=18)
     plt.ylabel(r"$G_0(x)$", fontsize=18)
-    plt.ylim(ylims)
-    plt.xlim(
-        config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
-    )
     plt.grid(True)

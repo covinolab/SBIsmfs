@@ -41,7 +41,7 @@ def generate_simulation(
         return x, theta
 
 
-if __name__ == "__main__":
+def main():
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--num_sim", action="store", type=int, required=True)
@@ -50,3 +50,7 @@ if __name__ == "__main__":
     args = cl_parser.parse_args()
 
     generate_simulation(args.num_workers, args.num_sim, args.file_name)
+
+
+if __name__ == "__main__":
+    main()
