@@ -1,11 +1,11 @@
-from gls_spline cimport *
+from gsl_spline cimport *
 from math import *
 from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as cnp
 
 
-def gls_spline(
+def c_spline(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
         cnp.ndarray[double] x_eval
@@ -43,7 +43,7 @@ def gls_spline(
     return y_eval
 
 
-def gls_spline_der(
+def c_spline_der(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
         cnp.ndarray[double] x_eval

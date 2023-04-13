@@ -31,8 +31,8 @@ if gsl_include_dir is None or gsl_lib_dir is None:
 
 extensions = [
     Extension(
-        "sbi_smfs.utils.gls_spline",
-        ["sbi_smfs/utils/gls_spline.pyx"],
+        "sbi_smfs.utils.gsl_spline",
+        ["sbi_smfs/utils/gsl_spline.pyx"],
         include_dirs=[np.get_include(), gsl_include_dir],
         library_dirs=[gsl_lib_dir],
         libraries=["gsl", "gslcblas"],

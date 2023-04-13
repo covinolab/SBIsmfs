@@ -1,8 +1,3 @@
-utils.plots
-    plot spline ensemble
-    plot spline mean with error
-    plot marginals
-
 analysis
     split_in_folded_unfolded
     autocorreltation
