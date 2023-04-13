@@ -49,7 +49,7 @@ def main():
     cl_parser.add_argument("--file_name", action="store", type=str, required=True)
     args = cl_parser.parse_args()
 
-    generate_simulation(args.num_workers, args.num_sim, args.file_name)
+    generate_simulation(args.config_file, args.num_sim, args.num_workers, True, args.file_name)
 
 
 if __name__ == "__main__":
