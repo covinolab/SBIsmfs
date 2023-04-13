@@ -1,0 +1,5 @@
+from sbi_smfs.inference.generate_simulations import generate_simulations
+
+
+def test_generate_simulations():
+    pass

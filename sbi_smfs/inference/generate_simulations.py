@@ -6,13 +6,13 @@ from sbi_smfs.inference.priors import get_priors_from_config
 from sbi_smfs.simulator import get_simulator_from_config
 
 
-def generate_simulation(
+def generate_simulations(
     config_file: str,
     num_sim: int,
     num_workers: int,
     file_name=None,
     show_progressbar=False,
-    save_as_file=True,
+    save_as_file=False,
 ):
     """Run simulations with parameters from prior."""
 
