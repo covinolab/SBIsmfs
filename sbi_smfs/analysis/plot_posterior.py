@@ -112,7 +112,6 @@ def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
     y_knots[1] = y_knots[-2] = config.getint("SIMULATOR", "max_G_1")
     y_knots[0] = y_knots[-1] = config.getint("SIMULATOR", "max_G_0")
     if isinstance(spline_nodes, torch.Tensor):
-        print('True')
         y_knots[2:-2] = spline_nodes.numpy()
     else:
         y_knots[2:-2] = spline_nodes
