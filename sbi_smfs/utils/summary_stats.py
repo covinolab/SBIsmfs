@@ -8,6 +8,7 @@ from sbi_smfs.utils.stats_utils import (
 )
 from sbi_smfs.utils.config_utils import get_config_parser
 
+
 def featurize_trajectory(q, lag_times):
     """
     Computes summary statsitics for trajecotires.

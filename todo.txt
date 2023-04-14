@@ -5,3 +5,5 @@ analysis
 
 priors
     implement different number of fixed nodes
+
+think about transfer learning, fine tuning
