@@ -6,4 +6,6 @@ analysis
 priors
     implement different number of fixed nodes
 
-think about transfer learning, fine tuning
+think about transfer learning, fine tuning (notebook)
+normalize splines before plotting
+add error for failed simulations in brownian integrator so that it return nan
