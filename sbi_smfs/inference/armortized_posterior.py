@@ -20,6 +20,26 @@ def train_armortized_posterior(
     posterior_file=None,
     device="cpu",
 ):
+    """Trains a truncated posterior.
+
+    Parameters
+    ----------
+    config_file: str
+        Config file name.
+    train_data: str, tuple
+        Data to use for training the posterior. If str, it is assumed to be a file name
+        containing the data. If tuple, it is assumed to be a tuple of torch.Tensor
+        containing the data.
+    posterior_file: str, None
+        File name to save the posterior to.
+    device: str
+        Device to use for training.
+
+    Returns
+    -------
+    inference: sbi.inference.snpe.snpe_base.SNPE
+        Trained posterior.
+    """
     config = get_config_parser(config_file)
 
     print("Building neural network on :", device)

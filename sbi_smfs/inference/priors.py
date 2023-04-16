@@ -10,7 +10,20 @@ PRIORS = {"GAUSSIAN": dists.Normal, "UNIFORM": dists.Uniform}
 
 
 class SplinePrior(MultipleIndependent):
-    """""Class which defines a prior for simulations on a spline potential""" ""
+    """ "Class which defines a prior for simulations on a spline potential.
+
+    Parameters
+    ----------
+        dists: torch.distributions
+            Distribution to use for the prior.
+        indipendent_vars: int
+            Number of indipendent variables in the prior.
+
+    Returns
+    -------
+        prior: torch.distributions
+            Prior distribution.
+    """
 
     def __init__(self, dists, indipendent_vars=2):
         super().__init__(dists, validate_args=False)
@@ -30,6 +43,20 @@ class SplinePrior(MultipleIndependent):
 
 
 def get_priors_from_config(config_file, device="cpu"):
+    """Returns the prior distribution from the config file.
+
+    Parameters
+    ----------
+    config_file: str
+        Config file name.
+    device: str
+        Device of the prior.
+
+    Returns
+    -------
+    prior: torch.distributions
+        Prior distribution.
+    """
     config = get_config_parser(config_file)
     indipendent_vars = 2
 

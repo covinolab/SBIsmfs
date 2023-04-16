@@ -29,7 +29,7 @@ def train_truncated_posterior(
     Parameters
     ----------
     config_file: str
-        Config file with entries for simualtion.
+        Config file name.
     num_rounds: int
         Number of rounds to train the posterior.
     num_sim_per_round: int
@@ -37,11 +37,16 @@ def train_truncated_posterior(
     num_workers: int
         Number of workers to use for simulation.
     observation: str, torch.Tensor
-        Observation to use for training the posterior.
+        Observation to use for conditioning the posterior.
     posterior_file: str, None
-        File to save the posterior to.
+        File name to save the posterior to.
     device: str
         Device to use for training.
+
+    Returns
+    -------
+    inference: sbi.inference.snpe.snpe_base.SNPE
+        Trained posterior.
     """
 
     if isinstance(observation, str):

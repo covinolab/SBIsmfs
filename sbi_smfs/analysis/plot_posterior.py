@@ -6,7 +6,19 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 
 def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)):
-    """Plot a ensemble of splines from the posterior."""
+    """Plot a ensemble of splines from the posterior.
+
+    Parameters
+    ----------
+    posterior_samples: torch.Tensor
+        Samples from the posterior.
+    num_splines: int
+        Number of splines to plot.
+    config: str, ConfigParser
+        Config file with entries for simualtion.
+    ylims: tuple
+        Limits for y-axis.
+    """
     config = get_config_parser(config)
 
     random_idx = torch.randperm(posterior_samples.shape[0])
@@ -43,7 +55,19 @@ def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)
 
 
 def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-10, 10)):
-    """Plot the posterior mean of the spline nodes with error bars."""
+    """Plot the posterior mean of the spline nodes with error bars.
+
+    Parameters
+    ----------
+    posterior_samples: torch.Tensor
+        Samples from the posterior.
+    config: str, ConfigParser
+        Config file with entries for simualtion.
+    alpha: float
+        Confidence level for error bars.
+    ylims: tuple
+        Limits for y-axis.
+    """
 
     config = get_config_parser(config)
     if "Dx" in config["SIMULATOR"]:
@@ -94,7 +118,19 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-1
 
 
 def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
-    """Plot a ensemble of splines from the posterior."""
+    """Plot a ensemble of splines from the posterior.
+
+    Parameters
+    ----------
+        spline_nodes: torch.Tensor
+            Sample from the posterior.
+        config: str, ConfigParser
+            Config file with entries for simualtion.
+        ylims: tuple
+            Limits for y-axis.
+        color: str
+            Color of the spline.
+    """
     config = get_config_parser(config)
 
     x_axis = np.linspace(

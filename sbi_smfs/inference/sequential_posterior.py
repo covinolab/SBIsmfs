@@ -23,6 +23,30 @@ def train_sequential_posterior(
     posterior_file=None,
     device="cpu",
 ):
+    """Trains a sequential posterior.
+
+    Parameters
+    ----------
+    config_file: str
+        Config file name.
+    num_rounds: int
+        Number of rounds to train the posterior.
+    num_sim_per_round: int
+        Number of simulations per round.
+    num_workers: int
+        Number of workers to use for simulation.
+    observation: str, torch.Tensor
+        Observation to use for conditioning the posterior.
+    posterior_file: str, None
+        File name to save the posterior to.
+    device: str
+        Device to use for training.
+
+    Returns
+    -------
+    inference: sbi.inference.snpe.snpe_base.SNPE
+        Trained posterior.
+    """
     if isinstance(observation, str):
         observation = torch.load(observation)
     prior = get_priors_from_config(config_file, device=device)

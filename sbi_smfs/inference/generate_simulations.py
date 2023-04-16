@@ -15,7 +15,30 @@ def generate_simulations(
     show_progressbar=False,
     save_as_file=False,
 ):
-    """Run simulations with parameters from prior."""
+    """Run simulations with parameters from prior.
+
+    Parameters
+    ----------
+    config_file: str
+        Config file name.
+    num_sim: int
+        Number of simulations to run.
+    num_workers: int
+        Number of workers to use for simulation.
+    file_name: str, None
+        File name to save the simulations to.
+    show_progressbar: bool
+        Whether to show a progress bar.
+    save_as_file: bool
+        Whether to save the simulations to a file.
+
+    Returns
+    -------
+    theta: torch.Tensor
+        Parameters used for the simulations.
+    x: torch.Tensor
+        Simulations.
+    """
 
     if save_as_file:
         assert isinstance(
