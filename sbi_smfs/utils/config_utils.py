@@ -2,6 +2,19 @@ import configparser
 
 
 def get_config_parser(config_file):
+    """Reads config file and returns ConfigParser object.
+
+    Parameters
+    ----------
+    config_file: str, ConfigParser
+        Config file with entries for simualtion.
+
+    Returns
+    -------
+    config: ConfigParser
+        ConfigParser object with entries for simualtion.
+    """
+
     if isinstance(config_file, configparser.ConfigParser):
         return config_file
 

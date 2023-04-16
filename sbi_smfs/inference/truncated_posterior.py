@@ -24,6 +24,26 @@ def train_truncated_posterior(
     posterior_file=None,
     device="cpu",
 ):
+    """Trains a truncated posterior.
+
+    Parameters
+    ----------
+    config_file: str
+        Config file with entries for simualtion.
+    num_rounds: int
+        Number of rounds to train the posterior.
+    num_sim_per_round: int
+        Number of simulations per round.
+    num_workers: int
+        Number of workers to use for simulation.
+    observation: str, torch.Tensor
+        Observation to use for training the posterior.
+    posterior_file: str, None
+        File to save the posterior to.
+    device: str
+        Device to use for training.
+    """
+
     if isinstance(observation, str):
         observation = torch.load(observation)
     prior = get_priors_from_config(config_file, device=device)
