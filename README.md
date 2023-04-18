@@ -1,7 +1,7 @@
 # SMFE_SBI_Spline
 Implementing Simulation-based inference for single-molecule force spectroscopy.
 
-## Compiling and installing code 
+## Installing code 
 Download code at : https://github.com/Dingel321/SBIsmfs.git 
 
 Install with `python3 setup.py install`
