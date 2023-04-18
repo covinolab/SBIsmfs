@@ -5,7 +5,7 @@ from sbi_smfs.inference.priors import get_priors_from_config
 
 def test_get_prior_from_config():
     num_samples = 1000000
-    prior = get_priors_from_config("tests/test.config")
+    prior = get_priors_from_config("tests/config_files/test.config")
     samples = prior.sample((num_samples,))
 
     assert torch.isclose(
@@ -27,7 +27,7 @@ def test_get_prior_from_config():
 
 def test_get_prior_from_config_with_dx():
     num_samples = 1000000
-    prior = get_priors_from_config("tests/test_2.config")
+    prior = get_priors_from_config("tests/config_files/test_2.config")
     samples = prior.sample((num_samples,))
 
     assert torch.isclose(

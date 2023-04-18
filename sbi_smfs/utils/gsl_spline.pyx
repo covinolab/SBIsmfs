@@ -10,6 +10,22 @@ def c_spline(
         cnp.ndarray[double] y_knots,
         cnp.ndarray[double] x_eval
         ):
+    """Cython wrapper for GSL spline interpolation
+    
+    Parameters
+    ----------
+    x_knots : array_like
+        x values of the knots
+    y_knots : array_like
+        y values of the knots
+    x_eval : array_like
+        x values where the spline is evaluated
+    
+    Returns
+    -------
+    y_eval : array_like
+        y values of the spline at x_eval
+    """
 
     cdef int N_knots = len(x_knots)
     cdef int N_eval = len(x_eval)
@@ -48,6 +64,22 @@ def c_spline_der(
         cnp.ndarray[double] y_knots,
         cnp.ndarray[double] x_eval
         ):
+    """Cython wrapper for GSL spline interpolation.
+    
+    Parameters
+    ----------
+    x_knots : array_like
+        x values of the knots
+    y_knots : array_like
+        y values of the knots
+    x_eval : array_like
+        x values where the spline is evaluated
+    
+    Returns
+    -------
+    y_eval : array_like
+        y values of the spline at x_eval
+    """
 
     cdef int N_knots = len(x_knots)
     cdef int N_eval = len(x_eval)

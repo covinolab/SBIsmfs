@@ -24,10 +24,9 @@ def brownian_integrator(
         double dt,
         int fs
         ):
-    '''
-    Integrator for SMFE.
+    """Integrator for constant force SMFE.
     Molecular free energy profile is contructed by a cubic spline.
-
+    
     Parameters
     ----------
     double x0 : float
@@ -49,15 +48,15 @@ def brownian_integrator(
     double dt : float
         Time step.
     int fs : int
-        Saving frequency of postion.
-
+        Saving frequency of postions.
+    
     Returns
     -------
     q : np.Array
         q-Trajectory.
-
-    '''
-
+    
+    """
+    
     # Initialize ints
     cdef int i
     cdef int N_knots = len(x_knots)

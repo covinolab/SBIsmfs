@@ -112,18 +112,17 @@ def smfe_simulator_mm(
 
 
 def get_simulator_from_config(config_file):
-    """
-    Initiates SMFS-Simulatr with integration constants from config file.
+    """Get simulator function from config file.
 
     Parameters
     ----------
-     config_file: str
-        Config file with entries for simualtion.
+    config_file : str
+        Path to config file.
 
     Returns
     -------
-    summary_stats : torch.Tensor
-        Summary statistics of simulation perform with parameters.
+    simulator : function
+        Simulator function.
     """
 
     config = configparser.ConfigParser(

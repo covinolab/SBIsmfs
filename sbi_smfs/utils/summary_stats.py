@@ -11,20 +11,19 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 def featurize_trajectory(q, lag_times):
     """
-    Computes summary statsitics for trajecotires.
+    Featurizes trajectory by computing summary statistics.
 
     Parameters
     ----------
-    q : np.Array
-        Trajectory.
+    q : np.ndarray
+        Trajectory
     lag_times : list
-        The lag times used for calculation of the propagator.
+        List of lag times to compute summary statistics
 
     Returns
     -------
     features : list
-        List with features computed from the trajectory.
-
+        List of summary statistics
     """
 
     propagators_stats = []
@@ -41,7 +40,25 @@ def featurize_trajectory(q, lag_times):
 
 def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
     """
-    Builds transition matricies from trajectory
+    Builds transition matricies for given lag times.
+
+    Parameters
+    ----------
+    q : np.ndarray
+        Trajectory
+    lag_times : list
+        List of lag times to compute summary statistics
+    min_bin : float
+        Minimum value of the bins
+    max_bin : float
+        Maximum value of the bins
+    num_bins : int
+        Number of bins between min_bin and max_bin
+
+    Returns
+    -------
+    matricies : np.ndarray
+        Transition matricies for given lag times
     """
 
     bins = np.linspace(min_bin, max_bin, num_bins + 1)
@@ -59,6 +76,21 @@ def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
 
 
 def compute_stats(trajectory, config):
+    """Computes summary statistics for a given trajectory.
+
+    Parameters
+    ----------
+    trajectory : np.ndarray
+        Trajectory
+    config : str
+        Path to config file
+
+    Returns
+    -------
+    summary_stats : torch.Tensor
+        Summary statistics
+    """
+
     config = get_config_parser(config)
 
     summary_stats = build_transition_matricies(

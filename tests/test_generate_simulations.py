@@ -3,7 +3,7 @@ from sbi_smfs.inference.generate_simulations import generate_simulations
 
 def test_generate_simulations():
     observations = generate_simulations(
-        "tests/test.config",
+        "tests/config_files/test.config",
         num_sim=3,
         num_workers=1,
         file_name=None,
@@ -16,7 +16,7 @@ def test_generate_simulations():
 
 def test_generate_simulations_with_Dx():
     observations = generate_simulations(
-        "tests/test_2.config",
+        "tests/config_files/test_2.config",
         num_sim=3,
         num_workers=1,
         file_name=None,
@@ -27,4 +27,4 @@ def test_generate_simulations_with_Dx():
     assert observations[1].shape == (3, 2400)
 
 
-test_generate_simulations()
+test_generate_simulations_with_Dx()

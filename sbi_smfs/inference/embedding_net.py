@@ -4,7 +4,23 @@ import torch.nn.functional as F
 
 
 class SimpleCNN(nn.Module):
-    """Simple single layer CNN with ReLU activation."""
+    """Simple single layer CNN with ReLU activation
+
+    Parameters
+    ----------
+    out_channels : int
+        Number of output channels.
+    kernel_size : int
+        Size of the convolution kernel.
+    stride : int
+        Stride of the convolution.
+    num_bins : int
+        Number of bins for transition matrix.
+    num_lags : int
+        Number of lag times for which a transition matrix is generated.
+    activation : torch.nn.Module
+        Activation function.
+    """
 
     def __init__(
         self,
@@ -35,7 +51,20 @@ class SimpleCNN(nn.Module):
 
 
 class MultiLayerCNN(nn.Module):
-    """Simple multi-layer CNN with ReLU activation."""
+    """Multi layer CNN with LeakyReLU activation
+
+    Parameters
+    ----------
+    num_bins : int
+        Number of bins for transition matrix.
+    num_lags : int
+        Number of lag times for which a transition matrix is generated.
+
+    Returns
+    -------
+    torch.Tensor
+        Flattened output of the CNN.
+    """
 
     def __init__(
         self,
