@@ -92,12 +92,39 @@ def compute_stats(trajectory, config):
     """
 
     config = get_config_parser(config)
+    # TODO add warning for short trajectories (steps < max(lag_times)
 
     summary_stats = build_transition_matricies(
         trajectory,
-        len(config.getintlist("SUMMARY_STATS", "lag_times")),
+        config.getintlist("SUMMARY_STATS", "lag_times"),
         config.getfloat("SUMMARY_STATS", "min_bin"),
         config.getfloat("SUMMARY_STATS", "max_bin"),
         config.getint("SUMMARY_STATS", "num_bins"),
     )
     return summary_stats
+
+
+def check_if_observation_contains_features(observation, config):
+    """Checks if observation contains features.
+
+    Parameters
+    ----------
+    observation : torch.Tensor
+        Observation
+    config : str
+        Path to config file
+
+    Returns
+    -------
+    bool
+        True if observation contains features, False otherwise
+    """
+
+    expected_shape = len(config.getlistint("SUMMARY_STATS", "lag_times")) * (
+        config.getint("SUMMARY_STATS", "num_bins") ** 2
+    )
+
+    if expected_shape != observation.shape[-1]:
+        return False
+    else:
+        return True

@@ -57,6 +57,7 @@ def get_priors_from_config(config_file, device="cpu"):
     prior: torch.distributions
         Prior distribution.
     """
+
     config = get_config_parser(config_file)
     indipendent_vars = 2
 

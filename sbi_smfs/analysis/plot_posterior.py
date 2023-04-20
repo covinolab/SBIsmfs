@@ -161,3 +161,38 @@ def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
     plt.xlabel(r"Molecular extension x", fontsize=18)
     plt.ylabel(r"$G_0(x)$", fontsize=18)
     plt.grid(True)
+
+
+def plot_inipendent_marginals(samples, config, fig_kwars={}):
+    """Plot the posterior marginal distributions of the independent variables.
+
+    Parameters
+    ----------
+    samples: torch.Tensor
+        Samples from the posterior.
+    config: str, ConfigParser
+        Config file with entries for simualtion.
+
+    Returns
+    -------
+    fig, axes: matplotlib.figure.Figure, matplotlib.axes.Axes
+    """
+
+    config = get_config_parser(config)
+    if "Dx" in config["SIMULATOR"]:
+        num_ind_var = 2
+        labels = [r"$log(D_q/D_x)$", r"$log(k_l)$"]
+    else:
+        num_ind_var = 3
+        labels = [r"$log(D_x)$", r"$log(D_q)$", r"$log(k_l)$"]
+
+    if isinstance(samples, torch.Tensor):
+        samples = samples.cpu().numpy()
+
+    fig, axes = plt.subplots(1, num_ind_var, **fig_kwars)
+    for i in range(num_ind_var):
+        axes[i].hist(samples[:, i].flatten(), bins=100, density=True, histtype="step")
+        axes[i].set_xlabel(labels[i])
+        axes[i].set_yticks([])
+
+    return fig, axes

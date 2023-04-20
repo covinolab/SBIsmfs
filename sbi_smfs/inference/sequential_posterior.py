@@ -12,6 +12,10 @@ from sbi_smfs.simulator import get_simulator_from_config
 from sbi_smfs.inference.priors import get_priors_from_config
 from sbi_smfs.inference.embedding_net import SimpleCNN
 from sbi_smfs.utils.config_utils import get_config_parser
+from sbi_smfs.utils.summary_stats import (
+    compute_stats,
+    check_if_observation_contains_features,
+)
 
 
 def train_sequential_posterior(
@@ -47,11 +51,15 @@ def train_sequential_posterior(
     inference: sbi.inference.snpe.snpe_base.SNPE
         Trained posterior.
     """
-    if isinstance(observation, str):
-        observation = torch.load(observation)
     prior = get_priors_from_config(config_file, device=device)
     simulator = get_simulator_from_config(config_file)
     config = get_config_parser(config_file)
+
+    if isinstance(observation, str):
+        observation = torch.load(observation)
+
+    if not check_if_observation_contains_features(observation, config):
+        observation = compute_stats(observation, config)
 
     print("Building neural network on :", device)
     cnn_net = SimpleCNN(
