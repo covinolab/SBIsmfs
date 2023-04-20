@@ -76,14 +76,14 @@ def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
 
 
 def compute_stats(trajectory, config):
-    """Computes summary statistics for a given trajectory.
+    """Computes summary statistics for given trajectory.
 
     Parameters
     ----------
     trajectory : np.ndarray
-        Trajectory
-    config : str
-        Path to config file
+        Trajectory, shape (num_samples, num_dimensions) or (num_dimensions,)
+    config : str, ConfigParser
+        Path to config file or ConfigParser object
 
     Returns
     -------
@@ -92,18 +92,33 @@ def compute_stats(trajectory, config):
     """
 
     config = get_config_parser(config)
+
     if isinstance(trajectory, torch.Tensor):
         trajectory = trajectory.numpy()
-    # TODO add warning for short trajectories (steps < max(lag_times)
-    # TODO test if trajectory is 1D
+    if len(trajectory.shape) > 2:
+        raise ValueError("Trajectory should be 1D or 2D array.")
+    elif len(trajectory.shape) == 2:
+        summary_stats = [
+            build_transition_matricies(
+                trajectory[:, i],
+                config.getlistint("SUMMARY_STATS", "lag_times"),
+                config.getfloat("SUMMARY_STATS", "min_bin"),
+                config.getfloat("SUMMARY_STATS", "max_bin"),
+                config.getint("SUMMARY_STATS", "num_bins"),
+            )
+            for i in range(trajectory.shape[0])
+        ]
+        summary_stats = torch.stack(summary_stats, dim=0)
+    elif len(trajectory.shape) == 1:
+        summary_stats = build_transition_matricies(
+            trajectory,
+            config.getlistint("SUMMARY_STATS", "lag_times"),
+            config.getfloat("SUMMARY_STATS", "min_bin"),
+            config.getfloat("SUMMARY_STATS", "max_bin"),
+            config.getint("SUMMARY_STATS", "num_bins"),
+        )
+        summary_stats = summary_stats
 
-    summary_stats = build_transition_matricies(
-        trajectory,
-        config.getlistint("SUMMARY_STATS", "lag_times"),
-        config.getfloat("SUMMARY_STATS", "min_bin"),
-        config.getfloat("SUMMARY_STATS", "max_bin"),
-        config.getint("SUMMARY_STATS", "num_bins"),
-    )
     return summary_stats
 
 

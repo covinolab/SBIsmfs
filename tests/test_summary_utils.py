@@ -35,6 +35,19 @@ def test_compute_stats():
     )
 
 
+def test_compute_stats_batched_traj():
+    config = get_config_parser("tests/config_files/test.config")
+    traj = np.random.standard_normal(size=(10, 100000))
+    features = compute_stats(traj, config)
+    assert features.shape == torch.Size(
+        [
+            10,
+            config.getint("SUMMARY_STATS", "num_bins") ** 2
+            * len(config.getlistint("SUMMARY_STATS", "lag_times")),
+        ]
+    )
+
+
 def test_check_if_observation_contains_features():
     config = get_config_parser("tests/config_files/test.config")
     features = torch.ones(
