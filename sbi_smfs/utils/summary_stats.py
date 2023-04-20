@@ -92,11 +92,14 @@ def compute_stats(trajectory, config):
     """
 
     config = get_config_parser(config)
+    if isinstance(trajectory, torch.Tensor):
+        trajectory = trajectory.numpy()
     # TODO add warning for short trajectories (steps < max(lag_times)
+    # TODO test if trajectory is 1D
 
     summary_stats = build_transition_matricies(
         trajectory,
-        config.getintlist("SUMMARY_STATS", "lag_times"),
+        config.getlistint("SUMMARY_STATS", "lag_times"),
         config.getfloat("SUMMARY_STATS", "min_bin"),
         config.getfloat("SUMMARY_STATS", "max_bin"),
         config.getint("SUMMARY_STATS", "num_bins"),
