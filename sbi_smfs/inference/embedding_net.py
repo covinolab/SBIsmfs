@@ -23,13 +23,7 @@ class SimpleCNN(nn.Module):
     """
 
     def __init__(
-        self,
-        out_channels,
-        kernel_size,
-        stride,
-        num_bins,
-        num_lags,
-        activation=nn.ReLU,
+        self, out_channels, kernel_size, stride, num_bins, num_lags, activation=nn.ReLU,
     ):
         super(SimpleCNN, self).__init__()
 
@@ -67,9 +61,7 @@ class MultiLayerCNN(nn.Module):
     """
 
     def __init__(
-        self,
-        num_bins,
-        num_lags,
+        self, num_bins, num_lags,
     ):
         super(MultiLayerCNN, self).__init__()
 
