@@ -15,7 +15,10 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 
 def train_armortized_posterior(
-    config_file: str, train_data, posterior_file=None, device="cpu",
+    config_file: str,
+    train_data,
+    posterior_file=None,
+    device="cpu",
 ):
     """Trains a truncated posterior.
 

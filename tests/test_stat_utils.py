@@ -45,7 +45,9 @@ def test_propagator():
 
 def test_transition_count():
     trajectory = np.array([-1, -2, 2, 6, 7, 10])
-    transitions = tutils.transition_count(trajectory,)
+    transitions = tutils.transition_count(
+        trajectory,
+    )
     assert transitions == 1
 
 

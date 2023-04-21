@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 from sbi_smfs.simulator.simulator import smfe_simulator_mm, get_simulator_from_config
 
@@ -94,4 +95,24 @@ def test_simulator_from_config_with_Dx():
     assert summary_stats.shape[0] == 6 * (20 ** 2)
 
 
-test_simulator_from_config()
+def test_simulator_from_config_with_no_Dx():
+    params = torch.tensor(
+        [
+            0,
+            0,
+            3,
+            6.94227994,
+            -0.67676768,
+            -4.23232323,
+            -3.72438672,
+            0.45021645,
+            2.48196248,
+            0.45021645,
+            3.72438672,
+            -4.23232323,
+            -0.67676768,
+            6.94227994,
+        ]
+    )
+    with pytest.raises(NotImplementedError):
+        simulator = get_simulator_from_config("tests/config_files/no_Dx.config")
