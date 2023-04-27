@@ -31,7 +31,7 @@ def get_config_parser(config_file):
 
 def validate_config(config_file):
     """
-    Chacks that all parameters are contained in config file.
+    Checks that all parameters are contained in config file.
 
     Parameters
     ----------
