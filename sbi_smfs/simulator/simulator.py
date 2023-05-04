@@ -1,3 +1,4 @@
+from typing import Union, Callable
 import torch
 import numpy as np
 from functools import partial
@@ -111,7 +112,7 @@ def smfe_simulator_mm(
     return matrices
 
 
-def get_simulator_from_config(config_file: str) -> partial:
+def get_simulator_from_config(config_file: Union[str, configparser.ConfigParser]) -> partial:
     """Get simulator function from config file.
 
     Parameters
