@@ -8,21 +8,21 @@ from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
 def smfe_simulator_mm(
     parameters: torch.Tensor,
-    dt,
-    N,
-    saving_freq,
-    Dx,
-    N_knots,
-    min_x,
-    max_x,
-    max_G_0,
-    max_G_1,
-    init_xq_range,
-    min_bin,
-    max_bin,
-    num_bins,
-    lag_times,
-):
+    dt: float,
+    N: int,
+    saving_freq: int,
+    Dx: float,
+    N_knots: int,
+    min_x: float,
+    max_x: float,
+    max_G_0: float,
+    max_G_1: float,
+    init_xq_range: tuple[float, float],
+    min_bin: float,
+    max_bin: float,
+    num_bins: int,
+    lag_times: list[int],
+) -> torch.Tensor:
     """
     Simulator for single-molecule force-spectroscopy experiments.
     The molecular free energy surface is described by a cubic spline
@@ -111,7 +111,7 @@ def smfe_simulator_mm(
     return matrices
 
 
-def get_simulator_from_config(config_file):
+def get_simulator_from_config(config_file: str) -> partial:
     """Get simulator function from config file.
 
     Parameters

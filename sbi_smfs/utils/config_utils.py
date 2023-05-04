@@ -1,7 +1,8 @@
-import configparser
+from typing import Union
+from configparser import ConfigParser
 
 
-def get_config_parser(config_file):
+def get_config_parser(config_file: Union[str, ConfigParser]) -> ConfigParser:
     """Reads config file and returns ConfigParser object.
 
     Parameters
@@ -15,10 +16,10 @@ def get_config_parser(config_file):
         ConfigParser object with entries for simualtion.
     """
 
-    if isinstance(config_file, configparser.ConfigParser):
+    if isinstance(config_file, ConfigParser):
         return config_file
 
-    config = configparser.ConfigParser(
+    config = ConfigParser(
         converters={
             "listint": lambda x: [int(i.strip()) for i in x.split(",")],
             "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
@@ -29,7 +30,7 @@ def get_config_parser(config_file):
     return config
 
 
-def validate_config(config_file):
+def validate_config(config_file: Union[str, ConfigParser]) -> None:
     """
     Checks that all parameters are contained in config file.
 
@@ -43,9 +44,9 @@ def validate_config(config_file):
         None.
     """
     if isinstance(config_file, str):
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.read(config_file)
-    elif isinstance(config_file, configparser.ConfigParser):
+    elif isinstance(config_file, ConfigParser):
         config = config_file
     else:
         raise NotImplementedError("config not properly specified!")

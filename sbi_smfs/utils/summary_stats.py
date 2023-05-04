@@ -1,3 +1,5 @@
+from typing import Union
+from configparser import ConfigParser
 import numpy as np
 import torch
 from sbi_smfs.utils.stats_utils import (
@@ -9,7 +11,7 @@ from sbi_smfs.utils.stats_utils import (
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
-def featurize_trajectory(q, lag_times):
+def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
     """
     Featurizes trajectory by computing summary statistics.
 
@@ -38,7 +40,9 @@ def featurize_trajectory(q, lag_times):
     return features
 
 
-def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
+def build_transition_matricies(
+    q: np.ndarray, lag_times: list[int], min_bin: float, max_bin: float, num_bins: int
+) -> torch.tensor:
     """
     Builds transition matricies for given lag times.
 
@@ -57,7 +61,7 @@ def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
 
     Returns
     -------
-    matricies : np.ndarray
+    matricies : torch.tensor
         Transition matricies for given lag times
     """
 
@@ -75,7 +79,9 @@ def build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins):
     return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()
 
 
-def compute_stats(trajectory, config):
+def compute_stats(
+    trajectory: np.ndarray, config: Union[str, ConfigParser]
+) -> torch.Tensor:
     """Computes summary statistics for given trajectory.
 
     Parameters
@@ -122,7 +128,9 @@ def compute_stats(trajectory, config):
     return summary_stats
 
 
-def check_if_observation_contains_features(observation, config):
+def check_if_observation_contains_features(
+    observation: torch.tensor, config: Union[str, ConfigParser]
+) -> bool:
     """Checks if observation contains features.
 
     Parameters

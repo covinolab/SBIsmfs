@@ -4,7 +4,7 @@ import numba as nb
 
 
 @nb.jit(nopython=True)
-def bin_trajectory(x, bins):
+def bin_trajectory(x: np.ndarray, bins: np.ndarray) -> np.ndarray:
     """
     Bins an array accoring to bins.
 
@@ -31,13 +31,15 @@ def bin_trajectory(x, bins):
 
 
 @nb.jit(nopython=True)
-def build_transition_matrix(binned_x, n_bins, t=1):
+def build_transition_matrix(
+    binned_x: np.ndarray, n_bins: np.ndarray, t: int = 1
+) -> np.ndarray:
     """
     Calculates the markov transition matrix for a binned trajectory.
 
     Parameters
     ----------
-    binned_x : np.Array
+    binned_x : np.ndarray
         Binned trajectory.
     n_bins : int
         Number of bins.
@@ -46,7 +48,7 @@ def build_transition_matrix(binned_x, n_bins, t=1):
 
     Returns
     -------
-    np.Array
+    np.ndarray
         Returns transition matrix of size (n_bins, n_bins).
 
     """
@@ -61,13 +63,13 @@ def build_transition_matrix(binned_x, n_bins, t=1):
     return matrix / norm
 
 
-def moments(x):
+def moments(x: np.ndarray) -> tuple:
     """
     Calculated the first 4 moments of the random variable x.
 
     Parameters
     ----------
-    x : np.Array
+    x : np.ndarray
         Random variable..
 
     Returns
@@ -84,7 +86,7 @@ def moments(x):
     return m1, m2, m3, m4
 
 
-def propagator(x, t=1):
+def propagator(x: np.ndarray, t: int = 1) -> np.ndarray:
     """
     Computes propagator for given lag time t.
 
@@ -105,7 +107,7 @@ def propagator(x, t=1):
 
 
 @nb.jit(nopython=True)
-def transition_count(x):
+def transition_count(x: np.ndarray) -> int:
     """
     Counts observed zero crossings for imput trajectory.
 
@@ -128,7 +130,7 @@ def transition_count(x):
     return freq
 
 
-def prop_stats(x, t):
+def prop_stats(x: np.ndarray, t: int) -> tuple:
     """
     Computes the first four moments of the propagator for input trajectory.
 

@@ -5,7 +5,12 @@ from sbi_smfs.utils.gsl_spline import c_spline
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
-def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)):
+def plot_spline_ensemble(
+    posterior_samples: torch.Tensor,
+    num_splines: int,
+    config: str,
+    ylims: tuple = (-10, 10),
+) -> None:
     """Plot a ensemble of splines from the posterior.
 
     Parameters
@@ -54,7 +59,12 @@ def plot_spline_ensemble(posterior_samples, num_splines, config, ylims=(-10, 10)
     plt.grid(True)
 
 
-def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-10, 10)):
+def plot_spline_mean_with_error(
+    posterior_samples: torch.Tensor,
+    config: str,
+    alpha: float = 0.05,
+    ylims: tuple = (-10, 10),
+) -> None:
     """Plot the posterior mean of the spline nodes with error bars.
 
     Parameters
@@ -117,7 +127,12 @@ def plot_spline_mean_with_error(posterior_samples, config, alpha=0.05, ylims=(-1
     plt.grid(True)
 
 
-def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
+def plot_spline(
+    spline_nodes: torch.Tensor,
+    config: str,
+    ylims: tuple = (-10, 10),
+    color: str = "red",
+) -> None:
     """Plot a ensemble of splines from the posterior.
 
     Parameters
@@ -163,7 +178,9 @@ def plot_spline(spline_nodes, config, ylims=(-10, 10), color="red"):
     plt.grid(True)
 
 
-def plot_inipendent_marginals(samples, config, fig_kwars={}):
+def plot_inipendent_marginals(
+    samples: torch.Tensor, config: str, fig_kwars: dict = {}
+) -> tuple:
     """Plot the posterior marginal distributions of the independent variables.
 
     Parameters
