@@ -25,7 +25,7 @@ class SplinePrior(MultipleIndependent):
             Prior distribution.
     """
 
-    def __init__(self, dists, indipendent_vars=2):
+    def __init__(self, dists: dists, indipendent_vars: int = 2):
         super().__init__(dists, validate_args=False)
         self._ind_vars = indipendent_vars
 

@@ -1,5 +1,6 @@
 import argparse
 import pickle
+from typing import Union
 
 import torch
 from sbi.inference import SNPE
@@ -23,10 +24,10 @@ def train_sequential_posterior(
     num_rounds: int,
     num_sim_per_round: int,
     num_workers: int,
-    observation,
-    posterior_file=None,
-    device="cpu",
-):
+    observation: Union[str, torch.Tensor],
+    posterior_file: bool = None,
+    device: str = "cpu",
+) -> Union[None, SNPE]:
     """Trains a sequential posterior.
 
     Parameters

@@ -1,5 +1,6 @@
 import argparse
 import pickle
+from typing import Union, Tuple
 
 import torch
 from sbi.inference import SNPE
@@ -16,10 +17,10 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 def train_armortized_posterior(
     config_file: str,
-    train_data,
-    posterior_file=None,
-    device="cpu",
-):
+    train_data: Union[str, Tuple[torch.Tensor, torch.Tensor]],
+    posterior_file: Union[str, None] = None,
+    device: str = "cpu",
+) -> Union[None, SNPE]:
     """Trains a truncated posterior.
 
     Parameters
@@ -107,7 +108,7 @@ def main():
         "--device", action="store", type=str, required=False, default="cpu"
     )
     args = cl_parser.parse_args()
-    train_posterior(args.config_file, args.train_data, args.posterior_file, args.device)
+    train_armortized_posterior(args.config_file, args.train_data, args.posterior_file, args.device)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import argparse
 import pickle
+from typing import Union
 
 import torch
 from sbi.inference import SNPE
@@ -24,10 +25,10 @@ def train_truncated_posterior(
     num_rounds: int,
     num_sim_per_round: int,
     num_workers: int,
-    observation,
-    posterior_file=None,
-    device="cpu",
-):
+    observation: Union[str, torch.Tensor],
+    posterior_file: Union[str, None] = None,
+    device: str = "cpu",
+) -> Union[None, SNPE]:
     """Trains a truncated posterior.
 
     Parameters

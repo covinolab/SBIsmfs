@@ -1,5 +1,6 @@
 import argparse
 import torch
+from typing import Union, Tuple
 
 from sbi.inference import simulate_for_sbi
 from sbi.utils.user_input_checks import get_batch_loop_simulator
@@ -11,9 +12,9 @@ def generate_simulations(
     config_file: str,
     num_sim: int,
     num_workers: int,
-    file_name=None,
-    show_progressbar=False,
-    save_as_file=False,
+    file_name: Union[str, None] = None,
+    show_progressbar: bool = False,
+    save_as_file: bool = False,
 ):
     """Run simulations with parameters from prior.
 
@@ -53,7 +54,7 @@ def generate_simulations(
         prior,
         num_simulations=num_sim,
         num_workers=num_workers,
-        show_progress_bar=False,
+        show_progress_bar=show_progressbar,
     )
 
     if save_as_file:

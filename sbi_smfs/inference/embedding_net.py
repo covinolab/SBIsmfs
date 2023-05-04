@@ -24,12 +24,12 @@ class SimpleCNN(nn.Module):
 
     def __init__(
         self,
-        out_channels,
-        kernel_size,
-        stride,
-        num_bins,
-        num_lags,
-        activation=nn.ReLU,
+        out_channels: int,
+        kernel_size: int,
+        stride: int,
+        num_bins: int,
+        num_lags: int,
+        activation: torch.nn = nn.ReLU,
     ):
         super(SimpleCNN, self).__init__()
 
@@ -43,7 +43,7 @@ class SimpleCNN(nn.Module):
         self.num_lags = num_lags
         self.activation = activation()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Check the original matrix size and lag times!!!
         x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
         x = self.activation(self.conv1(x))
@@ -68,8 +68,8 @@ class MultiLayerCNN(nn.Module):
 
     def __init__(
         self,
-        num_bins,
-        num_lags,
+        num_bins: int,
+        num_lags: int,
     ):
         super(MultiLayerCNN, self).__init__()
 
@@ -107,7 +107,7 @@ class MultiLayerCNN(nn.Module):
         self.num_bins = num_bins
         self.num_lags = num_lags
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Check the original matrix size and lag times!!!
         x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
         x = self.cnn_layers(x)
