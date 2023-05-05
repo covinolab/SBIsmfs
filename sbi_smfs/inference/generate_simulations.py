@@ -65,19 +65,3 @@ def generate_simulations(
     else:
         return theta, x
 
-
-def main():
-    cl_parser = argparse.ArgumentParser()
-    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
-    cl_parser.add_argument("--num_sim", action="store", type=int, required=True)
-    cl_parser.add_argument("--num_workers", action="store", type=int, required=True)
-    cl_parser.add_argument("--file_name", action="store", type=str, required=True)
-    args = cl_parser.parse_args()
-
-    generate_simulations(
-        args.config_file, args.num_sim, args.num_workers, True, args.file_name
-    )
-
-
-if __name__ == "__main__":
-    main()

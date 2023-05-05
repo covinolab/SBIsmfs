@@ -98,18 +98,3 @@ def train_armortized_posterior(
     else:
         raise NotImplementedError("posterior_file needs to be either None or a string!")
 
-
-def main():
-    cl_parser = argparse.ArgumentParser()
-    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
-    cl_parser.add_argument("--train_data", action="store", type=str, required=True)
-    cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
-    cl_parser.add_argument(
-        "--device", action="store", type=str, required=False, default="cpu"
-    )
-    args = cl_parser.parse_args()
-    train_armortized_posterior(args.config_file, args.train_data, args.posterior_file, args.device)
-
-
-if __name__ == "__main__":
-    main()

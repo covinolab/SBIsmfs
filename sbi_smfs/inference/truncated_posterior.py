@@ -133,35 +133,3 @@ def train_truncated_posterior(
 
     if not isinstance(posterior_file, str):
         return posterior
-
-
-def main():
-    cl_parser = argparse.ArgumentParser()
-    cl_parser.add_argument("--config_file", action="store", type=str, required=True)
-    cl_parser.add_argument("--num_rounds", action="store", type=int, required=True)
-    cl_parser.add_argument(
-        "--num_sim_per_round", action="store", type=int, required=True
-    )
-    cl_parser.add_argument("--num_workers", action="store", type=int, required=True)
-    cl_parser.add_argument(
-        "--observation_file", action="store", type=str, required=True
-    )
-    cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
-    cl_parser.add_argument(
-        "--device", action="store", type=str, required=False, default="cpu"
-    )
-    args = cl_parser.parse_args()
-
-    train_truncated_posterior(
-        args.config_file,
-        args.num_rounds,
-        args.num_sim_per_round,
-        args.num_workers,
-        args.observation_file,
-        args.posterior_file,
-        args.device,
-    )
-
-
-if __name__ == "__main__":
-    main()
