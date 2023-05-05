@@ -112,7 +112,9 @@ def smfe_simulator_mm(
     return matrices
 
 
-def get_simulator_from_config(config_file: Union[str, configparser.ConfigParser]) -> partial:
+def get_simulator_from_config(
+    config_file: Union[str, configparser.ConfigParser]
+) -> partial:
     """Get simulator function from config file.
 
     Parameters

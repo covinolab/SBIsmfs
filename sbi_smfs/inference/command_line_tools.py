@@ -73,7 +73,7 @@ def cmd_train_armortized_posterior():
     """
     Command line tool for training an armortized posterior.
     """
-    
+
     cl_parser = argparse.ArgumentParser()
     cl_parser.add_argument("--config_file", action="store", type=str, required=True)
     cl_parser.add_argument("--train_data", action="store", type=str, required=True)
@@ -82,7 +82,9 @@ def cmd_train_armortized_posterior():
         "--device", action="store", type=str, required=False, default="cpu"
     )
     args = cl_parser.parse_args()
-    train_armortized_posterior(args.config_file, args.train_data, args.posterior_file, args.device)
+    train_armortized_posterior(
+        args.config_file, args.train_data, args.posterior_file, args.device
+    )
 
 
 def cmd_generate_simulations():

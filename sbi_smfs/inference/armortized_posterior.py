@@ -97,4 +97,3 @@ def train_armortized_posterior(
             pickle.dump(posterior, handle)
     else:
         raise NotImplementedError("posterior_file needs to be either None or a string!")
-

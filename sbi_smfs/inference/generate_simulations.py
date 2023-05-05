@@ -64,4 +64,3 @@ def generate_simulations(
         torch.save(theta, theta_file_name)
     else:
         return theta, x
-
