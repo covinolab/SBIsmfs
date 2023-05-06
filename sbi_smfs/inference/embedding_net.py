@@ -1,3 +1,4 @@
+from typing import Callable
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,7 +30,7 @@ class SimpleCNN(nn.Module):
         stride: int,
         num_bins: int,
         num_lags: int,
-        activation: torch.nn = nn.ReLU,
+        activation: Callable[[], nn.Module] = nn.ReLU,
     ):
         super(SimpleCNN, self).__init__()
 
