@@ -90,9 +90,9 @@ def brownian_integrator(
 
     # Initialize constant for integrator
     cdef double Ax = Dx * dt
-    cdef double Bx = sqrt(2 * Ax)
+    cdef double Bx = sqrt(2.0 * Ax)
     cdef double Aq = Dq * dt
-    cdef double Bq = sqrt(2 * Aq)
+    cdef double Bq = sqrt(2.0 * Aq)
     cdef double xold = x0
     cdef double qold = q0
     cdef double Fx, Fq, xnew, qnew
@@ -109,8 +109,8 @@ def brownian_integrator(
         Fq = k * (xold - qold)
 
         # integration + random number gen
-        xnew = xold + Ax * Fx + Bx * gsl_ran_gaussian_ziggurat(r, 1)
-        qnew = qold + Aq * Fq + Bq * gsl_ran_gaussian_ziggurat(r, 1)
+        xnew = xold + Ax * Fx + Bx * gsl_ran_gaussian_ziggurat(r, 1.0)
+        qnew = qold + Aq * Fq + Bq * gsl_ran_gaussian_ziggurat(r, 1.0)
 
         # Save position
         if (i % fs) == 0:

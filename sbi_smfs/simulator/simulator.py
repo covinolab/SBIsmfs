@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Union, Tuple
 import torch
 import numpy as np
 from functools import partial
@@ -12,13 +12,13 @@ def smfe_simulator_mm(
     dt: float,
     N: int,
     saving_freq: int,
-    Dx: float,
+    Dx: Union[float, None],
     N_knots: int,
     min_x: float,
     max_x: float,
     max_G_0: float,
     max_G_1: float,
-    init_xq_range: tuple[float, float],
+    init_xq_range: Tuple[float, float],
     min_bin: float,
     max_bin: float,
     num_bins: int,
