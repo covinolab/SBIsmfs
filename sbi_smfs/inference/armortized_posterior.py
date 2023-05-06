@@ -45,11 +45,11 @@ def train_armortized_posterior(
 
     print("Building neural network on :", device)
     cnn_net = SimpleCNN(
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),  # type: ignore
         4,
         2,
         config.getint("SUMMARY_STATS", "num_bins"),
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),
+        len(config.getlistint("SUMMARY_STATS", "lag_times")),  # type: ignore
     )
     kwargs_flow = {
         "num_blocks": 2,
@@ -91,7 +91,7 @@ def train_armortized_posterior(
     posterior = inference.build_posterior(density_estimator)
 
     if not isinstance(posterior_file, str):
-        return posterior
+        return posterior  # type: ignore
     elif isinstance(posterior_file, str):
         with open(f"{posterior_file}.pkl", "wb") as handle:
             pickle.dump(posterior, handle)

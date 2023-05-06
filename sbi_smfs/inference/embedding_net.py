@@ -67,9 +67,7 @@ class MultiLayerCNN(nn.Module):
     """
 
     def __init__(
-        self,
-        num_bins: int,
-        num_lags: int,
+        self, num_bins: int, num_lags: int,
     ):
         super(MultiLayerCNN, self).__init__()
 

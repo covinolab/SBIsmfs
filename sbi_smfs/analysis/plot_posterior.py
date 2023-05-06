@@ -1,3 +1,5 @@
+from typing import Tuple, Union
+from configparser import ConfigParser
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,7 +10,7 @@ from sbi_smfs.utils.config_utils import get_config_parser
 def plot_spline_ensemble(
     posterior_samples: torch.Tensor,
     num_splines: int,
-    config: str,
+    config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
 ) -> None:
     """Plot a ensemble of splines from the posterior.
@@ -61,7 +63,7 @@ def plot_spline_ensemble(
 
 def plot_spline_mean_with_error(
     posterior_samples: torch.Tensor,
-    config: str,
+    config: Union[str, ConfigParser],
     alpha: float = 0.05,
     ylims: tuple = (-10, 10),
 ) -> None:
@@ -129,7 +131,7 @@ def plot_spline_mean_with_error(
 
 def plot_spline(
     spline_nodes: torch.Tensor,
-    config: str,
+    config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
     color: str = "red",
 ) -> None:
@@ -179,7 +181,7 @@ def plot_spline(
 
 
 def plot_inipendent_marginals(
-    samples: torch.Tensor, config: str, fig_kwars: dict = {}
+    samples: torch.Tensor, config: Union[str, ConfigParser], fig_kwars: dict = {}
 ) -> tuple:
     """Plot the posterior marginal distributions of the independent variables.
 
