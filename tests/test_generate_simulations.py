@@ -13,6 +13,7 @@ def test_generate_simulations():
         show_progressbar=False,
         save_as_file=False,
     )
+    assert observations is None
     assert observations[0].shape == (3, 13)
     assert observations[1].shape == (3, 2400)
 
@@ -26,6 +27,7 @@ def test_generate_simulations_with_Dx():
         show_progressbar=False,
         save_as_file=False,
     )
+    assert observations is None
     assert observations[0].shape == (3, 14)
     assert observations[1].shape == (3, 2400)
 
@@ -42,7 +44,7 @@ def test_generate_simulations_wrong_input():
         )
 
 
-def test_generate_simulations():
+def test_generate_simulations_save_file():
     observations = generate_simulations(
         "tests/config_files/test.config",
         num_sim=3,
