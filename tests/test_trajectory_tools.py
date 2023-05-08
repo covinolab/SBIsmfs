@@ -4,7 +4,6 @@ import pytest
 from sbi_smfs.analysis.trajectory_tools import (
     find_transitions,
     split_trajectory,
-    autocoor_in_basins,
     compare_pmfs,
 )
 
