@@ -1,4 +1,6 @@
+import pytest
 import numpy as np
+import bottleneck as bn
 import scipy.stats as stats
 import sbi_smfs.utils.stats_utils as tutils
 
@@ -43,9 +45,30 @@ def test_propagator():
     assert all(step_size_l2 == propagator_l2)
 
 
-def test_transition_count():
+@pytest.mark.parametrize("num_transitions", [2, 10])
+def test_transition_count_running_mean(num_transitions: int):
+    length = 10000 * num_transitions
+    test_trajectory = np.zeros((length,))
+    for i in range(num_transitions + 1):
+        section_length = int(length / (num_transitions + 1))
+        if i % 2 == 0:
+            mean_val = 1.5
+        else:
+            mean_val = -1.5
+        test_trajectory[i * section_length : (i + 1) * section_length] = (
+            np.random.standard_normal((section_length)) + mean_val
+        )
+    num_transitions_est = tutils.transition_count(
+        bn.move_mean(test_trajectory, window=100)
+    )
+    assert num_transitions == num_transitions_est
+
+
+def test_transition_count_raw():
     trajectory = np.array([-1, -2, 2, 6, 7, 10])
-    transitions = tutils.transition_count(trajectory,)
+    transitions = tutils.transition_count(
+        trajectory,
+    )
     assert transitions == 1
 
 
