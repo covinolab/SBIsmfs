@@ -93,7 +93,9 @@ def split_trajectory(
     return above_turn_point, below_turn_point
 
 
-def compare_pmfs(pmfs: list[np.ndarray], inital_perturbation: float = 0.1) -> list[np.ndarray]:
+def compare_pmfs(
+    pmfs: list[np.ndarray], inital_perturbation: float = 0.1
+) -> list[np.ndarray]:
     """
     Minimize the difference between pmfs by shifting them along the y-axis.
 
@@ -124,8 +126,7 @@ def compare_pmfs(pmfs: list[np.ndarray], inital_perturbation: float = 0.1) -> li
         return np.sum(new_pmfs.std(axis=1))
 
     opt_offsets = scipy.optimize.minimize(
-        minimize,
-        np.random.normal(size=(num_pmfs,), scale=inital_perturbation)
+        minimize, np.random.normal(size=(num_pmfs,), scale=inital_perturbation)
     )
     opt_pmfs = pmfs + opt_offsets.x
     opt_pmfs = [opt_pmfs[:, i] for i in range(num_pmfs)]

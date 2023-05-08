@@ -4,7 +4,10 @@ import torch
 from sbi_smfs.simulator.simulator import smfe_simulator_mm, get_simulator_from_config
 
 
-def test_simulator():
+@pytest.mark.parametrize(
+    "num_bins, lag_times", [(20, [1, 10, 100, 1000]), (50, [1, 10, 100])]
+)
+def test_simulator(num_bins: int, lag_times: list[int]):
     params = torch.tensor(
         [
             0,
@@ -23,8 +26,6 @@ def test_simulator():
         ]
     )
 
-    lag_times = [1, 10, 100, 1000]
-    num_bins = 20
     summary_stats = smfe_simulator_mm(
         parameters=params,
         dt=5e-4,

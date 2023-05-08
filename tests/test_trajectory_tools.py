@@ -70,4 +70,6 @@ def test_compare_pmfs_quadratic_functions(inital_perturbation):
         pmfs.append(np.linspace(-5, 5, 1000) ** 2 + np.random.rand() * 10)
     pmfs = compare_pmfs(pmfs, inital_perturbation=inital_perturbation)
     assert len(pmfs) == 10
-    assert all([np.isclose(pmfs[0], pmf).all() for pmf in pmfs]) # all pmfs are the same
+    assert all(
+        [np.isclose(pmfs[0], pmf).all() for pmf in pmfs]
+    )  # all pmfs are the same

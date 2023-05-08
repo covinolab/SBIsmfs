@@ -52,9 +52,9 @@ def test_transition_count_running_mean(num_transitions: int):
     for i in range(num_transitions + 1):
         section_length = int(length / (num_transitions + 1))
         if i % 2 == 0:
-            mean_val = 1.5
+            mean_val = 2
         else:
-            mean_val = -1.5
+            mean_val = -2
         test_trajectory[i * section_length : (i + 1) * section_length] = (
             np.random.standard_normal((section_length)) + mean_val
         )

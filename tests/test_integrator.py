@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 from sbi_smfs.utils.gsl_spline import c_spline
@@ -40,10 +41,8 @@ def test_integrator_saving():
     assert len(q) == num_steps // saving_freq
 
 
-def test_integrator_pmf():
-    deltaG = 6
-    k = 3
-    delta_x = 1.5
+@pytest.mark.parametrize("deltaG, k, delta_x", [(6, 3, 1.5), (4, 2, 1.0)])
+def test_integrator_pmf(deltaG: float, k: float, delta_x: float):
 
     x_knots = np.linspace(-6, 6, 150)
     y_knots = deltaG * G0(x_knots / delta_x)
