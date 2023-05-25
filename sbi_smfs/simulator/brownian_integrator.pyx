@@ -77,7 +77,7 @@ def brownian_integrator(
     cdef double *y_k = <double *> malloc(N_knots * sizeof(double))
 
     # Transfer spline knots from numpy to c arry
-    for i from 0 <= i < N_knots:
+    for i from 0 <= i < N_knots: # TODO : deprecated syntax
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 

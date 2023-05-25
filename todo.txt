@@ -11,3 +11,4 @@ normalize splines before plotting
 add error for failed simulations in brownian integrator so that it return nan
 add ratio estimation
 add nn setting to config
+add option to save posterior every n iterations

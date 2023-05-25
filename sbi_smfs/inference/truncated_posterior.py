@@ -103,7 +103,10 @@ def train_truncated_posterior(
             theta = proposal.sample((num_sim_per_round,))
 
         x = simulate_in_batches(
-            simulator, theta.cpu(), sim_batch_size=20, num_workers=num_workers
+            simulator,
+            theta.cpu(),
+            sim_batch_size=num_sim_per_round // num_workers,
+            num_workers=num_workers,
         )
 
         inference = inference.append_simulations(

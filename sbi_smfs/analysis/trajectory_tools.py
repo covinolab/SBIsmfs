@@ -67,7 +67,6 @@ def split_trajectory(
         list[np.ndarray]
             List of trajectories in each basin.
     """
-
     above_turn_point = []
     below_turn_point = []
 
