@@ -24,7 +24,8 @@ def brownian_integrator(
         double dt,
         int fs
         ):
-    """Integrator for constant force SMFE.
+    """
+    Integrator for constant force SMFE.
     Molecular free energy profile is contructed by a cubic spline.
     
     Parameters

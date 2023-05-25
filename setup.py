@@ -16,6 +16,11 @@ def get_gsl_config(args):
         return None
 
 
+def get_requirements():
+    with open("requirements.txt") as f:
+        return f.read().splitlines()
+
+
 try:
     gsl_include_dir = get_gsl_config(["--cflags"])
     gsl_lib_dir = get_gsl_config(["--libs"])
@@ -47,11 +52,6 @@ extensions = [
         language_level=3,
     ),
 ]
-
-
-def get_requirements():
-    with open("requirements.txt") as f:
-        return f.read().splitlines()
 
 
 setup(
