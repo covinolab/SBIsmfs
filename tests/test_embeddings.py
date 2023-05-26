@@ -26,15 +26,6 @@ def test_SimpleCNN(input_tensor):
     assert output.shape == (batch_size, 405)
 
 
-def test_MultiLayerCNN(input_tensor):
-    model = MultiLayerCNN(num_bins=num_bins, num_lags=num_lags)
-    output = model(input_tensor)
-    assert output.shape == (
-        batch_size,
-        640,
-    )  # expected output shape is batch_size x (num_lags * out_channels * feature_map_height * feature_map_width)
-
-
 def test_SimpleCNN_activation(input_tensor):
     model = SimpleCNN(
         out_channels=num_lags,
@@ -50,8 +41,17 @@ def test_SimpleCNN_activation(input_tensor):
     )  # expected all outputs to be non-negative due to ReLU activation
 
 
+def test_MultiLayerCNN(input_tensor):
+    model = MultiLayerCNN(num_bins=num_bins, num_lags=num_lags, num_features=120)
+    output = model(input_tensor)
+    assert output.shape == (
+        batch_size,
+        120,
+    )
+
+
 def test_MultiLayerCNN_activation(input_tensor):
-    model = MultiLayerCNN(num_bins=num_bins, num_lags=num_lags)
+    model = MultiLayerCNN(num_bins=num_bins, num_lags=num_lags, num_features=120)
     output = model(input_tensor)
     assert (
         torch.all(output < 0) == False

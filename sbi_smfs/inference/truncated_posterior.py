@@ -12,7 +12,7 @@ from sbi.utils.get_nn_models import posterior_nn
 
 from sbi_smfs.simulator import get_simulator_from_config
 from sbi_smfs.inference.priors import get_priors_from_config
-from sbi_smfs.inference.embedding_net import SimpleCNN
+from sbi_smfs.inference.embedding_net import EMBEDDING_NETS
 from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.utils.summary_stats import (
     compute_stats,
@@ -67,13 +67,26 @@ def train_truncated_posterior(
         observation = compute_stats(observation, config)
 
     print("Building neural network on :", device)
-    cnn_net = SimpleCNN(
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),
-        4,
-        2,
-        config.getint("SUMMARY_STATS", "num_bins"),
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),
-    )
+
+    if config.get("SUMMARY_STATS", "embedding_net") in EMBEDDING_NETS.keys():
+        cnn_net = EMBEDDING_NETS[config.get("SUMMARY_STATS", "embedding_net")](
+            config.getint("SUMMARY_STATS", "num_bins"),
+            len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            100,
+        )
+        print("Using embedding net :", config.get("SUMMARY_STATS", "embedding_net"))
+    else:
+        print(
+            f"only available embeddings are : {[key for key in EMBEDDING_NETS.keys()]}. Falling back to single_layer_cnn"
+        )
+        cnn_net = EMBEDDING_NETS["single_layer_cnn"](
+            len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            4,
+            2,
+            config.getint("SUMMARY_STATS", "num_bins"),
+            len(config.getlistint("SUMMARY_STATS", "lag_times")),
+        )
+    
     kwargs_flow = {
         "num_blocks": 2,
         "dropout_probability": 0.0,
