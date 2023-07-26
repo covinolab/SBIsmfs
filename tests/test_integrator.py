@@ -9,7 +9,7 @@ def G0(x):
     if np.abs(x) > 0.5:
         return 2 * (np.abs(x) - 1) ** 2 - 1
     else:
-        return -2 * x ** 2
+        return -2 * x**2
 
 
 def G(x, q, dG=4, k=2, delta_x=1):
@@ -43,7 +43,6 @@ def test_integrator_saving():
 
 @pytest.mark.parametrize("deltaG, k, delta_x", [(6, 3, 1.5), (4, 2, 1.0)])
 def test_integrator_pmf(deltaG: float, k: float, delta_x: float):
-
     x_knots = np.linspace(-6, 6, 150)
     y_knots = deltaG * G0(x_knots / delta_x)
 

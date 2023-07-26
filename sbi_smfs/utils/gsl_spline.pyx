@@ -1,4 +1,4 @@
-from gsl_spline cimport *
+cimport sbi_smfs.utils.gsl_spline as cspline
 from math import *
 from libc.stdlib cimport malloc, free
 import numpy as np
@@ -37,22 +37,22 @@ def c_spline(
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 
-    cdef gsl_interp_accel *acc
-    acc = gsl_interp_accel_alloc()
-    cdef gsl_spline *spline
-    spline = gsl_spline_alloc(gsl_interp_cspline, N_knots)
+    cdef cspline.gsl_interp_accel *acc
+    acc = cspline.gsl_interp_accel_alloc()
+    cdef cspline.gsl_spline *spline
+    spline = cspline.gsl_spline_alloc(cspline.gsl_interp_cspline, N_knots)
 
-    gsl_spline_init(spline, x_k, y_k, N_knots)
+    cspline.gsl_spline_init(spline, x_k, y_k, N_knots)
 
     cdef cnp.ndarray[double] y_eval = np.empty(N_eval, dtype=np.double)
     cdef tmp_y
 
     for i  from 0 <= i < N_eval:
-        tmp_y = gsl_spline_eval(spline, x_eval[i], acc)
+        tmp_y = cspline.gsl_spline_eval(spline, x_eval[i], acc)
         y_eval[i] = tmp_y
 
-    gsl_spline_free (spline)
-    gsl_interp_accel_free (acc)
+    cspline.gsl_spline_free (spline)
+    cspline.gsl_interp_accel_free (acc)
     free(x_k)
     free(y_k)
 
@@ -91,22 +91,22 @@ def c_spline_der(
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 
-    cdef gsl_interp_accel *acc
-    acc = gsl_interp_accel_alloc ()
-    cdef gsl_spline *spline
-    spline = gsl_spline_alloc(gsl_interp_cspline, N_knots)
+    cdef cspline.gsl_interp_accel *acc
+    acc = cspline.gsl_interp_accel_alloc ()
+    cdef cspline.gsl_spline *spline
+    spline = cspline.gsl_spline_alloc(cspline.gsl_interp_cspline, N_knots)
 
-    gsl_spline_init(spline, x_k, y_k, N_knots)
+    cspline.gsl_spline_init(spline, x_k, y_k, N_knots)
 
     cdef cnp.ndarray[double] y_eval = np.empty(N_eval, dtype=np.double)
     cdef tmp_y
 
     for i  from 0 <= i < N_eval:
-        tmp_y = gsl_spline_eval_deriv(spline, x_eval[i], acc)
+        tmp_y = cspline.gsl_spline_eval_deriv(spline, x_eval[i], acc)
         y_eval[i] = tmp_y
 
-    gsl_spline_free (spline)
-    gsl_interp_accel_free (acc)
+    cspline.gsl_spline_free (spline)
+    cspline.gsl_interp_accel_free (acc)
     free(x_k)
     free(y_k)
 
