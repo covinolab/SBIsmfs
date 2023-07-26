@@ -1,0 +1,8 @@
+bottleneck
+torch>=1.8.0
+sbi==0.21.0
+matplotlib
+cython
+numba
+scipy
+numpy
