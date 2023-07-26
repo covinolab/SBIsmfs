@@ -86,7 +86,7 @@ def train_truncated_posterior(
             config.getint("SUMMARY_STATS", "num_bins"),
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
         )
-    
+
     kwargs_flow = {
         "num_blocks": 2,
         "dropout_probability": 0.0,

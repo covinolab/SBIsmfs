@@ -3,8 +3,8 @@ import numpy as np
 
 from libc.math cimport sqrt
 cimport numpy as cnp
-from sbi_smfs.utils.gsl_spline cimport *
-from gsl_random_numbers cimport *
+cimport sbi_smfs.utils.gsl_spline as c_spline
+cimport sbi_smfs.simulator.gsl_random_numbers as grn
 from libc.stdlib cimport malloc, free
 from libc.time cimport time
 
@@ -64,14 +64,14 @@ def brownian_integrator(
     cdef long N_save = N // fs
 
     # Initalize random number generatot and seed
-    cdef gsl_rng_type * T
-    cdef gsl_rng * r
+    cdef grn.gsl_rng_type * T
+    cdef grn.gsl_rng * r
     cdef long seed = np.random.randint(low=1, high=2**63) # Initalize seed with randints between 1 and 2**63 = max(int64)
 
-    gsl_rng_env_setup()
-    T = gsl_rng_default
-    r = gsl_rng_alloc(T)
-    gsl_rng_set(r, seed)
+    grn.gsl_rng_env_setup()
+    T = grn.gsl_rng_default
+    r = grn.gsl_rng_alloc(T)
+    grn.gsl_rng_set(r, seed)
 
     # initalize spline knots as c type arrays
     cdef double *x_k = <double *> malloc(N_knots * sizeof(double))
@@ -83,11 +83,11 @@ def brownian_integrator(
         y_k[i] = y_knots[i]
 
     # Calculation of spline interpolation
-    cdef gsl_interp_accel *acc
-    acc = gsl_interp_accel_alloc ()
-    cdef gsl_spline *spline
-    spline = gsl_spline_alloc(gsl_interp_cspline, N_knots)
-    gsl_spline_init(spline, x_k, y_k, N_knots)
+    cdef c_spline.gsl_interp_accel *acc
+    acc = c_spline.gsl_interp_accel_alloc ()
+    cdef c_spline.gsl_spline *spline
+    spline = c_spline.gsl_spline_alloc(c_spline.gsl_interp_cspline, N_knots)
+    c_spline.gsl_spline_init(spline, x_k, y_k, N_knots)
 
     # Initialize constant for integrator
     cdef double Ax = Dx * dt
@@ -106,12 +106,12 @@ def brownian_integrator(
     for i in range(1, N):
 
         # Forces evaluation
-        Fx = -gsl_spline_eval_deriv(spline, xold, acc) - k * (xold - qold)
+        Fx = -c_spline.gsl_spline_eval_deriv(spline, xold, acc) - k * (xold - qold)
         Fq = k * (xold - qold)
 
         # integration + random number gen
-        xnew = xold + Ax * Fx + Bx * gsl_ran_gaussian_ziggurat(r, 1.0)
-        qnew = qold + Aq * Fq + Bq * gsl_ran_gaussian_ziggurat(r, 1.0)
+        xnew = xold + Ax * Fx + Bx * grn.gsl_ran_gaussian_ziggurat(r, 1.0)
+        qnew = qold + Aq * Fq + Bq * grn.gsl_ran_gaussian_ziggurat(r, 1.0)
 
         # Save position
         if (i % fs) == 0:
@@ -121,8 +121,8 @@ def brownian_integrator(
         qold = qnew
 
     # Free allocated memory
-    gsl_spline_free (spline)
-    gsl_interp_accel_free (acc)
+    c_spline.gsl_spline_free (spline)
+    c_spline.gsl_interp_accel_free (acc)
     free(x_k)
     free(y_k)
 
