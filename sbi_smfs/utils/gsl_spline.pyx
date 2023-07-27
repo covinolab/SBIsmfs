@@ -1,3 +1,4 @@
+import cython
 cimport sbi_smfs.utils.gsl_spline as c_spline
 from math import *
 from libc.stdlib cimport malloc, free
