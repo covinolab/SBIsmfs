@@ -1,10 +1,12 @@
-cimport sbi_smfs.utils.gsl_spline as cspline
+cimport sbi_smfs.utils.gsl_spline as c_spline
 from math import *
 from libc.stdlib cimport malloc, free
 import numpy as np
 cimport numpy as cnp
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def c_spline(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
@@ -37,28 +39,36 @@ def c_spline(
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 
-    cdef cspline.gsl_interp_accel *acc
-    acc = cspline.gsl_interp_accel_alloc()
-    cdef cspline.gsl_spline *spline
-    spline = cspline.gsl_spline_alloc(cspline.gsl_interp_cspline, N_knots)
+    cdef c_spline.gsl_interp_accel *acc
+    acc = c_spline.gsl_interp_accel_alloc()
+    cdef c_spline.gsl_spline *spline
+    spline = c_spline.gsl_spline_alloc(c_spline.gsl_interp_cspline, N_knots)
 
-    cspline.gsl_spline_init(spline, x_k, y_k, N_knots)
+    c_spline.gsl_spline_init(spline, x_k, y_k, N_knots)
 
     cdef cnp.ndarray[double] y_eval = np.empty(N_eval, dtype=np.double)
-    cdef tmp_y
+    cdef double tmp_y
+    cdef int status
 
     for i  from 0 <= i < N_eval:
-        tmp_y = cspline.gsl_spline_eval(spline, x_eval[i], acc)
+        status = c_spline.gsl_spline_eval_e(spline, x_eval[i], acc, &tmp_y)
+        if status != 0:
+            break
         y_eval[i] = tmp_y
 
-    cspline.gsl_spline_free (spline)
-    cspline.gsl_interp_accel_free (acc)
+    c_spline.gsl_spline_free (spline)
+    c_spline.gsl_interp_accel_free (acc)
     free(x_k)
     free(y_k)
+
+    if status != 0:
+        return None
 
     return y_eval
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def c_spline_der(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
@@ -91,23 +101,29 @@ def c_spline_der(
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 
-    cdef cspline.gsl_interp_accel *acc
-    acc = cspline.gsl_interp_accel_alloc ()
-    cdef cspline.gsl_spline *spline
-    spline = cspline.gsl_spline_alloc(cspline.gsl_interp_cspline, N_knots)
+    cdef c_spline.gsl_interp_accel *acc
+    acc = c_spline.gsl_interp_accel_alloc ()
+    cdef c_spline.gsl_spline *spline
+    spline = c_spline.gsl_spline_alloc(c_spline.gsl_interp_cspline, N_knots)
 
-    cspline.gsl_spline_init(spline, x_k, y_k, N_knots)
+    c_spline.gsl_spline_init(spline, x_k, y_k, N_knots)
 
     cdef cnp.ndarray[double] y_eval = np.empty(N_eval, dtype=np.double)
-    cdef tmp_y
+    cdef double tmp_y
+    cdef int status
 
     for i  from 0 <= i < N_eval:
-        tmp_y = cspline.gsl_spline_eval_deriv(spline, x_eval[i], acc)
+        status = c_spline.gsl_spline_eval_deriv_e(spline, x_eval[i], acc, &tmp_y)
+        if status != 0:
+            break
         y_eval[i] = tmp_y
 
-    cspline.gsl_spline_free (spline)
-    cspline.gsl_interp_accel_free (acc)
+    c_spline.gsl_spline_free (spline)
+    c_spline.gsl_interp_accel_free (acc)
     free(x_k)
     free(y_k)
+
+    if status != 0:
+        return None
 
     return y_eval

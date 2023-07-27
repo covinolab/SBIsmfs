@@ -96,7 +96,8 @@ def brownian_integrator(
     cdef double Bq = sqrt(2.0 * Aq)
     cdef double xold = x0
     cdef double qold = q0
-    cdef double Fx, Fq, xnew, qnew
+    cdef double Fx, Fq, xnew, qnew, spline_deriv
+    cdef int status
 
     # Initialize ndarray to save trajectory
     cdef cnp.ndarray[double] q = np.empty(N_save, dtype=np.double)
@@ -106,7 +107,11 @@ def brownian_integrator(
     for i in range(1, N):
 
         # Forces evaluation
-        Fx = -c_spline.gsl_spline_eval_deriv(spline, xold, acc) - k * (xold - qold)
+        status = c_spline.gsl_spline_eval_deriv_e(spline, xold, acc, &spline_deriv)
+        if status != 0:
+            break
+
+        Fx = -spline_deriv - k * (xold - qold)
         Fq = k * (xold - qold)
 
         # integration + random number gen
@@ -126,5 +131,7 @@ def brownian_integrator(
     free(x_k)
     free(y_k)
 
+    if status != 0:
+        return None
     return q
 

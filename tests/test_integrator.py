@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
-from sbi_smfs.utils.gsl_spline import c_spline
 
 
 @np.vectorize
@@ -14,6 +13,28 @@ def G0(x):
 
 def G(x, q, dG=4, k=2, delta_x=1):
     return dG * G0(x / delta_x) + 0.5 * k * (x - q) ** 2
+
+
+def test_integrator_error():
+    deltaG = 6
+    k = 3
+    delta_x = 1.5
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    
+    q = brownian_integrator(
+        x0=10,
+        q0=10,
+        Dx=1,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=10,
+        dt=5e-4,
+        fs=1,
+    )
+    assert q is None
 
 
 def test_integrator_saving():
