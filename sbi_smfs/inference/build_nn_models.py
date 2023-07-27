@@ -9,12 +9,12 @@ from sbi_smfs.inference.embedding_net import EMBEDDING_NETS
 
 def build_npe_model(config: str):
     """Builds a neural posterior.
-    
+
     Parameters
     ----------
     config: str
         Config file name.
-    
+
     Returns
     -------
     neural_posterior: sbi.utils.posterior_nn.Posterior
