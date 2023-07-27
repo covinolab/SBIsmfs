@@ -38,7 +38,10 @@ def build_npe_model(config: str):
             "num_bins": 10,
         }
 
-    if config.get("NEURAL_NETWORK", "embedding_net") in EMBEDDING_NETS.keys() and config.get("NEURAL_NETWORK", "embedding_net") is not "single_layer_cnn":
+    if (
+        config.get("NEURAL_NETWORK", "embedding_net") in EMBEDDING_NETS.keys()
+        and config.get("NEURAL_NETWORK", "embedding_net") is not "single_layer_cnn"
+    ):
         cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
             config.getint("SUMMARY_STATS", "num_bins"),
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
@@ -83,13 +86,13 @@ def get_train_parameter(config):
     ----------
     config: str
         Config file name.
-    
+
     Returns
     -------
     train_parameter: dict
         Training parameters.
     """
-    
+
     config = get_config_parser(config)
 
     if "TRAININ_PARAMS" not in config.sections():
@@ -104,9 +107,11 @@ def get_train_parameter(config):
         }
 
         return default_params
-    
+
     train_parameter = {
-        "validation_fraction": config.getfloat("TRAINING_PARAMS", "validation_fraction"),
+        "validation_fraction": config.getfloat(
+            "TRAINING_PARAMS", "validation_fraction"
+        ),
         "training_batch_size": config.getint("TRAINING_PARAMS", "training_batch_size"),
         "learning_rate": config.getfloat("TRAINING_PARAMS", "learning_rate"),
         "stop_after_epochs": config.getint("TRAINING_PARAMS", "stop_after_epochs"),
