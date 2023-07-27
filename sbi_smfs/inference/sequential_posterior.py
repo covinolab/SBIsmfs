@@ -7,7 +7,7 @@ from sbi.inference import SNPE
 
 from sbi.utils.user_input_checks import get_batch_loop_simulator
 from sbi.simulators.simutils import simulate_in_batches
-from sbi_smfs.inference.build_nn_models import build_npe_model
+from sbi_smfs.inference.build_nn_models import build_npe_model, get_train_parameter
 
 from sbi_smfs.simulator import get_simulator_from_config
 from sbi_smfs.inference.priors import get_priors_from_config
@@ -63,6 +63,7 @@ def train_sequential_posterior(
 
     print("Building neural network on :", device)
     neural_posterior = build_npe_model(config)
+    train_parameters = get_train_parameter(config)
 
     inference = SNPE(prior=prior, density_estimator=neural_posterior, device=device)
     simulator = get_batch_loop_simulator(simulator)
@@ -84,10 +85,7 @@ def train_sequential_posterior(
 
         density_estimator = inference.train(
             show_train_summary=True,
-            validation_fraction=0.15,
-            training_batch_size=50,
-            learning_rate=0.0005,
-            stop_after_epochs=20,
+            **train_parameters,
         )
 
         posterior = inference.build_posterior(density_estimator)

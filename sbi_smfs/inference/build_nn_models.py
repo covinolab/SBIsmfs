@@ -74,3 +74,42 @@ def build_npe_model(config: str):
     )
 
     return neural_posterior
+
+
+def get_train_parameter(config):
+    """Get training parameters from config file.
+
+    Parameters
+    ----------
+    config: str
+        Config file name.
+    
+    Returns
+    -------
+    train_parameter: dict
+        Training parameters.
+    """
+    
+    config = get_config_parser(config)
+
+    if "TRAININ_PARAMS" not in config.sections():
+        print("No training parameters specified in config file.")
+        print("Using default trainingparameters.")
+
+        default_params = {
+            "validation_fraction": 0.15,
+            "training_batch_size": 50,
+            "learning_rate": 0.0005,
+            "stop_after_epochs": 20,
+        }
+
+        return default_params
+    
+    train_parameter = {
+        "validation_fraction": config.getfloat("TRAINING_PARAMS", "validation_fraction"),
+        "training_batch_size": config.getint("TRAINING_PARAMS", "training_batch_size"),
+        "learning_rate": config.getfloat("TRAINING_PARAMS", "learning_rate"),
+        "stop_after_epochs": config.getint("TRAINING_PARAMS", "stop_after_epochs"),
+    }
+
+    return train_parameter
