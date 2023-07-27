@@ -29,7 +29,7 @@ def build_npe_model(config: str):
 
         config["NEURAL_NETWORK"] = {
             "embedding_net": "single_layer_cnn",
-            "num_blocks": 0,
+            "num_blocks": 2,
             "dropout_probability": 0.0,
             "use_batch_norm": False,
             "model": "nsf",
@@ -38,8 +38,8 @@ def build_npe_model(config: str):
             "num_bins": 10,
         }
 
-    if config.get("NEURAL_NETWORK", "embedding_net") in EMBEDDING_NETS.keys():
-        cnn_net = EMBEDDING_NETS[config.get("SUMMARY_STATS", "embedding_net")](
+    if config.get("NEURAL_NETWORK", "embedding_net") in EMBEDDING_NETS.keys() and config.get("NEURAL_NETWORK", "embedding_net") is not "single_layer_cnn":
+        cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
             config.getint("SUMMARY_STATS", "num_bins"),
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
             100,
@@ -60,11 +60,11 @@ def build_npe_model(config: str):
     kwargs_flow = {
         "num_blocks": config.getint("NEURAL_NETWORK", "num_blocks"),
         "dropout_probability": config.getfloat("NEURAL_NETWORK", "dropout_probability"),
-        "use_batch_norm": config.getbool("NEURAL_NETWORK", "use_batch_norm"),
+        "use_batch_norm": config.getboolean("NEURAL_NETWORK", "use_batch_norm"),
     }
 
     neural_posterior = posterior_nn(
-        model=config.getstr("NEURAL_NETWORK", "model"),
+        model=config.get("NEURAL_NETWORK", "model"),
         hidden_features=config.getint("NEURAL_NETWORK", "hidden_features"),
         num_transforms=config.getint("NEURAL_NETWORK", "num_transforms"),
         num_bins=config.getint("NEURAL_NETWORK", "num_bins"),
