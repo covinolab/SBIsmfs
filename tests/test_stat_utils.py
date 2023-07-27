@@ -47,7 +47,7 @@ def test_propagator():
 
 @pytest.mark.parametrize("num_transitions", [2, 10])
 def test_transition_count_running_mean(num_transitions: int):
-    np.random.seed(42)
+    rng = np.random.default_rng(seed=42)
     length = 10000 * num_transitions
     test_trajectory = np.zeros((length,))
     for i in range(num_transitions + 1):
@@ -57,7 +57,7 @@ def test_transition_count_running_mean(num_transitions: int):
         else:
             mean_val = -2.5
         test_trajectory[i * section_length : (i + 1) * section_length] = (
-            np.random.standard_normal((section_length)) + mean_val
+            rng.standard_normal((section_length)) + mean_val
         )
     num_transitions_est = tutils.transition_count(
         bn.move_mean(test_trajectory, window=200)
