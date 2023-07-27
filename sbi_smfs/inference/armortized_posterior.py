@@ -12,6 +12,7 @@ from sbi.utils.get_nn_models import posterior_nn
 from sbi_smfs.simulator import get_simulator_from_config
 from sbi_smfs.inference.priors import get_priors_from_config
 from sbi_smfs.inference.embedding_net import SimpleCNN
+from sbi_smfs.inference.build_nn_models import build_npe_model
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
@@ -44,28 +45,7 @@ def train_armortized_posterior(
     config = get_config_parser(config_file)
 
     print("Building neural network on :", device)
-    cnn_net = SimpleCNN(
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),  # type: ignore
-        4,
-        2,
-        config.getint("SUMMARY_STATS", "num_bins"),
-        len(config.getlistint("SUMMARY_STATS", "lag_times")),  # type: ignore
-    )
-    kwargs_flow = {
-        "num_blocks": 2,
-        "dropout_probability": 0.0,
-        "use_batch_norm": False,
-    }
-
-    neural_posterior = posterior_nn(
-        model="nsf",
-        hidden_features=100,
-        num_transforms=5,
-        num_bins=10,
-        embedding_net=cnn_net,
-        z_score_x="none",
-        **kwargs_flow,
-    )
+    neural_posterior = build_npe_model(config)
 
     inference = SNPE(density_estimator=neural_posterior, device=device)
 
