@@ -10,14 +10,15 @@ from sbi_smfs.analysis.trajectory_tools import (
 
 @pytest.mark.parametrize("num_transitions", [2, 10])
 def test_find_transitions(num_transitions: int):
+    np.random.seed(42)
     length = 10000 * num_transitions
     test_trajectory = np.zeros((length,))
     for i in range(num_transitions + 1):
         section_length = int(length / (num_transitions + 1))
         if i % 2 == 0:
-            mean_val = 2
+            mean_val = 3
         else:
-            mean_val = -2
+            mean_val = -3
         test_trajectory[i * section_length : (i + 1) * section_length] = (
             np.random.standard_normal((section_length)) + mean_val
         )
