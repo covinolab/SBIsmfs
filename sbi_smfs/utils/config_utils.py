@@ -74,14 +74,37 @@ def validate_config(config_file: Union[str, ConfigParser]) -> None:
             "parameters_k",
         ],
         "SUMMARY_STATS": ["min_bin", "max_bin", "num_bins", "lag_times"],
+        "NEURAL_NETWORK": [
+            "embedding_net",
+            "num_blocks",
+            "dropout_probability",
+            "use_batch_norm",
+            "model",
+            "hidden_features",
+            "num_transforms",
+            "num_bins",
+        ],
+        "TRAININ_PARAMS": [
+            "validation_fraction",
+            "training_batch_size",
+            "learning_rate",
+            "stop_after_epochs",
+        ],
     }
 
     # Check sections
     for sec in expected_sections:
+        if (
+            sec == "NEURAL_NETWORK" or sec == "TRAININ_PARAMS"
+        ):  # optional, have defaults
+            continue
         if sec not in config.sections():
             raise KeyError(f"Missing {sec} in config")
 
     for sec, keys in expected_keys.items():
+        if sec not in config.sections():
+            print(f"Skipping {sec} in config, falling back to default values")
+            continue
         for key in keys:
             if key not in config[sec]:
                 raise KeyError(f"Missing {key} in {sec}")
