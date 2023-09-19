@@ -108,6 +108,9 @@ def smfe_simulator_mm(
         fs=saving_freq,
     )
 
+    if q is None:
+        return None
+    
     matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
     return matrices
 
