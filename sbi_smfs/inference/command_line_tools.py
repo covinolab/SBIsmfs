@@ -97,8 +97,14 @@ def cmd_generate_simulations():
     cl_parser.add_argument("--num_sim", action="store", type=int, required=True)
     cl_parser.add_argument("--num_workers", action="store", type=int, required=True)
     cl_parser.add_argument("--file_name", action="store", type=str, required=True)
+    cl_parser.add_argument("--progress_bar", action="store", type=bool, required=False, default=False)
     args = cl_parser.parse_args()
 
     generate_simulations(
-        args.config_file, args.num_sim, args.num_workers, True, args.file_name
+        config_file=args.config_file, 
+        num_sim=args.num_sim, 
+        num_workers=args.num_workers, 
+        save_as_file=True, 
+        file_name=args.file_name,
+        show_progressbar=True,
     )
