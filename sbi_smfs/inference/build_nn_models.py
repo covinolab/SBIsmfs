@@ -40,7 +40,7 @@ def build_npe_model(config: str):
 
     if (
         config.get("NEURAL_NETWORK", "embedding_net") in EMBEDDING_NETS.keys()
-        and config.get("NEURAL_NETWORK", "embedding_net") is not "single_layer_cnn"
+        and config.get("NEURAL_NETWORK", "embedding_net") != "single_layer_cnn"
     ):
         cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
             config.getint("SUMMARY_STATS", "num_bins"),
