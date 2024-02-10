@@ -63,30 +63,42 @@ def get_priors_from_config(config_file, device="cpu"):
 
     dq_dist_params = config.getlistfloat("PRIORS", "parameters_Dq")
     prior_dq = PRIORS[config.get("PRIORS", "type_Dq")](
-        torch.tensor([dq_dist_params[0]], device=device),
-        torch.tensor([dq_dist_params[1]], device=device),
+        torch.tensor([dq_dist_params[0][0]], device=device),
+        torch.tensor([dq_dist_params[0][1]], device=device),
     )
     k_dist_params = config.getlistfloat("PRIORS", "parameters_k")
     prior_k = PRIORS[config.get("PRIORS", "type_k")](
-        torch.tensor([k_dist_params[0]], device=device),
-        torch.tensor([k_dist_params[1]], device=device),
+        torch.tensor([k_dist_params[0][0]], device=device),
+        torch.tensor([k_dist_params[0][1]], device=device),
     )
     spline_dist_params = config.getlistfloat("PRIORS", "parameters_spline")
-    prior_splines = [
-        PRIORS[config.get("PRIORS", "type_spline")](
-            torch.tensor([spline_dist_params[0]], device=device),
-            torch.tensor([spline_dist_params[1]], device=device),
-        )
-        for _ in range(config.getint("SIMULATOR", "num_knots") - 4)
-    ]
+    num_spline_knots = config.getint("SIMULATOR", "num_knots") - 4
+    if len(spline_dist_params) == 1:
+        prior_splines = [
+            PRIORS[config.get("PRIORS", "type_spline")](
+                torch.tensor([spline_dist_params[0][0]], device=device),
+                torch.tensor([spline_dist_params[0][1]], device=device),
+            )
+            for _ in range(num_spline_knots)
+        ]
+    elif len(spline_dist_params) == 2:
+        for i in range(2):
+            assert len(spline_dist_params[i]) == num_spline_knots, "wrong spline configuration"
+        prior_splines = [
+            PRIORS[config.get("PRIORS", "type_spline")](
+                torch.tensor([p1], device=device),
+                torch.tensor([p2], device=device),
+            )
+            for p1, p2 in zip(spline_dist_params[0], spline_dist_params[1])
+        ]
 
     priors = [prior_dq, prior_k, *prior_splines]
 
     if "type_dx" in config["PRIORS"] and "parameters_dx" in config["PRIORS"]:
         dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")
         prior_dx = PRIORS[config.get("PRIORS", "type_Dx")](
-            torch.tensor([dx_dist_params[0]], device=device),
-            torch.tensor([dx_dist_params[1]], device=device),
+            torch.tensor([dx_dist_params[0][0]], device=device),
+            torch.tensor([dx_dist_params[0][1]], device=device),
         )
         priors.insert(0, prior_dx)
         indipendent_vars += 1
