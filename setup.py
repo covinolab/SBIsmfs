@@ -1,7 +1,7 @@
 from setuptools import Extension, setup, find_packages
 import subprocess
 import os
-from Cython.Build import cythonize
+from cython.Build import cythonize
 import numpy as np
 
 
