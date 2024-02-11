@@ -29,7 +29,6 @@ def test_get_prior_from_config_with_dx():
     num_samples = 1000000
     prior = get_priors_from_config("tests/config_files/test_2.config")
     samples = prior.sample((num_samples,))
-
     assert torch.isclose(
         samples[:, 0].mean(), torch.tensor(-3.0), atol=0.1
     ).item(), "mean Dx"
@@ -52,5 +51,21 @@ def test_get_prior_from_config_with_dx():
         torch.isclose(samples[:, 3:].mean(axis=1), torch.zeros(num_samples), atol=1e-5)
     ).all(), "spline mean"
 
+
+def test_individual_spline_prior():
+    num_samples = 1000000
+    prior = get_priors_from_config("tests/config_files/test_spline_prior.config")
+    samples = prior.sample((num_samples,))
+    true_mean = torch.tensor([0, 1, 0, 1, 0, -3], dtype=torch.float32)
+    true_std = torch.tensor([1, 3, 1, 3, 1, 1], dtype=torch.float32)
+
+    for i in range(6):
+        print([samples[:, i+2].std() for i in range(6)], true_std[i])
+        assert torch.isclose(
+            samples[:, i+2].mean(), true_mean[i], atol=0.1
+        ).item(), f"mean spline {i}"
+        assert torch.isclose(
+            samples[:, i+2].std(), true_std[i], atol=0.1
+        ).item(), f"std spline {i}"
 
 # TODO : Add test for non spline prior
