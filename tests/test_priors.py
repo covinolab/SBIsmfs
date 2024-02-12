@@ -60,7 +60,6 @@ def test_individual_spline_prior():
     true_std = torch.tensor([1, 3, 1, 3, 1, 1], dtype=torch.float32)
 
     for i in range(6):
-        print([samples[:, i+2].std() for i in range(6)], true_std[i])
         assert torch.isclose(
             samples[:, i+2].mean(), true_mean[i], atol=0.1
         ).item(), f"mean spline {i}"
