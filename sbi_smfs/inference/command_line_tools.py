@@ -24,6 +24,9 @@ def cmd_train_truncated_posterior():
     cl_parser.add_argument(
         "--device", action="store", type=str, required=False, default="cpu"
     )
+    cl_parser.add_argument(
+        "--save_interval", action="store", type=int, required=False, default=1
+    )
     args = cl_parser.parse_args()
 
     train_truncated_posterior(
@@ -34,6 +37,7 @@ def cmd_train_truncated_posterior():
         args.observation_file,
         args.posterior_file,
         args.device,
+        args.save_interval,
     )
 
 
@@ -56,6 +60,9 @@ def cmd_train_sequential_posterior():
     cl_parser.add_argument(
         "--device", action="store", type=str, required=False, default="cpu"
     )
+    cl_parser.add_argument(
+        "--save_interval", action="store", type=int, required=False, default=1
+    )
     args = cl_parser.parse_args()
 
     train_sequential_posterior(
@@ -66,6 +73,7 @@ def cmd_train_sequential_posterior():
         args.observation_file,
         args.posterior_file,
         args.device,
+        args.save_interval,
     )
 
 

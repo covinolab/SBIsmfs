@@ -26,6 +26,7 @@ def train_sequential_posterior(
     observation: Union[str, torch.Tensor],
     posterior_file: bool = None,
     device: str = "cpu",
+    save_interval: int = 1,
 ) -> Union[None, SNPE]:
     """Trains a sequential posterior.
 
@@ -89,7 +90,7 @@ def train_sequential_posterior(
         )
 
         posterior = inference.build_posterior(density_estimator)
-        if isinstance(posterior_file, str):
+        if isinstance(posterior_file, str) and idx_round % save_interval == 0 and idx_round > 0:
             with open(f"{posterior_file}_round={idx_round}.pkl", "wb") as handle:
                 pickle.dump(posterior, handle)
 

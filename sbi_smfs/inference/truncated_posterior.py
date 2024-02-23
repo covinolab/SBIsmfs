@@ -28,6 +28,7 @@ def train_truncated_posterior(
     observation: Union[str, torch.Tensor],
     posterior_file: Union[str, None] = None,
     device: str = "cpu",
+    save_interval: int = 1,
 ) -> Union[None, SNPE]:
     """Trains a truncated posterior.
 
@@ -102,7 +103,7 @@ def train_truncated_posterior(
         posterior = inference.build_posterior(density_estimator).set_default_x(
             observation
         )
-        if isinstance(posterior_file, str):
+        if isinstance(posterior_file, str) and idx_round % save_interval == 0 and idx_round > 0:
             with open(f"{posterior_file}_round={idx_round}.pkl", "wb") as handle:
                 pickle.dump(posterior, handle)
 
