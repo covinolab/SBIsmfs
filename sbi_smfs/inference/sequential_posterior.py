@@ -98,3 +98,6 @@ def train_sequential_posterior(
 
     if not isinstance(posterior_file, str):
         return posterior
+    elif isinstance(posterior_file, str):
+        with open(f"{posterior_file}.pkl", "wb") as handle:
+            pickle.dump(posterior, handle)
