@@ -2,13 +2,15 @@ from typing import Union
 from configparser import ConfigParser
 
 
-def get_config_parser(config_file: Union[str, ConfigParser]) -> ConfigParser:
+def get_config_parser(config_file: Union[str, ConfigParser], validate: bool = False) -> ConfigParser:
     """Reads config file and returns ConfigParser object.
 
     Parameters
     ----------
     config_file: str, ConfigParser
         Config file with entries for simualtion.
+    validate: bool
+        Whether to check that all parameters are correctly specified.
 
     Returns
     -------
@@ -26,6 +28,9 @@ def get_config_parser(config_file: Union[str, ConfigParser]) -> ConfigParser:
         }
     )
     config.read(config_file)
+
+    if validate:
+        validate_config(config)
 
     return config
 

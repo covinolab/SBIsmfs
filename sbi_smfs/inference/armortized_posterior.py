@@ -42,7 +42,7 @@ def train_armortized_posterior(
     inference: sbi.inference.snpe.snpe_base.SNPE
         Trained posterior.
     """
-    config = get_config_parser(config_file)
+    config = get_config_parser(config_file, validate=True)
 
     print("Building neural network on :", device)
     neural_posterior = build_npe_model(config)
