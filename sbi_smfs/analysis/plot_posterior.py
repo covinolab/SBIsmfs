@@ -12,6 +12,7 @@ def plot_spline_ensemble(
     num_splines: int,
     config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
+    line_alpha: float = 0.02,
 ) -> None:
     """Plot a ensemble of splines from the posterior.
 
@@ -51,7 +52,7 @@ def plot_spline_ensemble(
             num_ind_var = 3
         y_knots[2:-2] = sample[num_ind_var:].numpy()
         y_axis = c_spline(x_knots, y_knots, x_axis)
-        plt.plot(x_axis, y_axis, alpha=0.02, color="blue")
+        plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
@@ -66,6 +67,7 @@ def plot_spline_mean_with_error(
     config: Union[str, ConfigParser],
     alpha: float = 0.05,
     ylims: tuple = (-10, 10),
+    line_alpha: float = 1.0,
 ) -> None:
     """Plot the posterior mean of the spline nodes with error bars.
 
@@ -110,7 +112,7 @@ def plot_spline_mean_with_error(
     y_knots[2:-2] = mean_posterior[num_ind_var:].numpy()
     y_axis = c_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis - np.min(y_axis), alpha=1, color="blue")
+    plt.plot(x_axis, y_axis - np.min(y_axis), alpha=line_alpha, color="blue")
     plt.errorbar(
         x_knots,
         y_knots - np.min(y_axis),
@@ -119,6 +121,7 @@ def plot_spline_mean_with_error(
         marker="o",
         color="blue",
         label="posterior mean",
+        alpha=line_alpha,
     )
     plt.ylim(ylims)
     plt.xlim(
@@ -134,6 +137,7 @@ def plot_spline(
     config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
     color: str = "red",
+    line_alpha: float = 1.0,
 ) -> None:
     """Plot a ensemble of splines from the posterior.
 
@@ -162,15 +166,18 @@ def plot_spline(
     )
 
     y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
-    y_knots[1] = y_knots[-2] = config.getint("SIMULATOR", "max_G_1")
-    y_knots[0] = y_knots[-1] = config.getint("SIMULATOR", "max_G_0")
+    y_knots[1] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[-2] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[0] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_0")
+    y_knots[-1] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_0")
+
     if isinstance(spline_nodes, torch.Tensor):
         y_knots[2:-2] = spline_nodes.numpy()
     else:
         y_knots[2:-2] = spline_nodes
     y_axis = c_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis, alpha=1, color=color)
+    plt.plot(x_axis, y_axis, alpha=line_alpha, color=color)
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")

@@ -88,9 +88,14 @@ def train_sequential_posterior(
             show_train_summary=True,
             **train_parameters,
         )
-
-        posterior = inference.build_posterior(density_estimator)
-        if isinstance(posterior_file, str) and idx_round % save_interval == 0 and idx_round > 0:
+        posterior = inference.build_posterior(
+            density_estimator,
+        )
+        if (
+            isinstance(posterior_file, str)
+            and idx_round % save_interval == 0
+            and idx_round > 0
+        ):
             with open(f"{posterior_file}_round={idx_round}.pkl", "wb") as handle:
                 pickle.dump(posterior, handle)
 

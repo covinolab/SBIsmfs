@@ -61,10 +61,11 @@ def test_individual_spline_prior():
 
     for i in range(6):
         assert torch.isclose(
-            samples[:, i+2].mean(), true_mean[i], atol=0.1
+            samples[:, i + 2].mean(), true_mean[i], atol=0.1
         ).item(), f"mean spline {i}"
         assert torch.isclose(
-            samples[:, i+2].std(), true_std[i], atol=0.1
+            samples[:, i + 2].std(), true_std[i], atol=0.1
         ).item(), f"std spline {i}"
+
 
 # TODO : Add test for non spline prior

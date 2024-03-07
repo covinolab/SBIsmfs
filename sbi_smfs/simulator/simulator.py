@@ -84,9 +84,9 @@ def smfe_simulator_mm(
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
     y_knots = np.zeros(N_knots)
-    y_knots[0] = max_G_0 + parameters[2].numpy()
+    y_knots[0] = max_G_0 + parameters[num_ind_params].numpy()
     y_knots[-1] = max_G_0 + parameters[-1].numpy()
-    y_knots[1] = max_G_1 + parameters[2].numpy()
+    y_knots[1] = max_G_1 + parameters[num_ind_params].numpy()
     y_knots[-2] = max_G_1 + parameters[-1].numpy()
     y_knots[2:-2] = parameters[num_ind_params:].numpy()
 
@@ -110,7 +110,7 @@ def smfe_simulator_mm(
 
     if q is None:
         return None
-    
+
     matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
     return matrices
 

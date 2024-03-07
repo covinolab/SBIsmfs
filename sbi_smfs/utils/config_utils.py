@@ -2,7 +2,9 @@ from typing import Union
 from configparser import ConfigParser
 
 
-def get_config_parser(config_file: Union[str, ConfigParser], validate: bool = False) -> ConfigParser:
+def get_config_parser(
+    config_file: Union[str, ConfigParser], validate: bool = False
+) -> ConfigParser:
     """Reads config file and returns ConfigParser object.
 
     Parameters
@@ -24,7 +26,9 @@ def get_config_parser(config_file: Union[str, ConfigParser], validate: bool = Fa
     config = ConfigParser(
         converters={
             "listint": lambda x: [int(i.strip()) for i in x.split(",")],
-            "listfloat": lambda x: [[float(i.strip()) for i in group.split(",")] for group in x.split(";")]
+            "listfloat": lambda x: [
+                [float(i.strip()) for i in group.split(",")] for group in x.split(";")
+            ],
         }
     )
     config.read(config_file)

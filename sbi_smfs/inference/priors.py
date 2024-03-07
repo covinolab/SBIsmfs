@@ -83,7 +83,9 @@ def get_priors_from_config(config_file, device="cpu"):
         ]
     elif len(spline_dist_params) == 2:
         for i in range(2):
-            assert len(spline_dist_params[i]) == num_spline_knots, "wrong spline configuration"
+            assert (
+                len(spline_dist_params[i]) == num_spline_knots
+            ), "wrong spline configuration"
         prior_splines = [
             PRIORS[config.get("PRIORS", "type_spline")](
                 torch.tensor([p1], device=device),
