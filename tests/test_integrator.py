@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from sbi_smfs.simulator.brownian_integrator import brownian_integrator
+from sbi_smfs.simulator.brownian_integrator import brownian_integrator, pdd_brownian_integrator
 
 
 @np.vectorize
@@ -137,3 +137,171 @@ def test_integrator_rng_generator():
     )
 
     assert not (q1 == q2).all()
+
+
+def test_pdd_integrator_error():
+    deltaG = 6
+    k = 3
+    delta_x = 1.5
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    dx_knots = np.ones(len(x_knots))
+
+    q = pdd_brownian_integrator(
+        x0=10,
+        q0=10,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=10,
+        dt=5e-4,
+        fs=1,
+    )
+    assert q is None
+
+
+def test_pdd_integrator_saving():
+    deltaG = 6
+    k = 3
+    delta_x = 1.5
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    dx_knots = np.ones(len(x_knots))
+
+    num_steps = 1e4
+    saving_freq = 10
+
+    q = pdd_brownian_integrator(
+        x0=1,
+        q0=1,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=num_steps,
+        dt=5e-4,
+        fs=saving_freq,
+    )
+    assert len(q) == num_steps // saving_freq
+
+
+@pytest.mark.parametrize("deltaG, k, delta_x", [(6, 3, 1.5), (4, 2, 1.0)])
+def test_pdd_integrator_pmf(deltaG: float, k: float, delta_x: float):
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    dx_knots = np.ones(len(x_knots))
+
+    q = pdd_brownian_integrator(
+        x0=1,
+        q0=1,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=int(5e8),
+        dt=5e-3,
+        fs=10,
+    )
+
+    bins = np.linspace(-3.0, 3.0, 200)
+    counts, bins = np.histogram(q, bins=bins, density=True)
+    pmf_sim = -np.log(counts)
+    pmf_sim = pmf_sim - min(pmf_sim)
+    bin_center = bins[1:] - (bins[1:] - bins[:-1]) / 2
+
+    x_values = np.linspace(-3, 3, len(bin_center))
+    y_values = bin_center
+    x, y = np.meshgrid(x_values, y_values)
+    pot = G(x, y, dG=deltaG, k=k, delta_x=delta_x)
+
+    L = len(pot[0, :])
+    y_proj = np.zeros(L)
+    for i in range(L):
+        y_proj[i] = -np.log(np.trapz(np.exp(-pot[i, :])))
+    y_proj = y_proj - min(y_proj)
+    average_error = np.mean(y_proj - pmf_sim)
+    assert np.isclose(average_error, 0, atol=0.1)
+
+
+@pytest.mark.parametrize("deltaG, k, delta_x", [(6, 3, 1.5), (4, 2, 1.0)])
+def test_pdd_integrator_pmf_modulated_diffusion(deltaG: float, k: float, delta_x: float):
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    dx_knots = np.linspace(0.5, 1.5, len(x_knots))
+
+    q = pdd_brownian_integrator(
+        x0=1,
+        q0=1,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=int(5e8),
+        dt=5e-3,
+        fs=10,
+    )
+
+    bins = np.linspace(-3.0, 3.0, 200)
+    counts, bins = np.histogram(q, bins=bins, density=True)
+    pmf_sim = -np.log(counts)
+    pmf_sim = pmf_sim - min(pmf_sim)
+    bin_center = bins[1:] - (bins[1:] - bins[:-1]) / 2
+
+    x_values = np.linspace(-3, 3, len(bin_center))
+    y_values = bin_center
+    x, y = np.meshgrid(x_values, y_values)
+    pot = G(x, y, dG=deltaG, k=k, delta_x=delta_x)
+
+    L = len(pot[0, :])
+    y_proj = np.zeros(L)
+    for i in range(L):
+        y_proj[i] = -np.log(np.trapz(np.exp(-pot[i, :])))
+    y_proj = y_proj - min(y_proj)
+    average_error = np.mean(y_proj - pmf_sim)
+    assert np.isclose(average_error, 0, atol=0.1)
+
+
+def test_pdd_integrator_rng_generator():
+    deltaG = 6
+    k = 3
+    delta_x = 1.5
+    x_knots = np.linspace(-6, 6, 150)
+    y_knots = deltaG * G0(x_knots / delta_x)
+    dx_knots = np.ones(len(x_knots))
+
+    num_steps = 1e2
+    saving_freq = 1
+
+    q1 = pdd_brownian_integrator(
+        x0=1,
+        q0=1,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=num_steps,
+        dt=5e-4,
+        fs=saving_freq,
+    )
+
+    q2 = pdd_brownian_integrator(
+        x0=1,
+        q0=1,
+        Dx=dx_knots,
+        Dq=1,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=num_steps,
+        dt=5e-4,
+        fs=saving_freq,
+    )
+
+    assert not (q1 == q2).all()
+

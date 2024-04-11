@@ -4,7 +4,7 @@ import numpy as np
 from functools import partial
 import configparser
 from sbi_smfs.utils.summary_stats import build_transition_matricies
-from sbi_smfs.simulator.brownian_integrator import brownian_integrator
+from sbi_smfs.simulator.brownian_integrator import brownian_integrator, pdd_brownian_integrator
 
 
 def smfe_simulator_mm(
@@ -96,6 +96,108 @@ def smfe_simulator_mm(
 
     # Call integrator
     q = brownian_integrator(
+        x0=x_init,
+        q0=q_init,
+        Dx=Dx,
+        Dq=Dq,
+        x_knots=x_knots,
+        y_knots=y_knots,
+        k=k,
+        N=N,
+        dt=dt,
+        fs=saving_freq,
+    )
+
+    if q is None:
+        return None
+
+    matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
+    return matrices
+
+
+def smfe_pdd_simulator_mm(
+    parameters: torch.Tensor,
+    dt: float,
+    N: int,
+    saving_freq: int,
+    N_knots: int,
+    min_x: float,
+    max_x: float,
+    max_G_0: float,
+    max_G_1: float,
+    init_xq_range: Tuple[float, float],
+    min_bin: float,
+    max_bin: float,
+    num_bins: int,
+    lag_times: list[int],
+) -> torch.Tensor:
+    """
+    Simulator for single-molecule force-spectroscopy experiments with position-dependent diffusion coefficient.
+    The molecular free energy surface and the position dependent diffuson coefficient is described by a cubic spline
+
+    Parameters
+    ----------
+    parameters : torch.Tensor
+        Changeable_parameters of the simulator.
+        (Dx, Dq, k, spline_nodes)
+    dt : float
+        Integration timestep
+    N : int
+        Totoal number of steps.
+    saving_freq : int
+        Saving frequency during integration.
+    Dx : float
+        Diffusion coefficient in x direction.
+    N_knots : int
+        Number of knots in spline potential.
+    min_x : float
+        Minimal x value of spline potenital.
+    max_x : float
+        Maximal x value of spline potenital.
+    max_G_0 : float
+        Additional barrier at the end of spline for first and last node.
+    max_G_1 : float
+        Additional barrier at the end of spline for seconf and second last node.
+    init_xq_range: tuple[float, float]
+        Range of inital positions.
+    min_bin : float
+        Outer left bin edge.
+    max_bin:
+        Outer right bin edge.
+    num_bins: int
+        Number of bins for transition matrix.
+    lag_times: List[Int]:
+        List of lag times for which a transition matrix is generated.
+
+    Returns
+    -------
+    summary_stats : torch.Tensor
+        Summary statistics of simulation perform with parameters.
+    """
+
+    assert len(parameters) == 2 + N_knots + N_knots - 4 # Dq, k, Dx, Gx (spline nodes - 4 fixed nodes)
+
+    # Select integration constants from parameters
+    Dq = 10 ** parameters[0].item()
+    k = 10 ** parameters[1].item()
+    Dx = 10 ** parameters[2: 2+N_knots].numpy()
+    Gx = parameters[2+N_knots:].numpy()
+
+    # Select spline knots from parameters
+    x_knots = np.linspace(min_x, max_x, N_knots)
+    y_knots = np.zeros(N_knots)
+    y_knots[0] = max_G_0 + Gx[0]
+    y_knots[-1] = max_G_0 + Gx[-1]
+    y_knots[1] = max_G_1 + Gx[0]
+    y_knots[-2] = max_G_1 + Gx[-1]
+    y_knots[2:-2] = Gx
+
+    # Select random initial position for x and q
+    x_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
+    q_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])
+
+    # Call integrator
+    q = pdd_brownian_integrator(
         x0=x_init,
         q0=q_init,
         Dx=Dx,
