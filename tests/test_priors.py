@@ -68,6 +68,20 @@ def test_individual_spline_prior():
         ).item(), f"std spline {i}"
 
 
+def test_prior_shape_pdd():
+    num_samples = 1000000
+    prior = get_priors_from_config("tests/config_files/test_pdd.config")
+    samples = prior.sample((num_samples,))
+    assert samples.shape[1] == 2 + 15 + 15 - 4, "wrong number of parameters"
+
+
+def test_prior_shape():
+    num_samples = 1000000
+    prior = get_priors_from_config("tests/config_files/test.config")
+    samples = prior.sample((num_samples,))
+    assert samples.shape[1] == 2 + 15 - 4, "number of parameters"
+
+
 def test_get_prior_from_config_with_pdd():
     num_samples = 1000000
     prior = get_priors_from_config("tests/config_files/test_pdd.config")
@@ -86,7 +100,7 @@ def test_get_prior_from_config_with_pdd():
         samples[:, 1].std(), torch.tensor(1.0), atol=0.1
     ).item(), "std k"
 
-    for i in range(10):
+    for i in range(15):
         assert torch.isclose(
             samples[:, i + 2].mean(), torch.tensor(-2.0), atol=0.1
         ).item(), f"mean spline Dx {i}"
@@ -94,10 +108,10 @@ def test_get_prior_from_config_with_pdd():
             samples[:, i + 2].std(), torch.tensor(0.5), atol=0.1
         ).item(), f"std spline Dx {i}"
 
-    for i in range(6):
+    for i in range(11):
         assert torch.isclose(
-            samples[:, i + 12].mean(), torch.tensor(0.0), atol=0.1
+            samples[:, i + 17].mean(), torch.tensor(0.0), atol=0.1
         ).item(), f"mean spline Gx {i + 12}"
         assert torch.isclose(
-            samples[:, i + 12].std(), torch.tensor(2.0), atol=0.1
+            samples[:, i + 17].std(), torch.tensor(2.0), atol=0.1
         ).item(), f"std spline Gx {i + 12}"

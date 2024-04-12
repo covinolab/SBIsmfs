@@ -42,7 +42,7 @@ def test_generate_simulations_with_pdd():
         save_as_file=False,
     )
     assert observations is not None
-    assert observations[0].shape == (3, 18)
+    assert observations[0].shape == (3, 2 + 15 + 15 - 4)
     assert observations[1].shape == (3, 2400)
 
 

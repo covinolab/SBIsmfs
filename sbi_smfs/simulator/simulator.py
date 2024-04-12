@@ -177,7 +177,7 @@ def smfe_pdd_simulator_mm(
     summary_stats : torch.Tensor
         Summary statistics of simulation performed with parameters.
     """
-
+    print(parameters)
     assert (
         len(parameters) == 2 + N_knots + N_knots - 4
     )  # Dq, k, Dx, Gx (spline nodes - 4 fixed nodes)
