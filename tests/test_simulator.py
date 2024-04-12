@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 import torch
-from sbi_smfs.simulator.simulator import smfe_simulator_mm, smfe_pdd_simulator_mm, get_simulator_from_config
+from sbi_smfs.simulator.simulator import (
+    smfe_simulator_mm,
+    smfe_pdd_simulator_mm,
+    get_simulator_from_config,
+)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +49,7 @@ def test_pdd_simulator(num_bins: int, lag_times: list[int]):
         lag_times=lag_times,
     )
 
-    assert summary_stats.shape[0] == len(lag_times) * (num_bins ** 2)
+    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2)
 
 
 @pytest.mark.parametrize(
@@ -89,7 +93,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
         lag_times=lag_times,
     )
 
-    assert summary_stats.shape[0] == len(lag_times) * (num_bins ** 2)
+    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2)
 
 
 def test_simulator_from_config():
@@ -113,7 +117,33 @@ def test_simulator_from_config():
 
     simulator = get_simulator_from_config("tests/config_files/test.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20 ** 2)
+    assert summary_stats.shape[0] == 6 * (20**2)
+
+
+def test_pdd_simulator_from_config():
+    params = torch.tensor(
+        [
+            0,
+            3,
+            *[0 for _ in range(15)],
+            6.94227994,
+            -0.67676768,
+            -4.23232323,
+            -3.72438672,
+            0.45021645,
+            2.48196248,
+            0.45021645,
+            3.72438672,
+            -4.23232323,
+            -0.67676768,
+            6.94227994,
+        ],
+        dtype=torch.float64,
+    )
+
+    simulator = get_simulator_from_config("tests/config_files/test_pdd.config")
+    summary_stats = simulator(params)
+    assert summary_stats.shape[0] == 6 * (20**2)
 
 
 def test_simulator_from_config_with_Dx():
@@ -138,7 +168,7 @@ def test_simulator_from_config_with_Dx():
 
     simulator = get_simulator_from_config("tests/config_files/test_2.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20 ** 2)
+    assert summary_stats.shape[0] == 6 * (20**2)
 
 
 def test_simulator_from_config_with_no_Dx():

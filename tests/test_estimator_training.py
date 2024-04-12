@@ -22,6 +22,13 @@ def test_sequential_training():
     assert isinstance(posterior, DirectPosterior)
 
 
+def test_sequential_training_with_pdd():
+    test_config = "tests/config_files/test_pdd.config"
+    test_observation = torch.randn(2400)
+    posterior = train_sequential_posterior(test_config, 2, 50, 1, test_observation)
+    assert isinstance(posterior, DirectPosterior)
+
+
 def test_sequential_training_with_Dx():
     test_config = "tests/config_files/test_2.config"
     test_observation = torch.randn(2400)

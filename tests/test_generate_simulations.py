@@ -32,6 +32,20 @@ def test_generate_simulations_with_Dx():
     assert observations[1].shape == (3, 2400)
 
 
+def test_generate_simulations_with_pdd():
+    observations = generate_simulations(
+        "tests/config_files/test_pdd.config",
+        num_sim=3,
+        num_workers=1,
+        file_name=None,
+        show_progressbar=False,
+        save_as_file=False,
+    )
+    assert observations is not None
+    assert observations[0].shape == (3, 18)
+    assert observations[1].shape == (3, 2400)
+
+
 def test_generate_simulations_wrong_input():
     with pytest.raises(AssertionError):
         observations = generate_simulations(

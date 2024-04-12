@@ -97,13 +97,32 @@ def get_priors_from_config(config_file, device="cpu"):
     priors = [prior_dq, prior_k, *prior_splines]
 
     if "type_dx" in config["PRIORS"] and "parameters_dx" in config["PRIORS"]:
-        dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")
-        prior_dx = PRIORS[config.get("PRIORS", "type_Dx")](
-            torch.tensor([dx_dist_params[0][0]], device=device),
-            torch.tensor([dx_dist_params[0][1]], device=device),
-        )
-        priors.insert(0, prior_dx)
-        indipendent_vars += 1
+        if "position_dependent_diffusion" in config["PRIORS"] and config.getboolean(
+            "PRIORS", "position_dependent_diffusion"
+        ):
+            dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")
+            num_dx_knots = config.getint("SIMULATOR", "num_knots")
+            prior_pdd_dx = [
+                PRIORS[config.get("PRIORS", "type_Dx")](
+                    torch.tensor([dx_dist_params[0][0]], device=device),
+                    torch.tensor([dx_dist_params[0][1]], device=device),
+                )
+                for _ in range(num_dx_knots)
+            ]
+            for dx_prior in prior_pdd_dx:
+                priors.insert(2, dx_prior)
+            indipendent_vars += num_dx_knots
+
+        if "position_dependent_diffusion" not in config[
+            "PRIORS"
+        ] or not config.getboolean("PRIORS", "position_dependent_diffusion"):
+            dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")
+            prior_dx = PRIORS[config.get("PRIORS", "type_Dx")](
+                torch.tensor([dx_dist_params[0][0]], device=device),
+                torch.tensor([dx_dist_params[0][1]], device=device),
+            )
+            priors.insert(0, prior_dx)
+            indipendent_vars += 1
 
     if config.getboolean("PRIORS", "norm_spline_nodes"):
         return SplinePrior(priors, indipendent_vars)

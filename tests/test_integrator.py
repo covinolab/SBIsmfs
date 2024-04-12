@@ -1,6 +1,9 @@
 import pytest
 import numpy as np
-from sbi_smfs.simulator.brownian_integrator import brownian_integrator, pdd_brownian_integrator
+from sbi_smfs.simulator.brownian_integrator import (
+    brownian_integrator,
+    pdd_brownian_integrator,
+)
 
 
 @np.vectorize
@@ -8,7 +11,7 @@ def G0(x):
     if np.abs(x) > 0.5:
         return 2 * (np.abs(x) - 1) ** 2 - 1
     else:
-        return -2 * x ** 2
+        return -2 * x**2
 
 
 def G(x, q, dG=4, k=2, delta_x=1):
@@ -228,7 +231,9 @@ def test_pdd_integrator_pmf(deltaG: float, k: float, delta_x: float):
 
 
 @pytest.mark.parametrize("deltaG, k, delta_x", [(6, 3, 1.5), (4, 2, 1.0)])
-def test_pdd_integrator_pmf_modulated_diffusion(deltaG: float, k: float, delta_x: float):
+def test_pdd_integrator_pmf_modulated_diffusion(
+    deltaG: float, k: float, delta_x: float
+):
     x_knots = np.linspace(-6, 6, 150)
     y_knots = deltaG * G0(x_knots / delta_x)
     dx_knots = np.linspace(0.5, 1.5, len(x_knots))
@@ -304,4 +309,3 @@ def test_pdd_integrator_rng_generator():
     )
 
     assert not (q1 == q2).all()
-

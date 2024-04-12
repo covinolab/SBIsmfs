@@ -1,3 +1,4 @@
+import os
 from typing import Union
 from configparser import ConfigParser
 
@@ -19,6 +20,8 @@ def get_config_parser(
     config: ConfigParser
         ConfigParser object with entries for simualtion.
     """
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Config file {config_file} not found.")
 
     if isinstance(config_file, ConfigParser):
         return config_file

@@ -4,7 +4,10 @@ import numpy as np
 from functools import partial
 import configparser
 from sbi_smfs.utils.summary_stats import build_transition_matricies
-from sbi_smfs.simulator.brownian_integrator import brownian_integrator, pdd_brownian_integrator
+from sbi_smfs.simulator.brownian_integrator import (
+    brownian_integrator,
+    pdd_brownian_integrator,
+)
 
 
 def smfe_simulator_mm(
@@ -65,9 +68,9 @@ def smfe_simulator_mm(
     Returns
     -------
     summary_stats : torch.Tensor
-        Summary statistics of simulation perform with parameters.
+        Summary statistics of simulation performed with parameters.
     """
-
+    parameters = parameters.to(torch.float64)
     # Select integration constants from parameters
     if Dx is None:
         num_ind_params = 3
@@ -172,20 +175,23 @@ def smfe_pdd_simulator_mm(
     Returns
     -------
     summary_stats : torch.Tensor
-        Summary statistics of simulation perform with parameters.
+        Summary statistics of simulation performed with parameters.
     """
 
-    assert len(parameters) == 2 + N_knots + N_knots - 4 # Dq, k, Dx, Gx (spline nodes - 4 fixed nodes)
+    assert (
+        len(parameters) == 2 + N_knots + N_knots - 4
+    )  # Dq, k, Dx, Gx (spline nodes - 4 fixed nodes)
+    parameters = parameters.to(torch.float64)
 
     # Select integration constants from parameters
     Dq = 10 ** parameters[0].item()
     k = 10 ** parameters[1].item()
-    Dx = 10 ** parameters[2: 2+N_knots].numpy()
-    Gx = parameters[2+N_knots:].numpy()
+    Dx = 10 ** parameters[2 : 2 + N_knots].numpy()
+    Gx = parameters[2 + N_knots :].numpy()
 
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
-    y_knots = np.zeros(N_knots)
+    y_knots = np.zeros(N_knots, dtype=np.float64)
     y_knots[0] = max_G_0 + Gx[0]
     y_knots[-1] = max_G_0 + Gx[-1]
     y_knots[1] = max_G_1 + Gx[0]
@@ -243,6 +249,25 @@ def get_simulator_from_config(
     if "Dx" in config["SIMULATOR"]:
         Dx = config.getfloat("SIMULATOR", "Dx")
     elif "type_Dx" in config["PRIORS"] and "parameters_Dx" in config["PRIORS"]:
+        if "position_dependent_diffusion" in config["PRIORS"] and config.getboolean(
+            "PRIORS", "position_dependent_diffusion"
+        ):
+            return partial(
+                smfe_pdd_simulator_mm,
+                dt=config.getfloat("SIMULATOR", "dt"),
+                N=config.getint("SIMULATOR", "num_steps"),
+                saving_freq=config.getint("SIMULATOR", "saving_freq"),
+                N_knots=config.getint("SIMULATOR", "num_knots"),
+                min_x=config.getfloat("SIMULATOR", "min_x"),
+                max_x=config.getfloat("SIMULATOR", "max_x"),
+                max_G_0=config.getfloat("SIMULATOR", "max_G_0"),
+                max_G_1=config.getfloat("SIMULATOR", "max_G_1"),
+                init_xq_range=config.getlistfloat("SIMULATOR", "init_xq_range"),
+                min_bin=config.getfloat("SUMMARY_STATS", "min_bin"),
+                max_bin=config.getfloat("SUMMARY_STATS", "max_bin"),
+                num_bins=config.getint("SUMMARY_STATS", "num_bins"),
+                lag_times=config.getlistint("SUMMARY_STATS", "lag_times"),
+            )
         Dx = None
     else:
         raise NotImplementedError("Dx not properly specified in config file!")
