@@ -68,4 +68,38 @@ def test_individual_spline_prior():
         ).item(), f"std spline {i}"
 
 
+def test_get_langevin_prior_from_config():
+    num_samples = 1000000
+    prior = get_priors_from_config("tests/config_files/langevin.config")
+    samples = prior.sample((num_samples,))
+
+    assert samples.shape[1] == 15, "wrong number of parameters"
+    assert torch.isclose(
+        samples[:, 0].mean(), torch.tensor(1.0), atol=0.1
+    ).item(), "mean xm"
+    assert torch.isclose(
+        samples[:, 0].std(), torch.tensor(0.577), atol=0.1
+    ).item(), "std xm"
+    assert torch.isclose(
+        samples[:, 1].mean(), torch.tensor(0.0), atol=0.1
+    ).item(), "mean xnu"
+    assert torch.isclose(
+        samples[:, 1].std(), torch.tensor(1.154), atol=0.1
+    ).item(), "std xnu"
+    assert torch.isclose(
+        samples[:, 2].mean(), torch.tensor(-1.5), atol=0.1
+    ).item(), "mean dq"
+    assert torch.isclose(
+        samples[:, 2].std(), torch.tensor(0.866), atol=0.1
+    ).item(), "std dq"
+    assert torch.isclose(
+        samples[:, 3].mean(), torch.tensor(0.0), atol=0.1
+    ).item(), "mean k"
+    assert torch.isclose(
+        samples[:, 3].std(), torch.tensor(1.0), atol=0.1
+    ).item(), "std k"
+    assert (
+        torch.isclose(samples[:, 4:].mean(axis=1), torch.zeros(num_samples), atol=1e-5)
+    ).all(), "spline mean"
+
 # TODO : Add test for non spline prior

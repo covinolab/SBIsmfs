@@ -10,3 +10,6 @@ def test_validate_config():
 def test_validate_corrupted_config():
     with pytest.raises(KeyError):
         validate_config("tests/config_files/fail.config")
+
+def test_validate_config_langevin():
+    assert validate_config("tests/config_files/langevin.config")

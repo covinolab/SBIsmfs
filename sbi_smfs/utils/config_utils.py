@@ -122,9 +122,13 @@ def validate_config(config_file: Union[str, ConfigParser]) -> None:
         if "type_Dx" in config["PRIORS"] or "parameters_Dx" in config["PRIORS"]:
             raise KeyError("Dx specified in prior and simulator!")
     elif "Dx" not in config["SIMULATOR"]:
-        if (
-            "type_Dx" not in config["PRIORS"]
-            and "parameters_Dx" not in config["PRIORS"]
-        ):
-            raise KeyError("Dx needs to be specified in simualtor or prior!")
+        if "type_xm" in config["PRIORS"] and "type_xnu" in config["PRIORS"] and "parameters_xm" in config["PRIORS"] and "parameters_xnu" in config["PRIORS"]:
+            pass
+        elif (
+                "type_Dx" in config["PRIORS"]
+                and "parameters_Dx" in config["PRIORS"]
+            ):
+            pass
+        else:
+            raise KeyError("Dx or xnu/xm not properly specified in config file!")
     return True

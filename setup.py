@@ -51,6 +51,14 @@ extensions = [
         libraries=["gsl", "gslcblas"],
         language_level=3,
     ),
+    Extension(
+        "sbi_smfs.simulator.langevin_integrator",
+        ["sbi_smfs/simulator/langevin_integrator.pyx"],
+        include_dirs=[np.get_include(), gsl_include_dir],
+        library_dirs=[gsl_lib_dir],
+        libraries=["gsl", "gslcblas"],
+        language_level=3,
+    ),
 ]
 
 

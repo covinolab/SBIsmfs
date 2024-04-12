@@ -105,6 +105,24 @@ def get_priors_from_config(config_file, device="cpu"):
         priors.insert(0, prior_dx)
         indipendent_vars += 1
 
+    if "type_xm" in config["PRIORS"] and "parameters_xm" in config["PRIORS"]:
+        xm_dist_params = config.getlistfloat("PRIORS", "parameters_xm")
+        prior_xm = PRIORS[config.get("PRIORS", "type_xm")](
+            torch.tensor([xm_dist_params[0][0]], device=device),
+            torch.tensor([xm_dist_params[0][1]], device=device),
+        )
+        priors.insert(0, prior_xm)
+        indipendent_vars += 1
+    
+    if "type_xnu" in config["PRIORS"] and "parameters_xnu" in config["PRIORS"]:
+        xnu_dist_params = config.getlistfloat("PRIORS", "parameters_xnu")
+        prior_xnu = PRIORS[config.get("PRIORS", "type_xnu")](
+            torch.tensor([xnu_dist_params[0][0]], device=device),
+            torch.tensor([xnu_dist_params[0][1]], device=device),
+        )
+        priors.insert(1, prior_xnu)
+        indipendent_vars += 1
+
     if config.getboolean("PRIORS", "norm_spline_nodes"):
         return SplinePrior(priors, indipendent_vars)
     else:
