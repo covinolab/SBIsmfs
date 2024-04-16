@@ -45,7 +45,7 @@ def build_npe_model(config: str):
         cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
             config.getint("SUMMARY_STATS", "num_bins"),
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
-            100,
+            512, # number of features TODO: make this a parameter
         )
         print("Using embedding net :", config.get("NEURAL_NETWORK", "embedding_net"))
     else:
@@ -65,6 +65,7 @@ def build_npe_model(config: str):
         "dropout_probability": config.getfloat("NEURAL_NETWORK", "dropout_probability"),
         "use_batch_norm": config.getboolean("NEURAL_NETWORK", "use_batch_norm"),
     }
+
 
     neural_posterior = posterior_nn(
         model=config.get("NEURAL_NETWORK", "model"),
