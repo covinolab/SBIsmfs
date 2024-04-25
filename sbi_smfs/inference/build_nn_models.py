@@ -72,7 +72,7 @@ def build_npe_model(config: str):
         hidden_features=config.getint("NEURAL_NETWORK", "hidden_features"),
         num_transforms=config.getint("NEURAL_NETWORK", "num_transforms"),
         num_bins=config.getint("NEURAL_NETWORK", "num_bins"),
-        embedding_net=cnn_net,
+        #embedding_net=cnn_net,
         z_score_x="none",
         **kwargs_flow,
     )

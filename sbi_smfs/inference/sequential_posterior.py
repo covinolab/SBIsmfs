@@ -59,8 +59,10 @@ def train_sequential_posterior(
     if isinstance(observation, str):
         observation = torch.load(observation)
 
-    if not check_if_observation_contains_features(observation, config):
-        observation = compute_stats(observation, config)
+    #if not check_if_observation_contains_features(observation, config):
+    #    observation = compute_stats(observation, config)
+
+    print("Observation shape :", observation.shape)
 
     print("Building neural network on :", device)
     neural_posterior = build_npe_model(config)

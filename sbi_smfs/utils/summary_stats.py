@@ -154,3 +154,27 @@ def check_if_observation_contains_features(
         return False
     else:
         return True
+    
+
+def extract_fourier_features(traj: np.array, num_coeff: int):
+    """Extracts the Fourier coefficients of a trajectory with the highest magnitude.
+
+    Parameters
+    ----------
+    traj : np.array
+        Trajectory to extract the Fourier coefficients from
+    num_coeff : int
+        Number of Fourier coefficients to extract
+    
+    Returns
+    -------
+    np.array
+        Fourier coefficients with the highest magnitude and their indices. The array has the following format:
+        [index_1, index_2, ..., index_n, magnitude_1, magnitude_2, ..., magnitude_n]
+    """
+
+    fft_traj = np.fft.fft(traj)
+    idx = np.abs(fft_traj).argsort()[-num_coeff:]
+    features = np.concatenate((idx, np.abs(fft_traj[idx])), axis=0)
+    features = np.float32(features)
+    return torch.from_numpy(features)  # return the index and the magnitude of the coefficients

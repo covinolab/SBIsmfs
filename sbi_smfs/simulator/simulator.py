@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from functools import partial
 import configparser
-from sbi_smfs.utils.summary_stats import build_transition_matricies
+from sbi_smfs.utils.summary_stats import build_transition_matricies, extract_fourier_features
 from sbi_smfs.simulator.brownian_integrator import (
     brownian_integrator,
     pdd_brownian_integrator,
@@ -114,7 +114,8 @@ def smfe_simulator_mm(
     if q is None:
         return None
 
-    matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
+    #matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
+    matrices = extract_fourier_features(q, 500)
     return matrices
 
 

@@ -233,7 +233,7 @@ def pdd_brownian_integrator(
     cdef double Aq = Dq * dt
     cdef double Bq = sqrt(2.0 * Aq)
     cdef double Fx, Fq, xnew, qnew, spline_gx_deriv, spline_dx_val, spline_dx_deriv
-    cdef int status
+    cdef int status_gx_deriv, status_dx, status_dx_deriv
 
     # Initialize ndarray to save trajectory
     cdef cnp.ndarray[double] q = np.empty(N_save, dtype=np.double)
