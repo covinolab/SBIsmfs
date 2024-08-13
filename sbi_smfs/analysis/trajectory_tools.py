@@ -74,7 +74,6 @@ def split_trajectory(
         bn.move_mean(x, window=window_size), turn_point=turn_point
     )
     transition_points.append(len(x))  # Add last point to transition points
-    print(transition_points, num_transitions)
 
     for segment_idx in range(num_transitions + 1):  # +1 because of last transition
         lower_idx = transition_points[segment_idx] + buffer_length

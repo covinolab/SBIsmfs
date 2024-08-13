@@ -96,7 +96,7 @@ def validate_config(config_file: Union[str, ConfigParser]) -> None:
             "num_transforms",
             "num_bins",
         ],
-        "TRAININ_PARAMS": [
+        "TRAINING_PARAMS": [
             "validation_fraction",
             "training_batch_size",
             "learning_rate",

@@ -11,6 +11,7 @@ cdef extern from "gsl/gsl_interp.h":
     gsl_interp_type * gsl_interp_cspline_periodic
     gsl_interp_type * gsl_interp_akima
     gsl_interp_type * gsl_interp_akima_periodic
+    gsl_interp_type * gsl_interp_steffen
 
     gsl_interp_accel * gsl_interp_accel_alloc() nogil
 

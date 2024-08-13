@@ -3,7 +3,7 @@ from configparser import ConfigParser
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from sbi_smfs.utils.gsl_spline import c_spline
+from sbi_smfs.utils.gsl_spline import c_spline, c_spline_der
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
@@ -13,6 +13,7 @@ def eval_spline(
     x_min: float = None,
     x_max: float = None,
     num_points: int = 1000,
+    derivative: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Evaluate a spline function given the spline nodes and configuration file for the simulator.
@@ -57,7 +58,55 @@ def eval_spline(
         y_knots[2:-2] = spline_nodes.numpy()
     else:
         y_knots[2:-2] = spline_nodes
-    y_axis = c_spline(x_knots, y_knots, x_axis)
+    
+    if derivative is False:
+        y_axis = c_spline(x_knots, y_knots, x_axis)
+    else:
+        y_axis = c_spline_der(x_knots, y_knots, x_axis)
+
+    return x_axis, y_axis
+
+
+def eval_spline_dx(
+    spline_nodes: torch.Tensor,
+    config: Union[str, ConfigParser],
+    num_points: int = 1000,
+    derivative: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Evaluate a spline function given the spline nodes and configuration file for the simulator.
+
+    Args:
+        spline_nodes (torch.Tensor): The spline nodes.
+        config (Union[str, ConfigParser]): The configuration for the spline evaluation.
+        num_points (int, optional): The number of points to evaluate the spline at. Defaults to 1000.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: The x-axis and y-axis values of the evaluated spline.
+    """
+    
+    config = get_config_parser(config)
+    x_min = config.getfloat("SIMULATOR", "min_x")
+    x_max = config.getfloat("SIMULATOR", "max_x")
+    
+    x_axis = np.linspace(
+        x_min,
+        x_max,
+        num_points,
+    )
+    x_knots = np.linspace(
+        config.getfloat("SIMULATOR", "min_x"),
+        config.getfloat("SIMULATOR", "max_x"),
+        config.getint("SIMULATOR", "num_knots"),
+    )
+
+    y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
+    y_knots = spline_nodes
+
+    if derivative is False:
+        y_axis = c_spline(x_knots, y_knots, x_axis)
+    else:
+        y_axis = c_spline_der(x_knots, y_knots, x_axis)
 
     return x_axis, y_axis
 

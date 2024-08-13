@@ -114,8 +114,7 @@ def smfe_simulator_mm(
     if q is None:
         return None
 
-    #matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
-    matrices = extract_fourier_features(q, 500)
+    matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
     return matrices
 
 
@@ -217,8 +216,8 @@ def smfe_pdd_simulator_mm(
         fs=saving_freq,
     )
 
-    if q is None:
-        return None
+    assert q is None, "Trajectory is None"    
+    assert not any(np.isnan(q)) , "NaNs in trajectory"
 
     matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
     return matrices

@@ -72,7 +72,7 @@ def build_npe_model(config: str):
         hidden_features=config.getint("NEURAL_NETWORK", "hidden_features"),
         num_transforms=config.getint("NEURAL_NETWORK", "num_transforms"),
         num_bins=config.getint("NEURAL_NETWORK", "num_bins"),
-        #embedding_net=cnn_net,
+        embedding_net=cnn_net,
         z_score_x="none",
         **kwargs_flow,
     )
@@ -96,7 +96,7 @@ def get_train_parameter(config):
 
     config = get_config_parser(config)
 
-    if "TRAININ_PARAMS" not in config.sections():
+    if "TRAINING_PARAMS" not in config.sections():
         print("No training parameters specified in config file.")
         print("Using default trainingparameters.")
 

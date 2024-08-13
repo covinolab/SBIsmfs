@@ -59,8 +59,8 @@ def train_sequential_posterior(
     if isinstance(observation, str):
         observation = torch.load(observation)
 
-    #if not check_if_observation_contains_features(observation, config):
-    #    observation = compute_stats(observation, config)
+    if not check_if_observation_contains_features(observation, config):
+        observation = compute_stats(observation, config)
 
     print("Observation shape :", observation.shape)
 
@@ -78,7 +78,7 @@ def train_sequential_posterior(
         x = simulate_in_batches(
             simulator,
             theta.cpu(),
-            sim_batch_size=num_sim_per_round // num_workers,
+            sim_batch_size=num_sim_per_round // (num_workers * 5),
             num_workers=num_workers,
         )
 

@@ -184,7 +184,6 @@ def pdd_brownian_integrator(
         q-Trajectory.
     
     """
-    
     # Initialize ints
     cdef int i
     cdef int N_knots = len(x_knots)
@@ -221,9 +220,8 @@ def pdd_brownian_integrator(
     cdef c_spline.gsl_interp_accel *acc_dx
     acc_dx = c_spline.gsl_interp_accel_alloc ()
     cdef c_spline.gsl_spline *spline_dx
-    spline_dx = c_spline.gsl_spline_alloc(c_spline.gsl_interp_cspline, N_knots)
+    spline_dx = c_spline.gsl_spline_alloc(c_spline.gsl_interp_steffen, N_knots) #gsl_interp_steffen
     c_spline.gsl_spline_init(spline_dx, x_k, Dx_k, N_knots)
-
 
     # Initialize constant for integrator
     cdef double xold = x0
@@ -252,13 +250,14 @@ def pdd_brownian_integrator(
         Fx = -spline_gx_deriv - k * (xold - qold)
         Fq = k * (xold - qold)
 
-        Ax = spline_dx_val * dt
+        Ax = spline_dx_val * dt 
         Bx = sqrt(2.0 * Ax)
         Cx = spline_dx_deriv * dt
 
         # integration + random number gen
         xnew = xold + Ax * Fx + Bx * grn.gsl_ran_gaussian_ziggurat(r, 1.0) + Cx
         qnew = qold + Aq * Fq + Bq * grn.gsl_ran_gaussian_ziggurat(r, 1.0)
+        
 
         # Save position
         if (i % fs) == 0:

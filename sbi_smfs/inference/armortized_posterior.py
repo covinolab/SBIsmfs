@@ -48,7 +48,10 @@ def train_armortized_posterior(
     neural_posterior = build_npe_model(config)
     train_parameters = get_train_parameter(config)
 
-    inference = SNPE(density_estimator=neural_posterior, device=device)
+    inference = SNPE(
+        density_estimator=neural_posterior,
+        device=device,
+    )
 
     if isinstance(train_data, str):
         x_file_name = f"{train_data}_x.pt"
@@ -60,7 +63,7 @@ def train_armortized_posterior(
     else:
         raise NotImplementedError
 
-    inference = inference.append_simulations(theta, x, data_device="cpu")
+    inference = inference.append_simulations(theta, x, data_device="cuda")
     density_estimator = inference.train(
         show_train_summary=True,
         **train_parameters,
