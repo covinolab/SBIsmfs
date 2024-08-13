@@ -1,13 +1,26 @@
 import numpy as np
 import pytest
 import torch
-from sbi_smfs.simulator.simulator import smfe_simulator_mm, get_simulator_from_config
+from sbi_smfs.simulator.simulator import Simulator
+
+
+@pytest.fixture
+def config():
+    config = "tests/config_files/test_config.yaml"
+    return config
+
+
+@pytest.fixture
+def config_dx():
+    config = "tests/config_files/test_config.yaml"
+    return config
 
 
 @pytest.mark.parametrize(
     "num_bins, lag_times", [(20, [1, 10, 100, 1000]), (50, [1, 10, 100])]
 )
-def test_simulator(num_bins: int, lag_times: list[int]):
+def test_simulator(config, num_bins: int, lag_times: list[int]):
+    simulator = Simulator(config)
     params = torch.tensor(
         [
             0,
@@ -25,8 +38,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
             6.94227994,
         ]
     )
-
-    summary_stats = smfe_simulator_mm(
+    summary_stats = simulator(
         parameters=params,
         dt=5e-4,
         N=1e6,
@@ -47,7 +59,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
     assert summary_stats.shape[0] == len(lag_times) * (num_bins ** 2)
 
 
-def test_simulator_from_config():
+def test_simulator_from_config(config):
     params = torch.tensor(
         [
             0,
@@ -66,12 +78,12 @@ def test_simulator_from_config():
         ]
     )
 
-    simulator = get_simulator_from_config("tests/config_files/test.config")
+    simulator = Simulator(config)
     summary_stats = simulator(params)
     assert summary_stats.shape[0] == 6 * (20 ** 2)
 
 
-def test_simulator_from_config_with_Dx():
+def test_simulator_from_config_with_Dx(config_dx):
     params = torch.tensor(
         [
             0,
@@ -91,12 +103,12 @@ def test_simulator_from_config_with_Dx():
         ]
     )
 
-    simulator = get_simulator_from_config("tests/config_files/test_2.config")
+    simulator = Simulator(config_dx)
     summary_stats = simulator(params)
     assert summary_stats.shape[0] == 6 * (20 ** 2)
 
 
-def test_simulator_from_config_with_no_Dx():
+def test_simulator_from_config_with_no_Dx(config_no_dx):
     params = torch.tensor(
         [
             0,
@@ -116,4 +128,4 @@ def test_simulator_from_config_with_no_Dx():
         ]
     )
     with pytest.raises(NotImplementedError):
-        simulator = get_simulator_from_config("tests/config_files/no_Dx.config")
+        simulator = Simulator(config_no_dx)

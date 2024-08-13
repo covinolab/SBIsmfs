@@ -1,11 +1,21 @@
-import configparser
+import pytest
 import torch
-from sbi_smfs.inference.priors import get_priors_from_config
+from sbi_smfs.inference.priors import SplinePrior
+
+@pytest.fixture
+def config():
+    config = "your_config_file.config"
+    return config
+
+@pytest.fixture
+def config_dx():
+    config = "your_config_file.config"
+    return config
 
 
-def test_get_prior_from_config():
+def test_get_prior_from_config(config):
     num_samples = 1000000
-    prior = get_priors_from_config("tests/config_files/test.config")
+    prior = SplinePrior(config)
     samples = prior.sample((num_samples,))
 
     assert torch.isclose(
@@ -25,9 +35,9 @@ def test_get_prior_from_config():
     ).all(), "spline mean"
 
 
-def test_get_prior_from_config_with_dx():
+def test_get_prior_from_config_with_dx(config_dx):
     num_samples = 1000000
-    prior = get_priors_from_config("tests/config_files/test_2.config")
+    prior = SplinePrior(config_dx)
     samples = prior.sample((num_samples,))
     assert torch.isclose(
         samples[:, 0].mean(), torch.tensor(-3.0), atol=0.1
@@ -52,9 +62,9 @@ def test_get_prior_from_config_with_dx():
     ).all(), "spline mean"
 
 
-def test_individual_spline_prior():
+def test_individual_spline_prior(config):
     num_samples = 1000000
-    prior = get_priors_from_config("tests/config_files/test_spline_prior.config")
+    prior = SplinePrior(config)
     samples = prior.sample((num_samples,))
     true_mean = torch.tensor([0, 1, 0, 1, 0, -3], dtype=torch.float32)
     true_std = torch.tensor([1, 3, 1, 3, 1, 1], dtype=torch.float32)
@@ -66,6 +76,3 @@ def test_individual_spline_prior():
         assert torch.isclose(
             samples[:, i + 2].std(), true_std[i], atol=0.1
         ).item(), f"std spline {i}"
-
-
-# TODO : Add test for non spline prior

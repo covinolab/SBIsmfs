@@ -7,22 +7,19 @@ import torch.nn.functional as F
 EMBEDDING_NETS = {}
 
 
-def add_embedding(name):
+def add_embedding(name: str):
     """
-    Add embedding net to EMBEDDING_NETS dict
+    Decorator to register an embedding network class.
 
     Args:
-        name (str): name of embedding net
-
-    Returns:
-        add (function): function to add embedding net to EMBEDDING_NETS dict
+        name (str): Name of the embedding network.
     """
 
-    def add(class_):
-        EMBEDDING_NETS[name] = class_
-        return class_
+    def decorator(embedding_class):
+        EMBEDDING_NETS[name] = embedding_class
+        return embedding_class
 
-    return add
+    return decorator
 
 
 @add_embedding("single_layer_cnn")

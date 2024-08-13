@@ -1,43 +1,10 @@
 from typing import Union
-from configparser import ConfigParser
 import numpy as np
 import torch
 from sbi_smfs.utils.stats_utils import (
-    prop_stats,
-    moments,
     bin_trajectory,
     build_transition_matrix,
 )
-from sbi_smfs.utils.config_utils import get_config_parser
-
-
-def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
-    """
-    Featurizes trajectory by computing summary statistics.
-
-    Parameters
-    ----------
-    q : np.ndarray
-        Trajectory
-    lag_times : list
-        List of lag times to compute summary statistics
-
-    Returns
-    -------
-    features : list
-        List of summary statistics
-    """
-
-    propagators_stats = []
-    for lag_time in lag_times:
-        for stat in prop_stats(q, t=lag_time):
-            propagators_stats.append(stat)
-
-    moments_q = moments(q)
-
-    features = [*moments_q, *propagators_stats]
-
-    return features
 
 
 def build_transition_matricies(
@@ -79,78 +46,48 @@ def build_transition_matricies(
     return torch.from_numpy(np.nan_to_num(matricies, nan=0.0)).flatten()
 
 
-def compute_stats(
-    trajectory: np.ndarray, config: Union[str, ConfigParser]
-) -> torch.Tensor:
+def compute_stats(trajectory: np.ndarray, lag_times, min_bin, max_bin, num_bins) -> torch.Tensor:
     """Computes summary statistics for given trajectory.
 
     Parameters
     ----------
     trajectory : np.ndarray
         Trajectory, shape (num_samples, num_dimensions) or (num_dimensions,)
-    config : str, ConfigParser
-        Path to config file or ConfigParser object
+    lag_times : list of int
+        List of lag times for summary statistics
+    min_bin : float
+        Minimum bin value for histogram calculation
+    max_bin : float
+        Maximum bin value for histogram calculation
+    num_bins : int
+        Number of bins for histogram calculation
 
     Returns
     -------
     summary_stats : torch.Tensor
         Summary statistics
     """
-
-    config = get_config_parser(config)
-
+    
     if isinstance(trajectory, torch.Tensor):
         trajectory = trajectory.numpy()
-    if len(trajectory.shape) > 2:
+    
+    # Ensure trajectory is at least 2D
+    if trajectory.ndim == 1:
+        trajectory = trajectory.reshape(-1, 1)  # Reshape to (num_samples, 1)
+
+    if trajectory.ndim != 2:
         raise ValueError("Trajectory should be 1D or 2D array.")
-    elif len(trajectory.shape) == 2:
-        summary_stats = [
-            build_transition_matricies(
-                trajectory[:, i],
-                config.getlistint("SUMMARY_STATS", "lag_times"),
-                config.getfloat("SUMMARY_STATS", "min_bin"),
-                config.getfloat("SUMMARY_STATS", "max_bin"),
-                config.getint("SUMMARY_STATS", "num_bins"),
-            )
-            for i in range(trajectory.shape[0])
-        ]
-        summary_stats = torch.stack(summary_stats, dim=0)
-    elif len(trajectory.shape) == 1:
-        summary_stats = build_transition_matricies(
-            trajectory,
-            config.getlistint("SUMMARY_STATS", "lag_times"),
-            config.getfloat("SUMMARY_STATS", "min_bin"),
-            config.getfloat("SUMMARY_STATS", "max_bin"),
-            config.getint("SUMMARY_STATS", "num_bins"),
+
+    # Compute summary statistics
+    summary_stats = torch.stack([
+        build_transition_matricies(
+            trajectory[:, i],
+            lag_times,
+            min_bin,
+            max_bin,
+            num_bins,
         )
-        summary_stats = summary_stats
+        for i in range(trajectory.shape[1])
+    ], dim=1)
 
     return summary_stats
-
-
-def check_if_observation_contains_features(
-    observation: torch.tensor, config: Union[str, ConfigParser]
-) -> bool:
-    """Checks if observation contains features.
-
-    Parameters
-    ----------
-    observation : torch.Tensor
-        Observation
-    config : str
-        Path to config file
-
-    Returns
-    -------
-    bool
-        True if observation contains features, False otherwise
-    """
-
-    expected_shape = len(config.getlistint("SUMMARY_STATS", "lag_times")) * (
-        config.getint("SUMMARY_STATS", "num_bins") ** 2
-    )
-
-    if expected_shape != observation.shape[-1]:
-        return False
-    else:
-        return True

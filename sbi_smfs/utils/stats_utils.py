@@ -3,7 +3,7 @@ import scipy.stats as stats
 import numba as nb
 
 
-@nb.jit(nopython=True)
+@nb.jit(nopython=True, fastmath=True)
 def bin_trajectory(x: np.ndarray, bins: np.ndarray) -> np.ndarray:
     """
     Bins an array accoring to bins.
@@ -30,7 +30,7 @@ def bin_trajectory(x: np.ndarray, bins: np.ndarray) -> np.ndarray:
     return binned_x
 
 
-@nb.jit(nopython=True)
+@nb.jit(nopython=True, fastmath=True)
 def build_transition_matrix(
     binned_x: np.ndarray, n_bins: np.ndarray, t: int = 1
 ) -> np.ndarray:
@@ -61,94 +61,3 @@ def build_transition_matrix(
 
     norm = np.sum(matrix, axis=0, dtype=np.int64)
     return matrix / norm
-
-
-def moments(x: np.ndarray) -> tuple:
-    """
-    Calculated the first 4 moments of the random variable x.
-
-    Parameters
-    ----------
-    x : np.ndarray
-        Random variable..
-
-    Returns
-    -------
-    First four moments of distribution.
-
-    """
-
-    m1 = np.mean(x)
-    m2 = np.std(x)
-    m3 = stats.skew(x)
-    m4 = stats.kurtosis(x)
-
-    return m1, m2, m3, m4
-
-
-def propagator(x: np.ndarray, t: int = 1) -> np.ndarray:
-    """
-    Computes propagator for given lag time t.
-
-    Parameters
-    ----------
-    x : np.Array
-        Trajectory which is used to compute propagator.
-    t : int, optional
-        Lag time used to compute step size. The default is 1.
-
-    Returns
-    -------
-    np.Array
-        Propagator amples computed from imput trajectory x.
-
-    """
-    return x[t:] - x[:-t]
-
-
-@nb.jit(nopython=True)
-def transition_count(x: np.ndarray) -> int:
-    """
-    Counts observed zero crossings for imput trajectory.
-
-    Parameters
-    ----------
-    x : np.Array
-        Trajctory to compute zero crossings.
-
-    Returns
-    -------
-    freq : int
-        Number of observed zeros crossings.
-
-    """
-
-    freq = 0
-    for i in range(len(x)):
-        if np.sign(x[i]) == -np.sign(x[i + 1]):
-            freq += 1
-    return freq
-
-
-def prop_stats(x: np.ndarray, t: int) -> tuple:
-    """
-    Computes the first four moments of the propagator for input trajectory.
-
-    Parameters
-    ----------
-    x : np.Array
-        Input trajctory to compute propagator stats from.
-    t : int
-        Lag time of the propagator.
-
-    Returns
-    -------
-    tuple
-        The first four moments of the propagator.
-
-    """
-
-    delta_x = propagator(x, t=t)
-    _moments = moments(delta_x)
-
-    return _moments
