@@ -15,11 +15,14 @@ from sbi_smfs.inference.priors import SplinePrior
 
 class PosteriorTrainer:
     def __init__(self, config: Union[str, DictConfig], device: str = "cpu") -> None:
-        self.config = self.load_config_yaml(config)
+        self.config = load_config_yaml(config)
         self.device = device
-        self.neural_posterior = self.build_npe_model(config)
+        self.neural_posterior = build_npe_model(config)
 
     def _prepare_observation(self, observation: Union[str, torch.Tensor]) -> torch.Tensor:
+        if isinstance(observation, str):
+            observation = torch.load(observation)
+        assert isinstance(observation, torch.Tensor), "Observation must be a tensor or a path to a tensor."
         return Observation(self.config, observation)
 
     def _save_posterior(self, posterior: SNPE, file_name: str) -> None:
