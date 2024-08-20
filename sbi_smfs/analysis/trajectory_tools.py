@@ -95,6 +95,7 @@ def split_trajectory(
 def compare_pmfs(
     pmfs: list[np.ndarray], inital_perturbation: float = 0.1
 ) -> list[np.ndarray]:
+    print('using rmsd not')
     """
     Minimize the difference between pmfs by shifting them along the y-axis.
 
@@ -123,6 +124,7 @@ def compare_pmfs(
     def minimize(offsets):
         new_pmfs = pmfs + offsets.reshape((1, -1))
         return np.sum(new_pmfs.std(axis=1))
+        #return np.sum((new_pmfs - new_pmfs[0]) ** 2)
 
     opt_offsets = scipy.optimize.minimize(
         minimize, np.random.normal(size=(num_pmfs,), scale=inital_perturbation)
@@ -131,3 +133,22 @@ def compare_pmfs(
     opt_pmfs = [opt_pmfs[:, i] for i in range(num_pmfs)]
 
     return opt_pmfs
+
+
+def align_spline_nodes(
+        spline_nodes: torch.Tensor,
+        initial_perturbation: float = 0.1,
+):
+    spline_nodes = spline_nodes.cpu().numpy()
+    num_splines = spline_nodes.shape[0]
+
+    def minimize(offsets):
+        new_splines = spline_nodes + offsets.reshape((1, -1))
+        return np.sum((new_splines - new_splines[0]) ** 2)
+    
+    opt_offsets = scipy.optimize.minimize(
+        minimize, np.random.normal(size=(num_splines,), scale=initial_perturbation)
+    )
+    new_splines = spline_nodes + opt_offsets.x
+
+    return new_splines

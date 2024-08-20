@@ -90,6 +90,7 @@ def train_sequential_posterior(
         )
         posterior = inference.build_posterior(
             density_estimator,
+            direct_sampling_parameters={"enable_transform": False}
         )
         if (
             isinstance(posterior_file, str)
