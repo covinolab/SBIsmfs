@@ -1,4 +1,4 @@
-# SBIsmfs : Simulation-based inference for single-molecule force spectroscopy
+## SBIsmfs: Simulation-based inference for single-molecule force spectroscopy
 Implementing Simulation-based inference for single-molecule force spectroscopy.
 
 ## Installing code 
