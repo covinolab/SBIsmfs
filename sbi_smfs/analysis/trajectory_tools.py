@@ -2,6 +2,7 @@ import numpy as np
 import numba as nb
 import bottleneck as bn
 import scipy
+import torch
 
 
 @nb.jit(nopython=True)
@@ -138,17 +139,39 @@ def compare_pmfs(
 def align_spline_nodes(
         spline_nodes: torch.Tensor,
         initial_perturbation: float = 0.1,
+        return_torch: bool = True,
 ):
+    """
+    Minimize the difference between spline nodes by shifting them along the y-axis.
+
+    Parameters
+    ----------
+    spline_nodes : torch.Tensor
+        Spline nodes to be aligned.
+    initial_perturbation : float, optional
+        Inital perturbation of spline offset. The default is 0.1.
+    return_torch : bool, optional
+        Whether to return the aligned spline nodes as a torch.Tensor. The default is True.
+
+    Returns
+    -------
+    torch.Tensor or np.ndarray
+        Aligned spline nodes.
+    """
+    
     spline_nodes = spline_nodes.cpu().numpy()
     num_splines = spline_nodes.shape[0]
 
     def minimize(offsets):
-        new_splines = spline_nodes + offsets.reshape((1, -1))
+        new_splines = spline_nodes + offsets.reshape((-1, 1))
         return np.sum((new_splines - new_splines[0]) ** 2)
     
     opt_offsets = scipy.optimize.minimize(
-        minimize, np.random.normal(size=(num_splines,), scale=initial_perturbation)
+        minimize, np.random.normal(size=(num_splines), scale=initial_perturbation)
     )
-    new_splines = spline_nodes + opt_offsets.x
+    new_splines = spline_nodes + opt_offsets.x.reshape((-1, 1))
 
-    return new_splines
+    if return_torch:
+        return torch.from_numpy(new_splines)
+    else:
+        return new_splines

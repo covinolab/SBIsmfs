@@ -43,14 +43,17 @@ def plot_spline_ensemble(
     )
 
     for sample in samples.cpu():
-        y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
-        y_knots[1] = y_knots[-2] = config.getint("SIMULATOR", "max_G_1")
-        y_knots[0] = y_knots[-1] = config.getint("SIMULATOR", "max_G_0")
         if "Dx" in config["SIMULATOR"]:
             num_ind_var = 2
         else:
             num_ind_var = 3
-        y_knots[2:-2] = sample[num_ind_var:].numpy()
+        spline_nodes = sample[num_ind_var:].numpy()
+        y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
+        y_knots[1] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_1")
+        y_knots[-2] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_1")
+        y_knots[0] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_0")
+        y_knots[-1] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_0")
+        y_knots[2:-2] = spline_nodes
         y_axis = c_spline(x_knots, y_knots, x_axis)
         plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
     plt.ylim(ylims)
@@ -89,6 +92,7 @@ def plot_spline_mean_with_error(
     else:
         num_ind_var = 3
     mean_posterior = torch.mean(posterior_samples.cpu(), dim=0)
+    mean_posterior -= mean_posterior[num_ind_var:].mean(dim=0)
     x_axis = np.linspace(
         config.getfloat("SIMULATOR", "min_x"),
         config.getfloat("SIMULATOR", "max_x"),
@@ -106,16 +110,19 @@ def plot_spline_mean_with_error(
         ]
         - mean_posterior[num_ind_var:].numpy()
     )
+    spline_nodes = mean_posterior[num_ind_var:].numpy()
     y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
-    y_knots[1] = y_knots[-2] = config.getint("SIMULATOR", "max_G_1")
-    y_knots[0] = y_knots[-1] = config.getint("SIMULATOR", "max_G_0")
-    y_knots[2:-2] = mean_posterior[num_ind_var:].numpy()
+    y_knots[1] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[-2] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[0] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_0")
+    y_knots[-1] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_0")
+    y_knots[2:-2] = spline_nodes
     y_axis = c_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis - np.min(y_axis), alpha=line_alpha, color="blue")
+    plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
     plt.errorbar(
         x_knots,
-        y_knots - np.min(y_axis),
+        y_knots,
         yerr=y_knots_err,
         linestyle="",
         marker="o",
