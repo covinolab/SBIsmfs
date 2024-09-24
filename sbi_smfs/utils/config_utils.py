@@ -29,6 +29,7 @@ def get_config_parser(
             "listfloat": lambda x: [
                 [float(i.strip()) for i in group.split(",")] for group in x.split(";")
             ],
+            "tuplefloat": lambda x: tuple([float(i.strip()) for i in x.split(",")]),
         }
     )
     config.read(config_file)

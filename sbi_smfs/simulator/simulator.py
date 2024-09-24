@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from functools import partial
 import configparser
+from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.utils.summary_stats import build_transition_matricies
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
@@ -23,6 +24,7 @@ def smfe_simulator_mm(
     max_bin: float,
     num_bins: int,
     lag_times: list[int],
+    return_q: bool = False,
 ) -> torch.Tensor:
     """
     Simulator for single-molecule force-spectroscopy experiments.
@@ -110,13 +112,16 @@ def smfe_simulator_mm(
 
     if q is None:
         return None
+    
+    if return_q:
+        return torch.from_numpy(q)
 
     matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
     return matrices
 
 
 def get_simulator_from_config(
-    config_file: Union[str, configparser.ConfigParser]
+    config_file: Union[str, configparser.ConfigParser], return_q: bool = False
 ) -> partial:
     """Get simulator function from config file.
 
@@ -131,19 +136,14 @@ def get_simulator_from_config(
         Simulator function.
     """
 
-    config = configparser.ConfigParser(
-        converters={
-            "listint": lambda x: [int(i.strip()) for i in x.split(",")],
-            "listfloat": lambda x: [float(i.strip()) for i in x.split(",")],
-        }
-    )
-    config.read(config_file)
+    config = get_config_parser(config_file, validate=True)
     if "Dx" in config["SIMULATOR"]:
         Dx = config.getfloat("SIMULATOR", "Dx")
     elif "type_Dx" in config["PRIORS"] and "parameters_Dx" in config["PRIORS"]:
         Dx = None
     else:
         raise NotImplementedError("Dx not properly specified in config file!")
+
 
     return partial(
         smfe_simulator_mm,
@@ -156,9 +156,10 @@ def get_simulator_from_config(
         max_x=config.getfloat("SIMULATOR", "max_x"),
         max_G_0=config.getfloat("SIMULATOR", "max_G_0"),
         max_G_1=config.getfloat("SIMULATOR", "max_G_1"),
-        init_xq_range=config.getlistfloat("SIMULATOR", "init_xq_range"),
+        init_xq_range=config.gettuplefloat("SIMULATOR", "init_xq_range"),
         min_bin=config.getfloat("SUMMARY_STATS", "min_bin"),
         max_bin=config.getfloat("SUMMARY_STATS", "max_bin"),
         num_bins=config.getint("SUMMARY_STATS", "num_bins"),
         lag_times=config.getlistint("SUMMARY_STATS", "lag_times"),
+        return_q=return_q,
     )
