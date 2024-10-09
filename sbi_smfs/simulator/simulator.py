@@ -83,14 +83,17 @@ def smfe_simulator_mm(
     else:
         raise NotImplementedError("Dx should be either float or None")
 
+    if isinstance(parameters, torch.Tensor):
+        parameters = parameters.numpy()
+
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
     y_knots = np.zeros(N_knots)
-    y_knots[0] = max_G_0 + parameters[num_ind_params].numpy()
-    y_knots[-1] = max_G_0 + parameters[-1].numpy()
-    y_knots[1] = max_G_1 + parameters[num_ind_params].numpy()
-    y_knots[-2] = max_G_1 + parameters[-1].numpy()
-    y_knots[2:-2] = parameters[num_ind_params:].numpy()
+    y_knots[0] = max_G_0 + parameters[num_ind_params]
+    y_knots[-1] = max_G_0 + parameters[-1]
+    y_knots[1] = max_G_1 + parameters[num_ind_params]
+    y_knots[-2] = max_G_1 + parameters[-1]
+    y_knots[2:-2] = parameters[num_ind_params:]
 
     # Select random initial position for x and q
     x_init = np.random.uniform(low=init_xq_range[0], high=init_xq_range[1])

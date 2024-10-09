@@ -115,5 +115,5 @@ def test_simulator_from_config_with_no_Dx():
             6.94227994,
         ]
     )
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(KeyError):
         simulator = get_simulator_from_config("tests/config_files/no_Dx.config")

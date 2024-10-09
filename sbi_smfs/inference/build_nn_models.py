@@ -49,9 +49,10 @@ def build_npe_model(config: str):
         )
         print("Using embedding net :", config.get("NEURAL_NETWORK", "embedding_net"))
     else:
-        print(
-            f"only available embeddings are : {[key for key in EMBEDDING_NETS.keys()]}. Falling back to single_layer_cnn"
-        )
+        if config.get("NEURAL_NETWORK", "embedding_net") != "single_layer_cnn":
+            print(
+                f"embedding net {config.get('NEURAL_NETWORK', 'embedding_net')} not available."
+            )
         cnn_net = EMBEDDING_NETS["single_layer_cnn"](
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
             4,
@@ -65,7 +66,7 @@ def build_npe_model(config: str):
         "dropout_probability": config.getfloat("NEURAL_NETWORK", "dropout_probability"),
         "use_batch_norm": config.getboolean("NEURAL_NETWORK", "use_batch_norm"),
     }
-
+    
     neural_posterior = posterior_nn(
         model=config.get("NEURAL_NETWORK", "model"),
         hidden_features=config.getint("NEURAL_NETWORK", "hidden_features"),
