@@ -56,7 +56,7 @@ def generate_simulations(
         num_simulations=num_sim,
         num_workers=num_workers,
         show_progress_bar=show_progressbar,
-        simulation_batch_size=10,
+        simulation_batch_size=simulation_batch_size,
     )
 
     if save_as_file:
