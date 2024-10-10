@@ -12,6 +12,7 @@ def generate_simulations(
     config_file: str,
     num_sim: int,
     num_workers: int,
+    simulation_batch_size: int,
     file_name: Union[str, None] = None,
     show_progressbar: bool = False,
     save_as_file: bool = False,
@@ -55,6 +56,7 @@ def generate_simulations(
         num_simulations=num_sim,
         num_workers=num_workers,
         show_progress_bar=show_progressbar,
+        simulation_batch_size=10,
     )
 
     if save_as_file:
