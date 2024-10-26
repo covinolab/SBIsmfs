@@ -21,6 +21,7 @@ def train_armortized_posterior(
     train_data: Union[str, Tuple[torch.Tensor, torch.Tensor]],
     posterior_file: Union[str, None] = None,
     device: str = "cpu",
+    data_device: str = "cpu",
 ) -> Union[None, SNPE]:
     """Trains a truncated posterior.
 
@@ -36,6 +37,8 @@ def train_armortized_posterior(
         File name to save the posterior to.
     device: str
         Device to use for training.
+    data_device: str
+        Device where training data is stored.
 
     Returns
     -------
@@ -60,7 +63,7 @@ def train_armortized_posterior(
     else:
         raise NotImplementedError
 
-    inference = inference.append_simulations(theta, x, data_device="cpu")
+    inference = inference.append_simulations(theta, x, data_device=data_device)
     density_estimator = inference.train(
         show_train_summary=True,
         **train_parameters,
