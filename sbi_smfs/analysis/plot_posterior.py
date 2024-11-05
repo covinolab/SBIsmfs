@@ -26,6 +26,8 @@ def plot_spline_ensemble(
         Config file with entries for simualtion.
     ylims: tuple
         Limits for y-axis.
+    line_alpha: float
+        Transparency of the splines.
     """
     config = get_config_parser(config)
 
