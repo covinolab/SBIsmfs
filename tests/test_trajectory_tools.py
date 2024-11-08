@@ -65,12 +65,12 @@ def test_split_trajectory(num_transitions: int):
     assert all([len(section) > 1000 for section in lower_sectrions])
 
 
-@pytest.mark.parametrize("inital_perturbation", [0.1, 1.0])
-def test_compare_pmfs_quadratic_functions(inital_perturbation):
+@pytest.mark.parametrize("initial_perturbation", [0.1, 1.0])
+def test_compare_pmfs_quadratic_functions(initial_perturbation):
     pmfs = []
     for i in range(10):
         pmfs.append(np.linspace(-5, 5, 1000) ** 2 + np.random.rand() * 10)
-    pmfs = compare_pmfs(pmfs, inital_perturbation=inital_perturbation)
+    pmfs = compare_pmfs(pmfs, initial_perturbation=initial_perturbation)
     assert len(pmfs) == 10
     assert all(
         [np.isclose(pmfs[0], pmf).all() for pmf in pmfs]

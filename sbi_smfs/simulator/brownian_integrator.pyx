@@ -26,14 +26,14 @@ def brownian_integrator(
         ):
     """
     Integrator for constant force SMFE.
-    Molecular free energy profile is contructed by a cubic spline.
+    Molecular free energy profile is constructed by a cubic spline.
     
     Parameters
     ----------
     double x0 : float
         Initial x position.
     double q0 : float
-        Intial q position.
+        Initial q position.
     double Dx : float
         Diffusion constant along x.
     double Dq : float
@@ -43,13 +43,13 @@ def brownian_integrator(
     cnp.ndarray[double] y_knots : np.Array
         y - position of spline knots.
     double k : float
-        Spring konstant of linker.
+        Spring constant of linker.
     long N : int
         Number of iterations.
     double dt : float
         Time step.
     int fs : int
-        Saving frequency of postions.
+        Saving frequency of positions.
     
     Returns
     -------
@@ -63,10 +63,10 @@ def brownian_integrator(
     cdef int N_knots = len(x_knots)
     cdef long N_save = N // fs
 
-    # Initalize random number generatot and seed
+    # Initalize random number generator and seed
     cdef grn.gsl_rng_type * T
     cdef grn.gsl_rng * r
-    cdef long seed = np.random.randint(low=1, high=2**63) # Initalize seed with randints between 1 and 2**63 = max(int64)
+    cdef long seed = np.random.randint(low=1, high=2**63) # Initialize seed with random integers between 1 and 2**63
 
     grn.gsl_rng_env_setup()
     T = grn.gsl_rng_default
@@ -77,8 +77,8 @@ def brownian_integrator(
     cdef double *x_k = <double *> malloc(N_knots * sizeof(double))
     cdef double *y_k = <double *> malloc(N_knots * sizeof(double))
 
-    # Transfer spline knots from numpy to c arry
-    for i from 0 <= i < N_knots: # TODO : deprecated syntax
+    # Transfer spline knots from numpy to C array
+    for i in range(N_knots):
         x_k[i] = x_knots[i]
         y_k[i] = y_knots[i]
 
@@ -131,6 +131,8 @@ def brownian_integrator(
     free(x_k)
     free(y_k)
 
+    # If the status is not 0, it indicates an error in the spline evaluation.
+    # Returning None to indicate that the integration process failed.
     if status != 0:
         return None
     return q

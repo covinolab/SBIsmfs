@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 import numba as nb
 import bottleneck as bn
@@ -12,7 +13,7 @@ def find_transitions(x: np.ndarray, turn_point: float = 0.0):
 
     Parameters
     ----------
-    x : np.Array
+    x : np.ndarray
         Runnning average of a trajectory.
     turn_point : float, optional
         Value of x at which two basins are separated. The default is 0.0.
@@ -27,7 +28,7 @@ def find_transitions(x: np.ndarray, turn_point: float = 0.0):
 
     freq = 0
     transition_pos = [0]
-    for i in range(len(x)):
+    for i in range(len(x) - 1):
         if (
             x[i] < turn_point
             and x[i + 1] > turn_point
@@ -65,8 +66,8 @@ def split_trajectory(
 
     Returns
     -------
-        list[np.ndarray]
-            List of trajectories in each basin.
+        Tuple[list[np.ndarray], list[np.ndarray]]
+            Tuple containing lists of trajectories in each basin.
     """
     above_turn_point = []
     below_turn_point = []
@@ -75,7 +76,6 @@ def split_trajectory(
         bn.move_mean(x, window=window_size), turn_point=turn_point
     )
     transition_points.append(len(x))  # Add last point to transition points
-    print(transition_points, num_transitions)
 
     for segment_idx in range(num_transitions + 1):  # +1 because of last transition
         lower_idx = transition_points[segment_idx] + buffer_length
@@ -93,85 +93,81 @@ def split_trajectory(
     return above_turn_point, below_turn_point
 
 
-def compare_pmfs(
-    pmfs: list[np.ndarray], inital_perturbation: float = 0.1
-) -> list[np.ndarray]:
-    print('using rmsd not')
+def compare_pmfs(pmfs: list[np.ndarray], initial_perturbation: float = 0.1) -> list[np.ndarray]:
     """
-    Minimize the difference between pmfs by shifting them along the y-axis.
+    Minimize the difference between probability mass functions (PMFs) by shifting them along the y-axis.
 
     Parameters
     ----------
     pmfs : list[np.ndarray]
-        List of pmfs to be compared.
-    inital_perturbation : float, optional
-        Standard deviation of the initial perturbation. The default is 0.1.
+        List of PMFs to be compared.
+    initial_perturbation : float, optional
+        Standard deviation of the initial random offsets. Default is 0.1.
 
     Returns
     -------
     list[np.ndarray]
-        List of pmfs with minimized difference.
+        List of aligned PMFs with minimized differences.
     """
-    num_pmfs = len(pmfs)
+    # Validate input PMFs have same shape
+    if not all(pmf.shape == pmfs[0].shape for pmf in pmfs):
+        raise ValueError("All PMFs must have the same shape")
 
-    # check that all np.ndarrays in pmfs have the same shape
-    assert all([pmfs[0].shape == pmf.shape for pmf in pmfs])
+    # Stack PMFs into 2D array for easier manipulation
+    stacked_pmfs = np.stack(pmfs, axis=1)
+    num_pmfs = stacked_pmfs.shape[1]
 
-    # Concate pmfs along y-axis
-    pmfs = np.stack(pmfs, axis=1)
-    assert pmfs.shape[-1] == num_pmfs
+    def calculate_alignment_error(offsets: np.ndarray) -> float:
+        """Calculate total standard deviation across aligned PMFs."""
+        shifted_pmfs = stacked_pmfs + offsets.reshape((1, -1))
+        return np.sum(shifted_pmfs.std(axis=1))
 
-    # Aligne pmfs by std along y
-    def minimize(offsets):
-        new_pmfs = pmfs + offsets.reshape((1, -1))
-        return np.sum(new_pmfs.std(axis=1))
-        #return np.sum((new_pmfs - new_pmfs[0]) ** 2)
+    # Optimize vertical alignment
+    initial_offsets = np.random.normal(size=num_pmfs, scale=initial_perturbation)
+    result = scipy.optimize.minimize(calculate_alignment_error, initial_offsets)
 
-    opt_offsets = scipy.optimize.minimize(
-        minimize, np.random.normal(size=(num_pmfs,), scale=inital_perturbation)
-    )
-    opt_pmfs = pmfs + opt_offsets.x
-    opt_pmfs = [opt_pmfs[:, i] for i in range(num_pmfs)]
-
-    return opt_pmfs
+    # Apply optimal offsets and split back into list
+    aligned_pmfs = stacked_pmfs + result.x.reshape((1, -1))
+    return [aligned_pmfs[:, i] for i in range(num_pmfs)]
 
 
 def align_spline_nodes(
-        spline_nodes: torch.Tensor,
-        initial_perturbation: float = 0.1,
-        return_torch: bool = True,
-):
+    spline_nodes: torch.Tensor,
+    initial_perturbation: float = 0.1,
+    return_torch: bool = True,
+) -> Union[torch.Tensor, np.ndarray]:
     """
-    Minimize the difference between spline nodes by shifting them along the y-axis.
+    Align multiple spline nodes by minimizing their vertical offsets.
 
     Parameters
     ----------
     spline_nodes : torch.Tensor
-        Spline nodes to be aligned.
+        Tensor containing multiple spline nodes to be aligned vertically.
     initial_perturbation : float, optional
-        Inital perturbation of spline offset. The default is 0.1.
+        Standard deviation for initial random offset values. Default is 0.1.
     return_torch : bool, optional
-        Whether to return the aligned spline nodes as a torch.Tensor. The default is True.
+        If True, returns torch.Tensor, otherwise returns numpy array. Default is True.
 
     Returns
     -------
-    torch.Tensor or np.ndarray
-        Aligned spline nodes.
+    Union[torch.Tensor, np.ndarray]
+        Aligned spline nodes with minimized vertical differences.
     """
+    # Convert to numpy for optimization
+    nodes_numpy = spline_nodes.cpu().numpy()
+    num_splines = nodes_numpy.shape[0]
     
-    spline_nodes = spline_nodes.cpu().numpy()
-    num_splines = spline_nodes.shape[0]
-
-    def minimize(offsets):
-        new_splines = spline_nodes + offsets.reshape((-1, 1))
-        return np.sum((new_splines - new_splines[0]) ** 2)
+    def compute_alignment_error(offsets: np.ndarray) -> float:
+        """Calculate sum of squared differences from reference spline."""
+        shifted_splines = nodes_numpy + offsets.reshape((-1, 1))
+        reference_spline = shifted_splines[0]
+        return np.sum((shifted_splines - reference_spline) ** 2)
     
-    opt_offsets = scipy.optimize.minimize(
-        minimize, np.random.normal(size=(num_splines), scale=initial_perturbation)
-    )
-    new_splines = spline_nodes + opt_offsets.x.reshape((-1, 1))
-
-    if return_torch:
-        return torch.from_numpy(new_splines)
-    else:
-        return new_splines
+    # Optimize vertical offsets
+    initial_offsets = np.random.normal(size=num_splines, scale=initial_perturbation)
+    result = scipy.optimize.minimize(compute_alignment_error, initial_offsets)
+    
+    # Apply optimal offsets
+    aligned_splines = nodes_numpy + result.x.reshape((-1, 1))
+    
+    return torch.from_numpy(aligned_splines) if return_torch else aligned_splines

@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.utils.summary_stats import (
-    build_transition_matricies,
+    build_transition_matrices,
     featurize_trajectory,
     compute_stats,
     check_if_observation_contains_features,
@@ -12,7 +12,7 @@ from sbi_smfs.utils.summary_stats import (
 def test_build_transition_matrices():
     traj = np.random.standard_normal(size=(1000,))
     lag_times = [1, 3, 10]
-    matricies = build_transition_matricies(traj, lag_times, -2, 2, 4)
+    matricies = build_transition_matrices(traj, lag_times, -2, 2, 4)
     assert matricies.shape[0] == 3 * (4 ** 2)
 
 

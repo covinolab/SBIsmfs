@@ -13,6 +13,7 @@ def plot_spline_ensemble(
     config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
     line_alpha: float = 0.02,
+    **plot_kwargs,
 ) -> None:
     """Plot a ensemble of splines from the posterior.
 
@@ -44,7 +45,7 @@ def plot_spline_ensemble(
         config.getint("SIMULATOR", "num_knots"),
     )
 
-    for sample in samples.cpu():
+    for idx, sample in enumerate(samples.cpu()):
         if "Dx" in config["SIMULATOR"]:
             num_ind_var = 2
         else:
@@ -57,7 +58,10 @@ def plot_spline_ensemble(
         y_knots[-1] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_0")
         y_knots[2:-2] = spline_nodes
         y_axis = c_spline(x_knots, y_knots, x_axis)
-        plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
+        if idx == 0:
+            plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue", **plot_kwargs)
+        else:
+            plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
@@ -73,6 +77,7 @@ def plot_spline_mean_with_error(
     alpha: float = 0.05,
     ylims: tuple = (-10, 10),
     line_alpha: float = 1.0,
+    **plot_kwargs,
 ) -> None:
     """Plot the posterior mean of the spline nodes with error bars.
 
@@ -121,7 +126,7 @@ def plot_spline_mean_with_error(
     y_knots[2:-2] = spline_nodes
     y_axis = c_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
+    plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue", **plot_kwargs)
     plt.errorbar(
         x_knots,
         y_knots,
@@ -147,6 +152,7 @@ def plot_spline(
     ylims: tuple = (-10, 10),
     color: str = "red",
     line_alpha: float = 1.0,
+    **plot_kwargs,
 ) -> None:
     """Plot a ensemble of splines from the posterior.
 
@@ -186,7 +192,7 @@ def plot_spline(
         y_knots[2:-2] = spline_nodes
     y_axis = c_spline(x_knots, y_knots, x_axis)
 
-    plt.plot(x_axis, y_axis, alpha=line_alpha, color=color)
+    plt.plot(x_axis, y_axis, alpha=line_alpha, color=color, **plot_kwargs)
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")

@@ -4,7 +4,7 @@ import numpy as np
 from functools import partial
 import configparser
 from sbi_smfs.utils.config_utils import get_config_parser
-from sbi_smfs.utils.summary_stats import build_transition_matricies
+from sbi_smfs.utils.summary_stats import build_transition_matrices
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
 
@@ -38,7 +38,7 @@ def smfe_simulator_mm(
     dt : float
         Integration timestep
     N : int
-        Totoal number of steps.
+        Total number of steps.
     saving_freq : int
         Saving frequency during integration.
     Dx : float
@@ -46,22 +46,22 @@ def smfe_simulator_mm(
     N_knots : int
         Number of knots in spline potential.
     min_x : float
-        Minimal x value of spline potenital.
+        Minimal x value of spline potential.
     max_x : float
-        Maximal x value of spline potenital.
+        Maximal x value of spline potential.
     max_G_0 : float
         Additional barrier at the end of spline for first and last node.
     max_G_1 : float
-        Additional barrier at the end of spline for seconf and second last node.
-    init_xq_range: tuple[float, float]
+        Additional barrier at the end of spline for second and second last node.
+    init_xq_range: Tuple[float, float]
         Range of inital positions.
     min_bin : float
         Outer left bin edge.
-    max_bin:
+    max_bin: float,
         Outer right bin edge.
     num_bins: int
         Number of bins for transition matrix.
-    lag_times: List[Int]:
+    lag_times : list[int]
         List of lag times for which a transition matrix is generated.
 
     Returns
@@ -83,8 +83,9 @@ def smfe_simulator_mm(
     else:
         raise NotImplementedError("Dx should be either float or None")
 
+    # Ensure parameters is a numpy array for further processing
     if isinstance(parameters, torch.Tensor):
-        parameters = parameters.numpy()
+        parameters = parameters.detach().cpu().numpy()
 
     # Select spline knots from parameters
     x_knots = np.linspace(min_x, max_x, N_knots)
@@ -114,12 +115,12 @@ def smfe_simulator_mm(
     )
 
     if q is None:
-        return None
+        raise ValueError("Simulation failed!")
     
     if return_q:
         return torch.from_numpy(q)
 
-    matrices = build_transition_matricies(q, lag_times, min_bin, max_bin, num_bins)
+    matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
     return matrices
 
 
@@ -132,6 +133,8 @@ def get_simulator_from_config(
     ----------
     config_file : str
         Path to config file.
+    return_q : bool, optional
+        If True, return the q trajectory from the simulator. Default is False.
 
     Returns
     -------

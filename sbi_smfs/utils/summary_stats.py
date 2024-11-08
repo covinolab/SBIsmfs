@@ -40,9 +40,9 @@ def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
     return features
 
 
-def build_transition_matricies(
+def build_transition_matrices(
     q: np.ndarray, lag_times: list[int], min_bin: float, max_bin: float, num_bins: int
-) -> torch.tensor:
+) -> torch.Tensor:
     """
     Builds transition matricies for given lag times.
 
@@ -61,7 +61,7 @@ def build_transition_matricies(
 
     Returns
     -------
-    matricies : torch.tensor
+    matricies : torch.Tensor
         Transition matricies for given lag times
     """
 
@@ -105,7 +105,7 @@ def compute_stats(
         raise ValueError("Trajectory should be 1D or 2D array.")
     elif len(trajectory.shape) == 2:
         summary_stats = [
-            build_transition_matricies(
+            build_transition_matrices(
                 trajectory[:, i],
                 config.getlistint("SUMMARY_STATS", "lag_times"),
                 config.getfloat("SUMMARY_STATS", "min_bin"),
@@ -116,7 +116,7 @@ def compute_stats(
         ]
         summary_stats = torch.stack(summary_stats, dim=0)
     elif len(trajectory.shape) == 1:
-        summary_stats = build_transition_matricies(
+        summary_stats = build_transition_matrices(
             trajectory,
             config.getlistint("SUMMARY_STATS", "lag_times"),
             config.getfloat("SUMMARY_STATS", "min_bin"),
