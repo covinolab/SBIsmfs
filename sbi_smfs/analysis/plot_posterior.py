@@ -7,6 +7,52 @@ from sbi_smfs.utils.gsl_spline import c_spline
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
+def evaluate_spline(
+        x_eval: torch.Tensor,
+        spline_nodes: torch.Tensor,
+        config: Union[str, ConfigParser]
+    ) -> torch.Tensor:
+
+    """Evaluate the spline at x_eval.
+
+    Parameters
+    ----------
+    x_eval: torch.Tensor
+        Points at which to evaluate the spline.
+    spline_nodes: torch.Tensor
+        Spline nodes.
+    config: str, ConfigParser
+        Config file with entries for simualtion.
+    
+    Returns
+    -------
+    y_eval: torch.Tensor
+        Spline evaluated at x_eval.
+    """
+    if isinstance(x_eval, torch.Tensor):
+        x_eval = x_eval.to(torch.float64).numpy()
+
+    config = get_config_parser(config)
+    x_axis = np.linspace(
+        config.getfloat("SIMULATOR", "min_x"),
+        config.getfloat("SIMULATOR", "max_x"),
+        1000,
+    )
+    x_knots = np.linspace(
+        config.getfloat("SIMULATOR", "min_x"),
+        config.getfloat("SIMULATOR", "max_x"),
+        config.getint("SIMULATOR", "num_knots"),
+    )
+    y_knots = np.ones(config.getint("SIMULATOR", "num_knots"))
+    y_knots[1] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[-2] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_1")
+    y_knots[0] = spline_nodes[0] + config.getint("SIMULATOR", "max_G_0")
+    y_knots[-1] = spline_nodes[-1] + config.getint("SIMULATOR", "max_G_0")
+    y_knots[2:-2] = spline_nodes
+    y_eval = c_spline(x_knots, y_knots, x_eval)
+    return y_eval
+
+
 def plot_spline_ensemble(
     posterior_samples: torch.Tensor,
     num_splines: int,
@@ -31,6 +77,9 @@ def plot_spline_ensemble(
         Transparency of the splines.
     """
     config = get_config_parser(config)
+
+    if not plot_kwargs:
+        plot_kwargs = {"color": "blue", "alpha": 0.02}
 
     random_idx = torch.randperm(posterior_samples.shape[0])
     samples = posterior_samples[random_idx[:num_splines]]
@@ -59,9 +108,9 @@ def plot_spline_ensemble(
         y_knots[2:-2] = spline_nodes
         y_axis = c_spline(x_knots, y_knots, x_axis)
         if idx == 0:
-            plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue", **plot_kwargs)
+            plt.plot(x_axis, y_axis, **plot_kwargs)
         else:
-            plt.plot(x_axis, y_axis, alpha=line_alpha, color="blue")
+            plt.plot(x_axis, y_axis, **plot_kwargs)
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
