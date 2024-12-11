@@ -15,7 +15,7 @@ def test_generate_simulations():
         save_as_file=False,
     )
     assert observations is not None
-    assert observations[0].shape == (3, 13)
+    assert observations[0].shape == (3, 14)
     assert observations[1].shape == (3, 2400)
 
 
@@ -30,7 +30,7 @@ def test_generate_simulations_with_Dx():
         save_as_file=False,
     )
     assert observations is not None
-    assert observations[0].shape == (3, 14)
+    assert observations[0].shape == (3, 15)
     assert observations[1].shape == (3, 2400)
 
 
@@ -61,5 +61,5 @@ def test_generate_simulations_save_file():
     observation_theta_shape = torch.load(f"test_theta.pt").shape
     os.remove("test_x.pt")
     os.remove("test_theta.pt")
-    assert observation_theta_shape == (3, 13)
+    assert observation_theta_shape == (3, 14)
     assert observation_x_shape == (3, 2400)

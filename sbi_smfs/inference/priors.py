@@ -89,6 +89,11 @@ def get_priors_from_config(config_file, device="cpu"):
         torch.tensor([k_dist_params[0][0]], device=device),
         torch.tensor([k_dist_params[0][1]], device=device),
     )
+    kt_dist_params = config.getlistfloat("PRIORS", "parameters_kt")
+    prior_kt = PRIORS[config.get("PRIORS", "type_kt")](
+        torch.tensor([kt_dist_params[0][0]], device=device),
+        torch.tensor([kt_dist_params[0][1]], device=device),
+    )
     spline_dist_params = config.getlistfloat("PRIORS", "parameters_spline")
     num_spline_knots = config.getint("SIMULATOR", "num_knots") - 4
     if len(spline_dist_params) == 1:
@@ -119,7 +124,7 @@ def get_priors_from_config(config_file, device="cpu"):
                 torch.tensor(spline_dist_params[2], device=device),
             )
         ]
-    priors = [prior_dq, prior_k, *prior_splines]
+    priors = [prior_dq, prior_k, prior_kt, *prior_splines]
 
     if "type_dx" in config["PRIORS"] and "parameters_dx" in config["PRIORS"]:
         dx_dist_params = config.getlistfloat("PRIORS", "parameters_Dx")

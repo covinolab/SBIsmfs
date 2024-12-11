@@ -68,18 +68,22 @@ def smfe_simulator_mm(
     -------
     summary_stats : torch.Tensor
         Summary statistics of simulation perform with parameters.
+    forces : torch.Tensor
+        Measured forces during the synthetic experiment. (only if return_q=True)
     """
 
     # Select integration constants from parameters
     if Dx is None:
-        num_ind_params = 3
+        num_ind_params = 4
         Dx = 10 ** parameters[0].item()
         Dq = 10 ** parameters[1].item()
         k = 10 ** parameters[2].item()
+        kt = 10 ** parameters[3].item()
     elif isinstance(Dx, (float, int)):
-        num_ind_params = 2
+        num_ind_params = 3
         Dq = Dx * (10 ** parameters[0].item())
         k = 10 ** parameters[1].item()
+        kt = 10 ** parameters[2].item()
     else:
         raise NotImplementedError("Dx should be either float or None")
 
@@ -109,6 +113,7 @@ def smfe_simulator_mm(
         x_knots=x_knots,
         y_knots=y_knots,
         k=k,
+        kt=kt,
         N=N,
         dt=dt,
         fs=saving_freq,
@@ -118,9 +123,9 @@ def smfe_simulator_mm(
         raise ValueError("Simulation failed!")
     
     if return_q:
-        return torch.from_numpy(q)
+        return torch.from_numpy(kt*q)
 
-    matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
+    matrices = build_transition_matrices(kt * (q - q.mean()), lag_times, min_bin, max_bin, num_bins)
     return matrices
 
 

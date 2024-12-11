@@ -20,6 +20,7 @@ def brownian_integrator(
         cnp.ndarray[double] x_knots,
         cnp.ndarray[double] y_knots,
         double k,
+        double kt,
         long N,
         double dt,
         int fs
@@ -112,7 +113,7 @@ def brownian_integrator(
             break
 
         Fx = -spline_deriv - k * (xold - qold)
-        Fq = k * (xold - qold)
+        Fq = k * (xold - qold) - kt * qold
 
         # integration + random number gen
         xnew = xold + Ax * Fx + Bx * grn.gsl_ran_gaussian_ziggurat(r, 1.0)
