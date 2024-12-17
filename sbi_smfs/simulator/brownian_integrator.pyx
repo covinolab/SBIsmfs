@@ -121,7 +121,7 @@ def brownian_integrator(
 
         # Save position
         if (i % fs) == 0:
-            q[i / fs] = qnew
+            q[i / fs] = xnew
 
         xold = xnew
         qold = qnew
