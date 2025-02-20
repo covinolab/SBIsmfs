@@ -58,7 +58,7 @@ def plot_spline_ensemble(
     num_splines: int,
     config: Union[str, ConfigParser],
     ylims: tuple = (-10, 10),
-    line_alpha: float = 0.02,
+    label: Union[str, None] = None,
     **plot_kwargs,
 ) -> None:
     """Plot a ensemble of splines from the posterior.
@@ -108,9 +108,9 @@ def plot_spline_ensemble(
         y_knots[2:-2] = spline_nodes
         y_axis = c_spline(x_knots, y_knots, x_axis)
         if idx == 0:
-            plt.plot(x_axis, y_axis, **plot_kwargs)
+            plt.plot(x_axis, y_axis) #, **plot_kwargs, label=label)
         else:
-            plt.plot(x_axis, y_axis, **plot_kwargs)
+            plt.plot(x_axis, y_axis) #, **plot_kwargs, label=None)
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
