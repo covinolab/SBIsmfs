@@ -95,7 +95,7 @@ def split_trajectory(
 
 def compare_pmfs(pmfs: list[np.ndarray], initial_perturbation: float = 0.1) -> list[np.ndarray]:
     """
-    Minimize the difference between probability mass functions (PMFs) by shifting them along the y-axis.
+    Minimize the difference between potentials of mean force (PMFs) by shifting them along the y-axis.
 
     Parameters
     ----------

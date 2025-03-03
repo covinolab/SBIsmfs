@@ -5,7 +5,8 @@ from configparser import ConfigParser
 def get_config_parser(
     config_file: Union[str, ConfigParser], validate: bool = False
 ) -> ConfigParser:
-    """Reads config file and returns ConfigParser object.
+    """
+    Reads config file and returns ConfigParser object.
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ def get_config_parser(
 
 def validate_config(config_file: Union[str, ConfigParser]) -> None:
     """
-    Checks that all parameters are contained in config file.
+    Checks that all parameters are specified in config file.
 
     Parameters
     ----------

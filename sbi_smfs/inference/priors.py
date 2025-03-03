@@ -1,4 +1,3 @@
-import configparser
 import torch
 from sbi.utils import MultipleIndependent
 import torch.distributions as dists
@@ -10,7 +9,8 @@ PRIORS = {"GAUSSIAN": dists.Normal, "UNIFORM": dists.Uniform}
 
 
 class SplinePrior(MultipleIndependent):
-    """ "Class which defines a prior for simulations on a spline potential.
+    """
+    Class which defines a prior for simulations on a spline potential.
 
     Parameters
     ----------
@@ -43,6 +43,19 @@ class SplinePrior(MultipleIndependent):
 
 
 def make_covariance_matrix(n, scale, correlation, device="cpu"):
+    """
+    Create a covariance matrix with specified scale and correlation.
+
+    Args:
+        n (int): Size of the covariance matrix (n x n).
+        scale (float): Scaling factor for the covariance values.
+        correlation (float): Correlation factor determining the decay of covariance.
+        device (str, optional): Device to store the tensor ('cpu' or 'cuda'). Default is 'cpu'.
+
+    Returns:
+        torch.Tensor: Covariance matrix of size (n x n).
+    """
+
     cov = torch.zeros(n, n, device=device)
     for i in range(n):
         for j in range(n):
@@ -51,6 +64,18 @@ def make_covariance_matrix(n, scale, correlation, device="cpu"):
 
 
 def make_gprior(mean, scale, correlation):
+    """
+    Creates a Gaussian prior distribution with the specified mean, scale, and correlation.
+
+    Args:
+        mean (torch.Tensor): The mean vector of the Gaussian distribution.
+        scale (float): The scale factor for the covariance matrix.
+        correlation (float): The correlation factor determining the decay of covariance values.
+
+    Returns:
+        torch.distributions.MultivariateNormal
+    """
+
     cov = make_covariance_matrix(
         n=mean.shape[0], 
         scale=scale, 
@@ -61,7 +86,8 @@ def make_gprior(mean, scale, correlation):
 
 
 def get_priors_from_config(config_file, device="cpu"):
-    """Returns the prior distribution from the config file.
+    """
+    Returns the prior distribution specified from the config file.
 
     Parameters
     ----------

@@ -6,7 +6,7 @@ import numba as nb
 @nb.jit(nopython=True)
 def bin_trajectory(x: np.ndarray, bins: np.ndarray) -> np.ndarray:
     """
-    Bins an array accoring to bins.
+    Bins an trajectory into discrete bins.
 
     Parameters
     ----------
@@ -35,7 +35,7 @@ def build_transition_matrix(
     binned_x: np.ndarray, n_bins: np.ndarray, t: int = 1
 ) -> np.ndarray:
     """
-    Calculates the markov transition matrix for a binned trajectory.
+    Counts the transition for a binned trajectory.
 
     Parameters
     ----------

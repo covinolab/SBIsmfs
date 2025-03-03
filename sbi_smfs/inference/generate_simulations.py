@@ -17,7 +17,8 @@ def generate_simulations(
     show_progressbar: bool = False,
     save_as_file: bool = False,
 ) -> Union[Tuple[torch.Tensor, torch.Tensor], None]:
-    """Run simulations with parameters from prior.
+    """
+    Run simulations with parameters from prior.
 
     Parameters
     ----------

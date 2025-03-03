@@ -28,7 +28,8 @@ def train_sequential_posterior(
     device: str = "cpu",
     save_interval: int = 1,
 ) -> Union[None, SNPE]:
-    """Trains a sequential posterior.
+    """
+    Trains a sequential posterior.
 
     Parameters
     ----------

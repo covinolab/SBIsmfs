@@ -1,14 +1,12 @@
-from sbi_smfs.utils.config_utils import get_config_parser
 from sbi.utils.get_nn_models import posterior_nn
-from sbi_smfs.simulator import get_simulator_from_config
-from sbi_smfs.inference.priors import get_priors_from_config
-from sbi_smfs.inference.embedding_net import SimpleCNN
+from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.inference.embedding_net import EMBEDDING_NETS
 
 
 def build_npe_model(config: str):
-    """Builds a neural posterior.
+    """
+    Builds a neural posterior from a config file.
 
     Parameters
     ----------
@@ -80,7 +78,8 @@ def build_npe_model(config: str):
 
 
 def get_train_parameter(config):
-    """Get training parameters from config file.
+    """
+    Get training parameters from config file.
 
     Parameters
     ----------

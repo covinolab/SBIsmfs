@@ -1,17 +1,8 @@
-import argparse
 import pickle
 from typing import Union, Tuple
-
 import torch
+
 from sbi.inference import SNPE
-
-from sbi.utils.user_input_checks import get_batch_loop_simulator
-from sbi.simulators.simutils import simulate_in_batches
-from sbi.utils.get_nn_models import posterior_nn
-
-from sbi_smfs.simulator import get_simulator_from_config
-from sbi_smfs.inference.priors import get_priors_from_config
-from sbi_smfs.inference.embedding_net import SimpleCNN
 from sbi_smfs.inference.build_nn_models import build_npe_model, get_train_parameter
 from sbi_smfs.utils.config_utils import get_config_parser
 
@@ -23,7 +14,7 @@ def train_armortized_posterior(
     device: str = "cpu",
     data_device: str = "cpu",
 ) -> Union[None, SNPE]:
-    """Trains a truncated posterior.
+    """Trains a amortized posterior.
 
     Parameters
     ----------

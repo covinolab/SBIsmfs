@@ -20,9 +20,9 @@ def evaluate_spline(
     x_eval: torch.Tensor
         Points at which to evaluate the spline.
     spline_nodes: torch.Tensor
-        Spline nodes.
+        Spline nodes to construct the spline function.
     config: str, ConfigParser
-        Config file with entries for simualtion.
+        Config file with parameters.
     
     Returns
     -------
@@ -61,12 +61,12 @@ def plot_spline_ensemble(
     label: Union[str, None] = None,
     **plot_kwargs,
 ) -> None:
-    """Plot a ensemble of splines from the posterior.
+    """Plot a ensemble of splines from the posterior samples.
 
     Parameters
     ----------
     posterior_samples: torch.Tensor
-        Samples from the posterior.
+        Samples from the posterior distribution.
     num_splines: int
         Number of splines to plot.
     config: str, ConfigParser
@@ -108,9 +108,9 @@ def plot_spline_ensemble(
         y_knots[2:-2] = spline_nodes
         y_axis = c_spline(x_knots, y_knots, x_axis)
         if idx == 0:
-            plt.plot(x_axis, y_axis) #, **plot_kwargs, label=label)
+            plt.plot(x_axis, y_axis, **plot_kwargs, label=label)
         else:
-            plt.plot(x_axis, y_axis) #, **plot_kwargs, label=None)
+            plt.plot(x_axis, y_axis, **plot_kwargs, label=None)
     plt.ylim(ylims)
     plt.xlim(
         config.getfloat("SIMULATOR", "min_x"), config.getfloat("SIMULATOR", "max_x")
@@ -128,7 +128,7 @@ def plot_spline_mean_with_error(
     line_alpha: float = 1.0,
     **plot_kwargs,
 ) -> None:
-    """Plot the posterior mean of the spline nodes with error bars.
+    """Plot posterior mean and error for all parameters which build spline.
 
     Parameters
     ----------
@@ -140,6 +140,10 @@ def plot_spline_mean_with_error(
         Confidence level for error bars.
     ylims: tuple
         Limits for y-axis.
+    line_alpha: float
+        Transparency of the spline function.
+    plot_kwargs: dict
+        Additional keyword arguments for matplotlib plt.plot function.
     """
 
     config = get_config_parser(config)
@@ -203,18 +207,22 @@ def plot_spline(
     line_alpha: float = 1.0,
     **plot_kwargs,
 ) -> None:
-    """Plot a ensemble of splines from the posterior.
+    """Construct and plot a spline function for representing a free-energy landscape.
 
     Parameters
     ----------
         spline_nodes: torch.Tensor
             Sample from the posterior.
         config: str, ConfigParser
-            Config file with entries for simualtion.
+            Config file with parameters.
         ylims: tuple
             Limits for y-axis.
         color: str
             Color of the spline.
+        line_alpha: float
+            Transparency of the spline.
+        plot_kwargs: dict
+            Additional keyword arguments for matplotlib plt.plot function.
     """
     config = get_config_parser(config)
 

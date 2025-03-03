@@ -13,7 +13,7 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
     """
-    Featurizes trajectory by computing summary statistics.
+    Featurizes trajectory by computing the first four moments of the stationary distribution and step sizes for specified lag times.
 
     Parameters
     ----------
@@ -82,7 +82,8 @@ def build_transition_matrices(
 def compute_stats(
     trajectory: np.ndarray, config: Union[str, ConfigParser]
 ) -> torch.Tensor:
-    """Computes summary statistics for given trajectory.
+    """
+    Computes summary statistics for given trajectory.
 
     Parameters
     ----------
@@ -131,7 +132,8 @@ def compute_stats(
 def check_if_observation_contains_features(
     observation: torch.tensor, config: Union[str, ConfigParser]
 ) -> bool:
-    """Checks if observation contains features.
+    """
+    Checks if observation contains features.
 
     Parameters
     ----------
