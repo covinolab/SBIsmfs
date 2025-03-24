@@ -260,20 +260,28 @@ def plot_spline(
 
 
 def plot_inipendent_marginals(
-    samples: torch.Tensor, config: Union[str, ConfigParser], fig_kwars: dict = {}
+    samples: torch.Tensor, config: Union[str, ConfigParser], figsize = (7, 3), fig_kwargs: dict = {}, **hist_kwargs
 ) -> tuple:
-    """Plot the posterior marginal distributions of the independent variables.
-
+    """Plot independent marginals of the posterior samples.
+    
     Parameters
     ----------
     samples: torch.Tensor
-        Samples from the posterior.
+        Posterior samples.
+        
     config: str, ConfigParser
-        Config file with entries for simualtion.
-
+        Config file with parameters.    
+    
+    fig_size: tuple
+        Figure size.
+        
+    hist_kwargs: dict
+        Additional keyword arguments for matplotlib plt.hist function.
+    
     Returns
     -------
-    fig, axes: matplotlib.figure.Figure, matplotlib.axes.Axes
+    fig, axes: tuple
+        Figure and axes objects.
     """
 
     config = get_config_parser(config)
@@ -287,9 +295,9 @@ def plot_inipendent_marginals(
     if isinstance(samples, torch.Tensor):
         samples = samples.cpu().numpy()
 
-    fig, axes = plt.subplots(1, num_ind_var, **fig_kwars)
+    fig, axes = plt.subplots(1, num_ind_var, figsize=figsize, **fig_kwargs)
     for i in range(num_ind_var):
-        axes[i].hist(samples[:, i].flatten(), bins=100, density=True, histtype="step")
+        axes[i].hist(samples[:, i].flatten(), density=True, **hist_kwargs)
         axes[i].set_xlabel(labels[i])
         axes[i].set_yticks([])
 
