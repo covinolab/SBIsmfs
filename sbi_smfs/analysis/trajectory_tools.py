@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 import numpy as np
 import numba as nb
 import bottleneck as bn
@@ -27,7 +27,7 @@ def find_transitions(x: np.ndarray, turn_point: float = 0.0):
     """
 
     freq = 0
-    transition_pos = [0]
+    transition_pos = []
     for i in range(len(x) - 1):
         if (
             x[i] < turn_point
@@ -40,13 +40,18 @@ def find_transitions(x: np.ndarray, turn_point: float = 0.0):
     return freq, transition_pos
 
 
+def count_transitions(x: np.ndarray, turn_point: float = 0.0, window_size: int = 100) -> int:
+    num_transitions, transition_points = find_transitions(bn.move_mean(x, window=window_size), turn_point=turn_point)
+    return num_transitions, transition_points
+
+
 def split_trajectory(
     x: np.ndarray,
     turn_point: float = 0.0,
     window_size: int = 1,
     buffer_length: int = 100,
     min_length: int = 1000,
-) -> list[np.ndarray]:
+) -> Tuple[list[np.ndarray], list[np.ndarray]]:
     """
     Split trajectory into individual trajectories in each basin.
     Uses a moving average to find the transition points.
@@ -72,9 +77,10 @@ def split_trajectory(
     above_turn_point = []
     below_turn_point = []
 
-    num_transitions, transition_points = find_transitions(
-        bn.move_mean(x, window=window_size), turn_point=turn_point
+    num_transitions, transition_points = count_transitions(
+        x, turn_point=turn_point, window_size=window_size
     )
+    transition_points.insert(0, 0)  # Add first point to transition points
     transition_points.append(len(x))  # Add last point to transition points
 
     for segment_idx in range(num_transitions + 1):  # +1 because of last transition

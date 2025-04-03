@@ -24,7 +24,7 @@ def test_find_transitions(num_transitions: int):
         )
 
     transition_points = [
-        i * length / (num_transitions + 1) for i in range(num_transitions + 1)
+        i * length / (num_transitions + 1) for i in range(1, num_transitions+1)
     ]
     num_transitions_est, transition_points_est = find_transitions(
         bn.move_mean(test_trajectory, window=100), turn_point=0
@@ -57,7 +57,7 @@ def test_split_trajectory(num_transitions: int):
         turn_point=0,
         min_length=1000,
         buffer_length=100,
-        window_size=10,
+        window_size=100,
     )
     assert len(upper_sections) == (num_transitions + 2) // 2
     assert len(lower_sectrions) == (num_transitions + 1) // 2
