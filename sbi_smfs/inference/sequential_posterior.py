@@ -24,7 +24,7 @@ def train_sequential_posterior(
     num_sim_per_round: int,
     num_workers: int,
     observation: Union[str, torch.Tensor],
-    posterior_file: bool = None,
+    posterior_file: Union[None, str] = None,
     device: str = "cpu",
     save_interval: int = 1,
 ) -> Union[None, SNPE]:
