@@ -29,14 +29,14 @@ def cmd_train_sequential_posterior():
     args = cl_parser.parse_args()
 
     train_sequential_posterior(
-        args.config_file,
-        args.num_rounds,
-        args.num_sim_per_round,
-        args.num_workers,
-        args.observation_file,
-        args.posterior_file,
-        args.device,
-        args.save_interval,
+        config_file=args.config_file,
+        num_rounds=args.num_rounds,
+        num_sim_per_round=args.num_sim_per_round,
+        num_workers=args.num_workers,
+        observation=args.observation_file,
+        posterior_file=args.posterior_file,
+        device=args.device,
+        save_interval=args.save_interval,
     )
 
 
