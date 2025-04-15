@@ -1,5 +1,5 @@
 ## SBIsmfs: Simulation-based inference for single-molecule force spectroscopy
-Implementing Simulation-based inference for single-molecule force spectroscopy.
+SBIsmfs is a Python module for simulation-based inference for single-molecule force spectroscopy experiments. The module provides tools for simulating syntehtic force-spectrscopy experiments, training an amortized and sequential posterior model, and sampling from the posterior distribution. The code is based on the [sbi-toolkit](https://sbi-dev.github.io/sbi/latest/), which is using Pytorch.
 
 ## Installing code 
 Clone the code repository:
