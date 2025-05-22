@@ -1,6 +1,6 @@
 bottleneck
 torch>=1.8.0
-sbi
+sbi==0.22.0
 matplotlib
 cython==3.0.0
 numba
