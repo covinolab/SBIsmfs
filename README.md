@@ -23,8 +23,8 @@ Install with
 python3 -m pip install .
 ```
 
-## Running a simulation example
-````
+## Running a simulation
+```python
     from sbi_smfs.simulator import get_simulator_from_config
 
     simulator = get_simulator_from_config(
@@ -32,13 +32,13 @@ python3 -m pip install .
         return_q=True
     )
 
-    parameters = torch.tensor([[0.1, 0.2, 0.3, 0.4, 0.5]])  # Example parameters
+    parameters = torch.tensor([0.1, 0.2, 0.3, 0.4, 0.5])  # Example parameters
 
     # Simulate a single trajectory
-    q = simulator.simulate(parameters)
+    q = simulator(parameters)
 ```
 
-## Running a simple inference example
+## Running a simple inference
 The code can be run with the following command:
 ```commandline
     train_sequential_posterior \
