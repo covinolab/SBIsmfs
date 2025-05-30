@@ -20,7 +20,22 @@ Install with
 python3 -m pip install .
 ```
 
-## Running the code
+## Running a simulation example
+````
+    from sbi_smfs.simulator import get_simulator_from_config
+
+    simulator = get_simulator_from_config(
+        config_file='path_to_config_file.config', 
+        return_q=True
+    )
+
+    parameters = torch.tensor([[0.1, 0.2, 0.3, 0.4, 0.5]])  # Example parameters
+
+    # Simulate a single trajectory
+    q = simulator.simulate(parameters)
+```
+
+## Running a simple inference example
 The code can be run with the following command:
 ```commandline
     train_sequential_posterior \
@@ -46,6 +61,36 @@ Simple visualization of the posterior distribtuion:
     samples[:, 2:] = samples[:, 2:] - torch.mean(samples[:, 2:], dim=1).reshape(-1, 1)
 
     plot_spline_ensemble(samples, 1000, config_file, label='Samples', color="blue", alpha=0.02)
+```
+
+## Minimal config file example
+```config
+    [SIMULATOR]
+    dt = 0.01
+    num_steps = 100000000
+    num_knots = 10
+    saving_freq = 100
+    min_x = 0
+    Dx = 0.38
+    max_x = 50
+    max_G_0 = 30
+    max_G_1 = 10
+    init_xq_range=10, 40
+
+    [PRIORS]
+    type_spline=GAUSSIAN
+    parameters_spline=0, 4
+    norm_spline_nodes=yes
+    type_Dq=UNIFORM
+    parameters_Dq=-1, 1
+    type_k=UNIFORM
+    parameters_k=-2, 0
+
+    [SUMMARY_STATS]
+    min_bin = 10
+    max_bin = 40
+    num_bins = 15
+    lag_times = 1, 10, 100, 1000, 10000, 100000
 ```
 
 ## Installation can be tested with:
