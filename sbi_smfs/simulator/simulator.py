@@ -8,7 +8,7 @@ from sbi_smfs.utils.summary_stats import build_transition_matrices
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
 
-def smfe_simulator_mm(
+def smfe_simulator(
     parameters: torch.Tensor,
     dt: float,
     N: int,
@@ -151,7 +151,7 @@ def get_simulator_from_config(
         raise NotImplementedError("Dx not properly specified in config file!")
 
     return partial(
-        smfe_simulator_mm,
+        smfe_simulator,
         dt=config.getfloat("SIMULATOR", "dt"),
         N=config.getint("SIMULATOR", "num_steps"),
         saving_freq=config.getint("SIMULATOR", "saving_freq"),

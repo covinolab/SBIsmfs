@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import torch
-from sbi_smfs.simulator.simulator import smfe_simulator_mm, get_simulator_from_config
+from sbi_smfs.simulator.simulator import smfe_simulator, get_simulator_from_config
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
         ]
     )
 
-    summary_stats = smfe_simulator_mm(
+    summary_stats = smfe_simulator(
         parameters=params,
         dt=5e-4,
         N=1e6,
