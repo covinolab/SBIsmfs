@@ -59,7 +59,7 @@ def make_covariance_matrix(n, scale, correlation, device="cpu"):
     cov = torch.zeros(n, n, device=device)
     for i in range(n):
         for j in range(n):
-            cov[i, j] =  scale * torch.exp(- correlation * torch.abs(torch.tensor(i - j)))
+            cov[i, j] = scale * torch.exp(-correlation * torch.abs(torch.tensor(i - j)))
     return cov
 
 
@@ -77,10 +77,7 @@ def make_gprior(mean, scale, correlation):
     """
 
     cov = make_covariance_matrix(
-        n=mean.shape[0], 
-        scale=scale, 
-        correlation=correlation,
-        device=mean.device
+        n=mean.shape[0], scale=scale, correlation=correlation, device=mean.device
     )
     return dists.MultivariateNormal(mean, cov)
 
@@ -137,7 +134,10 @@ def get_priors_from_config(config_file, device="cpu"):
             )
             for p1, p2 in zip(spline_dist_params[0], spline_dist_params[1])
         ]
-    elif len(spline_dist_params) == 3 and config.get("PRIORS", "type_spline") == "GAUSSIAN_PROCESS":
+    elif (
+        len(spline_dist_params) == 3
+        and config.get("PRIORS", "type_spline") == "GAUSSIAN_PROCESS"
+    ):
         prior_splines = [
             make_gprior(
                 torch.tensor(spline_dist_params[0], device=device),

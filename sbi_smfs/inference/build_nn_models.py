@@ -64,7 +64,7 @@ def build_npe_model(config: str):
         "dropout_probability": config.getfloat("NEURAL_NETWORK", "dropout_probability"),
         "use_batch_norm": config.getboolean("NEURAL_NETWORK", "use_batch_norm"),
     }
-    
+
     neural_posterior = posterior_nn(
         model=config.get("NEURAL_NETWORK", "model"),
         hidden_features=config.getint("NEURAL_NETWORK", "hidden_features"),

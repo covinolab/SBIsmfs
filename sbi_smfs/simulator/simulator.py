@@ -116,7 +116,7 @@ def smfe_simulator_mm(
 
     if q is None:
         raise ValueError("Simulation failed!")
-    
+
     if return_q:
         return torch.from_numpy(q)
 
@@ -149,7 +149,6 @@ def get_simulator_from_config(
         Dx = None
     else:
         raise NotImplementedError("Dx not properly specified in config file!")
-
 
     return partial(
         smfe_simulator_mm,

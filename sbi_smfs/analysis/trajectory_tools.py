@@ -40,8 +40,12 @@ def find_transitions(x: np.ndarray, turn_point: float = 0.0):
     return freq, transition_pos
 
 
-def count_transitions(x: np.ndarray, turn_point: float = 0.0, window_size: int = 100) -> int:
-    num_transitions, transition_points = find_transitions(bn.move_mean(x, window=window_size), turn_point=turn_point)
+def count_transitions(
+    x: np.ndarray, turn_point: float = 0.0, window_size: int = 100
+) -> int:
+    num_transitions, transition_points = find_transitions(
+        bn.move_mean(x, window=window_size), turn_point=turn_point
+    )
     return num_transitions, transition_points
 
 
@@ -99,7 +103,9 @@ def split_trajectory(
     return above_turn_point, below_turn_point
 
 
-def compare_pmfs(pmfs: list[np.ndarray], initial_perturbation: float = 0.1) -> list[np.ndarray]:
+def compare_pmfs(
+    pmfs: list[np.ndarray], initial_perturbation: float = 0.1
+) -> list[np.ndarray]:
     """
     Minimize the difference between potentials of mean force (PMFs) by shifting them along the y-axis.
 
@@ -162,18 +168,18 @@ def align_spline_nodes(
     # Convert to numpy for optimization
     nodes_numpy = spline_nodes.cpu().numpy()
     num_splines = nodes_numpy.shape[0]
-    
+
     def compute_alignment_error(offsets: np.ndarray) -> float:
         """Calculate sum of squared differences from reference spline."""
         shifted_splines = nodes_numpy + offsets.reshape((-1, 1))
         reference_spline = shifted_splines[0]
         return np.sum((shifted_splines - reference_spline) ** 2)
-    
+
     # Optimize vertical offsets
     initial_offsets = np.random.normal(size=num_splines, scale=initial_perturbation)
     result = scipy.optimize.minimize(compute_alignment_error, initial_offsets)
-    
+
     # Apply optimal offsets
     aligned_splines = nodes_numpy + result.x.reshape((-1, 1))
-    
+
     return torch.from_numpy(aligned_splines) if return_torch else aligned_splines

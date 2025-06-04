@@ -8,11 +8,8 @@ from sbi_smfs.utils.config_utils import get_config_parser
 
 
 def evaluate_spline(
-        x_eval: torch.Tensor,
-        spline_nodes: torch.Tensor,
-        config: Union[str, ConfigParser]
-    ) -> torch.Tensor:
-
+    x_eval: torch.Tensor, spline_nodes: torch.Tensor, config: Union[str, ConfigParser]
+) -> torch.Tensor:
     """Evaluate the spline at x_eval.
 
     Parameters
@@ -23,7 +20,7 @@ def evaluate_spline(
         Spline nodes to construct the spline function.
     config: str, ConfigParser
         Config file with parameters.
-    
+
     Returns
     -------
     y_eval: torch.Tensor
@@ -260,24 +257,28 @@ def plot_spline(
 
 
 def plot_inipendent_marginals(
-    samples: torch.Tensor, config: Union[str, ConfigParser], figsize = (7, 3), fig_kwargs: dict = {}, **hist_kwargs
+    samples: torch.Tensor,
+    config: Union[str, ConfigParser],
+    figsize=(7, 3),
+    fig_kwargs: dict = {},
+    **hist_kwargs,
 ) -> tuple:
     """Plot independent marginals of the posterior samples.
-    
+
     Parameters
     ----------
     samples: torch.Tensor
         Posterior samples.
-        
+
     config: str, ConfigParser
-        Config file with parameters.    
-    
+        Config file with parameters.
+
     fig_size: tuple
         Figure size.
-        
+
     hist_kwargs: dict
         Additional keyword arguments for matplotlib plt.hist function.
-    
+
     Returns
     -------
     fig, axes: tuple
