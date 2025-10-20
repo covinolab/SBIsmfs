@@ -24,7 +24,7 @@ def test_find_transitions(num_transitions: int):
         )
 
     transition_points = [
-        i * length / (num_transitions + 1) for i in range(1, num_transitions+1)
+        i * length / (num_transitions + 1) for i in range(1, num_transitions + 1)
     ]
     num_transitions_est, transition_points_est = find_transitions(
         bn.move_mean(test_trajectory, window=100), turn_point=0

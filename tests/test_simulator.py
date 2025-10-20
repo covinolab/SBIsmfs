@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import torch
-from sbi_smfs.simulator.simulator import smfe_simulator_mm, get_simulator_from_config
+from sbi_smfs.simulator.simulator import smfe_simulator, get_simulator_from_config
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
         ]
     )
 
-    summary_stats = smfe_simulator_mm(
+    summary_stats = smfe_simulator(
         parameters=params,
         dt=5e-4,
         N=1e6,
@@ -44,7 +44,7 @@ def test_simulator(num_bins: int, lag_times: list[int]):
         lag_times=lag_times,
     )
 
-    assert summary_stats.shape[0] == len(lag_times) * (num_bins ** 2)
+    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2)
 
 
 def test_simulator_from_config():
@@ -68,7 +68,7 @@ def test_simulator_from_config():
 
     simulator = get_simulator_from_config("tests/config_files/test.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20 ** 2)
+    assert summary_stats.shape[0] == 6 * (20**2)
 
 
 def test_simulator_from_config_with_Dx():
@@ -93,7 +93,7 @@ def test_simulator_from_config_with_Dx():
 
     simulator = get_simulator_from_config("tests/config_files/test_2.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20 ** 2)
+    assert summary_stats.shape[0] == 6 * (20**2)
 
 
 def test_simulator_from_config_with_no_Dx():
