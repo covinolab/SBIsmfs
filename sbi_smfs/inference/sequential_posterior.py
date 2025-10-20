@@ -23,7 +23,7 @@ def train_sequential_posterior(
     num_rounds: int,
     num_sim_per_round: int,
     num_workers: int,
-    observation: Union[str, torch.Tensor],
+    observation: Union[str, torch.Tensor, list[torch.Tensor], list[str]],
     posterior_file: Union[None, str] = None,
     device: str = "cpu",
     save_interval: int = 1,
@@ -41,8 +41,8 @@ def train_sequential_posterior(
         Number of simulations per round.
     num_workers: int
         Number of workers to use for simulation.
-    observation: str, torch.Tensor
-        Observation to use for conditioning the posterior.
+    observation: str, torch.Tensor, list[torch.Tensor], list[str]
+        Observation(s) to use for conditioning the posterior.
     posterior_file: str, None
         File name to save the posterior to.
     device: str
@@ -57,7 +57,12 @@ def train_sequential_posterior(
     simulator = get_simulator_from_config(config_file)
     config = get_config_parser(config_file, validate=True)
 
-    if isinstance(observation, str):
+    if isinstance(observation, list):
+        observation = [
+            obs if isinstance(obs, torch.Tensor) else torch.load(obs)
+            for obs in observation
+        ]
+    elif isinstance(observation, str):
         observation = torch.load(observation)
 
     if not check_if_observation_contains_features(observation, config):

@@ -32,15 +32,15 @@ def bin_trajectory(x: np.ndarray, bins: np.ndarray) -> np.ndarray:
 
 @nb.jit(nopython=True)
 def build_transition_matrix(
-    binned_x: np.ndarray, n_bins: np.ndarray, t: int = 1
+    binned_x: np.ndarray, n_bins: int, t: int = 1
 ) -> np.ndarray:
     """
-    Counts the transition for a binned trajectory.
+    Counts the transitions for a binned trajectory or a batch of binned trajectories.
 
     Parameters
     ----------
     binned_x : np.ndarray
-        Binned trajectory.
+        Binned trajectory (1D) or batched binned trajectories (2D: n_traj x length).
     n_bins : int
         Number of bins.
     t : int, optional
@@ -49,18 +49,50 @@ def build_transition_matrix(
     Returns
     -------
     np.ndarray
-        Returns transition matrix of size (n_bins, n_bins).
-
+        Returns transition matrix of size (n_bins, n_bins) with columns normalized
+        to sum to 1 (float64).
     """
 
-    matrix = np.zeros(shape=(n_bins, n_bins), dtype=np.int64)
-    for i in range(len(binned_x) - t):
-        column = binned_x[i]
-        row = binned_x[i + t]
-        matrix[row][column] += 1
+    assert t >= 1, "Lag time t must be at least 1."
+    assert n_bins >= 2, "Number of bins must be at least 2."
 
-    norm = np.sum(matrix, axis=0, dtype=np.int64)
-    return matrix / norm
+    matrix_int = np.zeros((n_bins, n_bins), dtype=np.int64)
+
+    # handle 1D trajectory
+    if binned_x.ndim == 1:
+        L = binned_x.shape[0]
+        for i in range(L - t):
+            col = binned_x[i]
+            row = binned_x[i + t]
+            matrix_int[row, col] += 1
+    # handle batched trajectories (2D: n_traj x length)
+    else:
+        n_traj = binned_x.shape[0]
+        L = binned_x.shape[1]
+        for traj in range(n_traj):
+            for i in range(L - t):
+                col = binned_x[traj, i]
+                row = binned_x[traj, i + t]
+                matrix_int[row, col] += 1
+
+    # convert to float and normalize columns (avoid division by zero)
+    matrix = np.zeros((n_bins, n_bins), dtype=np.float64)
+    for i in range(n_bins):
+        for j in range(n_bins):
+            matrix[i, j] = matrix_int[i, j]
+
+    for j in range(n_bins):
+        s = 0.0
+        for i in range(n_bins):
+            s += matrix[i, j]
+        if s > 0.0:
+            for i in range(n_bins):
+                matrix[i, j] = matrix[i, j] / s
+        else:
+            for i in range(n_bins):
+                matrix[i, j] = 0.0
+
+    return matrix
 
 
 def moments(x: np.ndarray) -> tuple:

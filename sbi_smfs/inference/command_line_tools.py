@@ -17,7 +17,7 @@ def cmd_train_sequential_posterior():
     )
     cl_parser.add_argument("--num_workers", action="store", type=int, required=True)
     cl_parser.add_argument(
-        "--observation_file", action="store", type=str, required=True
+        "--observation_file", action="store", type=str, required=True, nargs="+"
     )
     cl_parser.add_argument("--posterior_file", action="store", type=str, required=True)
     cl_parser.add_argument(

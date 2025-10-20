@@ -1,2 +1,32 @@
 [build-system]
-requires = ["setuptools", "wheel", "Cython", "numpy"]
+requires = ["setuptools>=61.0", "wheel", "Cython", "numpy"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "SBIsmfs"
+version = "0.0.1"
+authors = [
+    {name = "Lars Dingeldein", email = "dingeldein@fias.uni-frankfurt.de"}
+]
+description = "Simulation-based inference for single-molecule force-spectroscopy"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+dependencies = [
+    # Dependencies will be read from requirements.txt by setup.py
+]
+
+[project.urls]
+Homepage = "https://github.com/Dingel321/SBIsmfs.git"
+
+[project.scripts]
+generate_simulations = "sbi_smfs.inference.command_line_tools:cmd_generate_simulations"
+train_armortized_posterior = "sbi_smfs.inference.command_line_tools:cmd_train_armortized_posterior"
+train_sequential_posterior = "sbi_smfs.inference.command_line_tools:cmd_train_sequential_posterior"
+train_truncated_posterior = "sbi_smfs.inference.command_line_tools:cmd_train_truncated_posterior"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["."]
