@@ -92,28 +92,29 @@ def get_train_parameter(config):
         Training parameters.
     """
 
-    config = get_config_parser(config)
-
-    if "TRAINING_PARAMS" not in config.sections():
-        print("No training parameters specified in config file.")
-        print("Using default trainingparameters.")
-
-        default_params = {
+    default_params = {
             "validation_fraction": 0.15,
             "training_batch_size": 50,
             "learning_rate": 0.0005,
             "stop_after_epochs": 20,
+            "retrain_from_scratch": False,
         }
 
-        return default_params
+    config = get_config_parser(config)
 
-    train_parameter = {
-        "validation_fraction": config.getfloat(
-            "TRAINING_PARAMS", "validation_fraction"
-        ),
-        "training_batch_size": config.getint("TRAINING_PARAMS", "training_batch_size"),
-        "learning_rate": config.getfloat("TRAINING_PARAMS", "learning_rate"),
-        "stop_after_epochs": config.getint("TRAINING_PARAMS", "stop_after_epochs"),
-    }
+    if "TRAINING_PARAMS" not in config.sections():
+        print("No training parameters specified in config file.")
+        print("Using default training parameters.")
+        return default_params
+    
+    train_parameter = {}
+    
+    for param in default_params.keys():
+        if param not in config["TRAINING_PARAMS"].keys():
+            print(f"No {param} specified in config file.")
+            print("Using default value :", default_params[param])
+            train_parameter[param] = default_params[param]
+        else:
+            train_parameter[param] = config.get("TRAINING_PARAMS", param)
 
     return train_parameter

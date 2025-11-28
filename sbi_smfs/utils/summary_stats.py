@@ -11,7 +11,7 @@ from sbi_smfs.utils.stats_utils import (
 from sbi_smfs.utils.config_utils import get_config_parser
 
 
-def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
+def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list[float]:
     """
     Featurizes trajectory by computing the first four moments of the stationary distribution and step sizes for specified lag times.
 
@@ -19,7 +19,7 @@ def featurize_trajectory(q: np.ndarray, lag_times: list[int]) -> list:
     ----------
     q : np.ndarray
         Trajectory
-    lag_times : list
+    lag_times : list[int]
         List of lag times to compute summary statistics
 
     Returns
