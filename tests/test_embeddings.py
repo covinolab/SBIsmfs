@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import pytest
-from sbi_smfs.inference.embedding_net import SimpleCNN, MultiLayerCNN
+from sbi_smfs.inference.embedding_net import SimpleCNN, MultiLayerCNN, SingleLayerMLP
 
 num_bins = 20
 num_lags = 5
@@ -56,3 +56,19 @@ def test_MultiLayerCNN_activation(input_tensor):
     assert (
         torch.all(output < 0) == False
     )  # expected at least one output to be positive due to LeakyReLU activation
+
+
+def test_SingleLayerMLP(input_tensor):
+    model = SingleLayerMLP(
+        num_bins=num_bins,
+        num_lags=num_lags,
+        num_features=10,
+        activation=nn.GELU,
+    )       
+    output = model(input_tensor)
+
+    assert output .shape == (
+        batch_size,
+        10,
+    )
+

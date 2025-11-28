@@ -43,7 +43,7 @@ def build_npe_model(config: str):
         cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
             config.getint("SUMMARY_STATS", "num_bins"),
             len(config.getlistint("SUMMARY_STATS", "lag_times")),
-            100,
+            config.getint("NEURAL_NETWORK", "hidden_features"),
         )
         print("Using embedding net :", config.get("NEURAL_NETWORK", "embedding_net"))
     else:

@@ -25,6 +25,44 @@ def add_embedding(name):
     return add
 
 
+@add_embedding("single_layer_mlp")
+class SingleLayerMLP(nn.Module):
+    """
+    Single layer MLP with ReLU activation
+
+    Parameters
+    ----------
+    num_bins : int
+        Number of bins for transition matrix.
+    num_lags : int
+        Number of lag times for which a transition matrix is generated.
+    num_features : int
+        Number of output features for the embedding.
+    activation : torch.nn.Module
+        Activation function.
+    """
+
+    def __init__(
+        self,
+        num_bins: int,
+        num_lags: int,
+        num_features: int,
+        activation: Callable[[], nn.Module] = nn.GELU,
+    ):
+        super(SingleLayerMLP, self).__init__()
+
+        self.num_bins = num_bins
+        self.num_lags = num_lags
+        self.num_features = num_features
+        self.fc1 = nn.Linear(num_bins * num_bins * num_lags, num_features)
+        self.activation = activation()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = x.view((-1, self.num_lags * self.num_bins * self.num_bins))
+        x = self.activation(self.fc1(x))
+        return x
+
+
 @add_embedding("single_layer_cnn")
 class SimpleCNN(nn.Module):
     """
