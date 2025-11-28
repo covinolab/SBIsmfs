@@ -93,12 +93,12 @@ def get_train_parameter(config):
     """
 
     default_params = {
-            "validation_fraction": 0.15,
-            "training_batch_size": 50,
-            "learning_rate": 0.0005,
-            "stop_after_epochs": 20,
-            "retrain_from_scratch": False,
-        }
+        "validation_fraction": 0.15,
+        "training_batch_size": 50,
+        "learning_rate": 0.0005,
+        "stop_after_epochs": 20,
+        "retrain_from_scratch": False,
+    }
 
     config = get_config_parser(config)
 
@@ -106,15 +106,27 @@ def get_train_parameter(config):
         print("No training parameters specified in config file.")
         print("Using default training parameters.")
         return default_params
-    
+
     train_parameter = {}
-    
-    for param in default_params.keys():
-        if param not in config["TRAINING_PARAMS"].keys():
+
+    for param, default in default_params.items():
+        if param not in config["TRAINING_PARAMS"]:
             print(f"No {param} specified in config file.")
-            print("Using default value :", default_params[param])
-            train_parameter[param] = default_params[param]
+            print("Using default value :", default)
+            train_parameter[param] = default
         else:
-            train_parameter[param] = config.get("TRAINING_PARAMS", param)
+            try:
+                if isinstance(default, bool):
+                    value = config.getboolean("TRAINING_PARAMS", param)
+                elif isinstance(default, int) and not isinstance(default, bool):
+                    value = config.getint("TRAINING_PARAMS", param)
+                elif isinstance(default, float):
+                    value = config.getfloat("TRAINING_PARAMS", param)
+                else:
+                    value = config.get("TRAINING_PARAMS", param)
+            except ValueError:
+                print(f"Invalid value for {param} in config. Using default value :", default)
+                value = default
+            train_parameter[param] = value
 
     return train_parameter
