@@ -4,5 +4,5 @@ sbi==0.22.0
 matplotlib
 cython==3.0.0
 numba
-scipy
+scipy<=1.10
 numpy
