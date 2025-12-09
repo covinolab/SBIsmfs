@@ -5,9 +5,9 @@ from sbi_smfs.simulator.simulator import smfe_simulator, get_simulator_from_conf
 
 
 @pytest.mark.parametrize(
-    "num_bins, lag_times", [(20, [1, 10, 100, 1000]), (50, [1, 10, 100])]
+    "num_bins, lag_times, num_freq", [(20, [1, 10, 100, 1000], 0), (50, [1, 10, 100], 50)]
 )
-def test_simulator(num_bins: int, lag_times: list[int]):
+def test_simulator(num_bins: int, lag_times: list[int], num_freq: int):
     params = torch.tensor(
         [
             0,
@@ -42,9 +42,10 @@ def test_simulator(num_bins: int, lag_times: list[int]):
         max_bin=5,
         num_bins=num_bins,
         lag_times=lag_times,
+        num_freq=num_freq,
     )
 
-    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2)
+    assert summary_stats.shape[0] == len(lag_times) * (num_bins**2) + num_freq
 
 
 def test_simulator_from_config():
@@ -68,7 +69,7 @@ def test_simulator_from_config():
 
     simulator = get_simulator_from_config("tests/config_files/test.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20**2)
+    assert summary_stats.shape[0] == 6 * (20**2) + 50
 
 
 def test_simulator_from_config_with_Dx():
@@ -93,7 +94,7 @@ def test_simulator_from_config_with_Dx():
 
     simulator = get_simulator_from_config("tests/config_files/test_2.config")
     summary_stats = simulator(params)
-    assert summary_stats.shape[0] == 6 * (20**2)
+    assert summary_stats.shape[0] == 6 * (20**2) + 50
 
 
 def test_simulator_from_config_with_no_Dx():

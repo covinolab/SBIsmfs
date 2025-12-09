@@ -16,7 +16,7 @@ def test_generate_simulations():
     )
     assert observations is not None
     assert observations[0].shape == (3, 13)
-    assert observations[1].shape == (3, 2400)
+    assert observations[1].shape == (3, 2400 + 50)
 
 
 def test_generate_simulations_with_Dx():
@@ -31,7 +31,7 @@ def test_generate_simulations_with_Dx():
     )
     assert observations is not None
     assert observations[0].shape == (3, 14)
-    assert observations[1].shape == (3, 2400)
+    assert observations[1].shape == (3, 2400 + 50)
 
 
 def test_generate_simulations_wrong_input():
@@ -62,4 +62,4 @@ def test_generate_simulations_save_file():
     os.remove("test_x.pt")
     os.remove("test_theta.pt")
     assert observation_theta_shape == (3, 13)
-    assert observation_x_shape == (3, 2400)
+    assert observation_x_shape == (3, 2400 + 50)

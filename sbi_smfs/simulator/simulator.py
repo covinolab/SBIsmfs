@@ -4,7 +4,7 @@ import numpy as np
 from functools import partial
 import configparser
 from sbi_smfs.utils.config_utils import get_config_parser
-from sbi_smfs.utils.summary_stats import build_transition_matrices
+from sbi_smfs.utils.summary_stats import featurize_trajectory
 from sbi_smfs.simulator.brownian_integrator import brownian_integrator
 
 
@@ -24,6 +24,7 @@ def smfe_simulator(
     max_bin: float,
     num_bins: int,
     lag_times: list[int],
+    num_freq: int = 0,
     return_q: bool = False,
 ) -> torch.Tensor:
     """
@@ -120,8 +121,8 @@ def smfe_simulator(
     if return_q:
         return torch.from_numpy(q)
 
-    matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
-    return matrices
+    features = featurize_trajectory(q, lag_times, min_bin, max_bin, num_bins, num_freq=num_freq)
+    return features
 
 
 def get_simulator_from_config(
@@ -166,5 +167,6 @@ def get_simulator_from_config(
         max_bin=config.getfloat("SUMMARY_STATS", "max_bin"),
         num_bins=config.getint("SUMMARY_STATS", "num_bins"),
         lag_times=config.getlistint("SUMMARY_STATS", "lag_times"),
+        num_freq=config.getint("SUMMARY_STATS", "num_freq"),
         return_q=return_q,
     )

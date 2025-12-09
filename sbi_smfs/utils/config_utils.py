@@ -84,7 +84,7 @@ def validate_config(config_file: Union[str, ConfigParser]) -> None:
             "type_k",
             "parameters_k",
         ],
-        "SUMMARY_STATS": ["min_bin", "max_bin", "num_bins", "lag_times"],
+        "SUMMARY_STATS": ["min_bin", "max_bin", "num_bins", "lag_times", "num_freq"],
         "NEURAL_NETWORK": [
             "embedding_net",
             "num_blocks",

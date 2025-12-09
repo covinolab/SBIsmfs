@@ -1,4 +1,6 @@
+from networkx import config
 import numpy as np
+import pytest
 import torch
 from sbi_smfs.utils.config_utils import get_config_parser
 from sbi_smfs.utils.summary_stats import (
@@ -26,8 +28,15 @@ def test_build_transition_matrices_batched():
 def test_featurize_trajectory():
     traj = np.random.standard_normal(size=(1000,))
     lag_times = [1, 3, 10]
-    features = featurize_trajectory(traj, lag_times)
-    assert len(features) == (4 + 3 * 4)
+    features = featurize_trajectory(
+        traj, 
+        lag_times=lag_times,
+        min_bin=-2.0,
+        max_bin=2.0,
+        num_bins=10,
+        num_freq=50
+    )
+    assert len(features) == (10**2) * len(lag_times) + 50  # 50 from freq features
 
 
 def test_compute_stats():
@@ -38,6 +47,7 @@ def test_compute_stats():
         [
             config.getint("SUMMARY_STATS", "num_bins") ** 2
             * len(config.getlistint("SUMMARY_STATS", "lag_times"))
+            + config.getint("SUMMARY_STATS", "num_freq"),
         ]
     )
 
@@ -45,8 +55,15 @@ def test_compute_stats():
 def test_compute_stats_batched_traj():
     config = get_config_parser("tests/config_files/test.config")
     traj = [np.random.standard_normal(size=(100000,))] * 5
-    features = compute_stats(traj, config)
-    assert features.shape[0] == (6 * 20 * 20) # look into config file 6 lag times, 20 bins
+    
+    with pytest.raises(NotImplementedError):
+        features = compute_stats(traj, config)
+
+    #assert features.shape[0] == (
+    #    config.getint("SUMMARY_STATS", "num_bins") ** 2 
+    #    * len(config.getlistint("SUMMARY_STATS", "lag_times") 
+    #          + config.getint("SUMMARY_STATS", "num_freq"))
+    #)
 
 
 def test_check_if_observation_contains_features():

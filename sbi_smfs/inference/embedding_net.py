@@ -46,6 +46,7 @@ class SingleLayerMLP(nn.Module):
         self,
         num_bins: int,
         num_lags: int,
+        num_freq: int,
         num_features: int,
         activation: Callable[[], nn.Module] = nn.GELU,
     ):
@@ -53,12 +54,13 @@ class SingleLayerMLP(nn.Module):
 
         self.num_bins = num_bins
         self.num_lags = num_lags
+        self.num_freq = num_freq
         self.num_features = num_features
-        self.fc1 = nn.Linear(num_bins * num_bins * num_lags, num_features)
+        self.fc1 = nn.Linear((num_bins * num_bins * num_lags) + num_freq, num_features)
         self.activation = activation()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.view((-1, self.num_lags * self.num_bins * self.num_bins))
+        x = x.view((-1, (self.num_lags * self.num_bins * self.num_bins) + self.num_freq))
         x = self.activation(self.fc1(x))
         return x
 
@@ -91,6 +93,7 @@ class SimpleCNN(nn.Module):
         stride: int,
         num_bins: int,
         num_lags: int,
+        num_freq: int,
         activation: Callable[[], nn.Module] = nn.ReLU,
     ):
         super(SimpleCNN, self).__init__()
@@ -103,13 +106,25 @@ class SimpleCNN(nn.Module):
         )
         self.num_bins = num_bins
         self.num_lags = num_lags
+        self.num_freq = num_freq
         self.activation = activation()
+
+        if num_freq > 0:
+            self.fc1 = nn.Linear(num_freq, num_freq//2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Check the original matrix size and lag times!!!
-        x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
-        x = self.activation(self.conv1(x))
-        return x.flatten(start_dim=1)
+        transition_matrix = x[:, :-self.num_freq].view(
+            (-1, self.num_lags, self.num_bins, self.num_bins)
+        )
+        x1 = self.activation(self.conv1(transition_matrix))
+
+        if self.num_freq == 0:
+            return x1.flatten(start_dim=1)
+        
+        elif self.num_freq > 0:
+            x2 = self.activation(self.fc1(x[:, -self.num_freq:]))
+            return torch.cat((x1.flatten(start_dim=1), x2), dim=1)
 
 
 @add_embedding("multi_layer_cnn")
@@ -131,6 +146,7 @@ class MultiLayerCNN(nn.Module):
         self,
         num_bins: int,
         num_lags: int,
+        num_freq: int,
         num_features: int,
     ):
         super(MultiLayerCNN, self).__init__()
@@ -138,6 +154,7 @@ class MultiLayerCNN(nn.Module):
         self.num_bins = num_bins
         self.num_lags = num_lags
         self.num_features = num_features
+        self.num_freq = num_freq
 
         self.cnn = nn.Sequential(
             nn.Conv2d(num_lags, num_lags * 2, 3, stride=1, padding=1),
@@ -167,7 +184,15 @@ class MultiLayerCNN(nn.Module):
             nn.Linear(num_lags * 128, num_features),
             nn.LeakyReLU(0.1),
         )
+        self.fc1 = nn.Linear(num_freq, num_freq//2) if num_freq > 0 else None
+        self.activation = nn.ReLU(0.1)
 
     def forward(self, x):
-        x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
+        if self.num_freq > 0:
+            freq_features = self.activation(self.fc1(x[:, -self.num_freq:]))
+            transition_matrix = x[:, :-self.num_freq]
+            cnn_features = self.cnn(transition_matrix.view((-1, self.num_lags, self.num_bins, self.num_bins)))
+            return torch.cat((cnn_features, freq_features), dim=1)
+        elif self.num_freq == 0:
+            x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
         return self.cnn(x)

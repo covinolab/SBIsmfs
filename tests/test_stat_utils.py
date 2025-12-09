@@ -4,6 +4,7 @@ import bottleneck as bn
 import scipy.stats as stats
 import sbi_smfs.utils.stats_utils as stutils
 
+np.random.seed(4312)
 
 def test_transition_matrix():
     binned_traj = np.array([0, 0, 1, 1, 1, 0, 0])

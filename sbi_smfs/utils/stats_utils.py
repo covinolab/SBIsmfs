@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import scipy.stats as stats
 import numba as nb
 
@@ -184,3 +185,25 @@ def prop_stats(x: np.ndarray, t: int) -> tuple:
     _moments = moments(delta_x)
 
     return _moments
+
+
+def compute_normalized_fft_magnitudes(traj, num_freq=50):
+    """
+    Computes the normalized frequency magnitudes of the FFT of the input trajectory.
+
+    Parameters
+    ----------
+    traj : np.ndarray
+        Input trajectory.
+    n_freq : int, optional
+        Number of frequency components to consider. The default is 50.
+    
+    Returns
+    -------
+    np.ndarray
+        Normalized (by sum) magnitudes of the FFT of the trajectory.
+    """
+
+    fft_traj = np.abs(np.fft.fft(traj)[1:num_freq+1])
+    fft_traj = fft_traj / fft_traj.sum()
+    return torch.from_numpy(fft_traj)
