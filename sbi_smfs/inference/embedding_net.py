@@ -63,6 +63,49 @@ class SingleLayerMLP(nn.Module):
         x = x.view((-1, (self.num_lags * self.num_bins * self.num_bins) + self.num_freq))
         x = self.activation(self.fc1(x))
         return x
+    
+
+@add_embedding("single_layer_mlp_skip_freq")
+class SingleLayerMLP_skip(nn.Module):
+    """
+    Single layer MLP with ReLU activation
+
+    Parameters
+    ----------
+    num_bins : int
+        Number of bins for transition matrix.
+    num_lags : int
+        Number of lag times for which a transition matrix is generated.
+    num_features : int
+        Number of output features for the embedding.
+    activation : torch.nn.Module
+        Activation function.
+    """
+
+    def __init__(
+        self,
+        num_bins: int,
+        num_lags: int,
+        num_freq: int,
+        num_features: int,
+        activation: Callable[[], nn.Module] = nn.GELU,
+    ):
+        super(SingleLayerMLP_skip, self).__init__()
+
+        self.num_bins = num_bins
+        self.num_lags = num_lags
+        self.num_freq = num_freq
+        self.num_features = num_features
+        self.fc1 = nn.Linear((num_bins * num_bins * num_lags), num_features)
+        self.activation = activation()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        matrices = x[:, :-self.num_freq]  # transition matrices
+        freq = x[:, -self.num_freq:]  # frequency features
+        matrices = matrices.view((-1, (self.num_lags * self.num_bins * self.num_bins)))
+        x = self.activation(self.fc1(matrices))
+        x = torch.cat((x, freq), dim=1)
+        return x
 
 
 @add_embedding("single_layer_cnn")

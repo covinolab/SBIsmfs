@@ -41,9 +41,10 @@ def build_npe_model(config: str):
         and config.get("NEURAL_NETWORK", "embedding_net") != "single_layer_cnn"
     ):
         cnn_net = EMBEDDING_NETS[config.get("NEURAL_NETWORK", "embedding_net")](
-            config.getint("SUMMARY_STATS", "num_bins"),
-            len(config.getlistint("SUMMARY_STATS", "lag_times")),
-            config.getint("NEURAL_NETWORK", "hidden_features"),
+            num_bins=config.getint("SUMMARY_STATS", "num_bins"),
+            num_lags=len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            num_freq=config.getint("SUMMARY_STATS", "num_freq"),
+            num_features=config.getint("NEURAL_NETWORK", "hidden_features"),
         )
         print("Using embedding net :", config.get("NEURAL_NETWORK", "embedding_net"))
     else:
@@ -52,11 +53,12 @@ def build_npe_model(config: str):
                 f"embedding net {config.get('NEURAL_NETWORK', 'embedding_net')} not available."
             )
         cnn_net = EMBEDDING_NETS["single_layer_cnn"](
-            len(config.getlistint("SUMMARY_STATS", "lag_times")),
-            4,
-            2,
-            config.getint("SUMMARY_STATS", "num_bins"),
-            len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            out_channels=len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            kernel_size=4,
+            stride=2,
+            num_bins=config.getint("SUMMARY_STATS", "num_bins"),
+            num_lags=len(config.getlistint("SUMMARY_STATS", "lag_times")),
+            num_freq=config.getint("SUMMARY_STATS", "num_freq"),
         )
 
     kwargs_flow = {
@@ -98,6 +100,8 @@ def get_train_parameter(config):
         "learning_rate": 0.0005,
         "stop_after_epochs": 20,
         "retrain_from_scratch": False,
+        "discard_prior_samples": False,
+        "force_first_round_loss": False
     }
 
     config = get_config_parser(config)

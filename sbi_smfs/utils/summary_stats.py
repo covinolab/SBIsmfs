@@ -7,7 +7,8 @@ from sbi_smfs.utils.stats_utils import (
     moments,
     bin_trajectory,
     build_transition_matrix,
-    compute_normalized_fft_magnitudes
+    compute_normalized_fft_magnitudes,
+    compute_psd_welch,
 )
 from sbi_smfs.utils.config_utils import get_config_parser
 
@@ -82,13 +83,15 @@ def featurize_trajectory(
     torch.Tensor
         1-D tensor of features.
     """
+    if isinstance(q, list):
+        q = q[0]
     # Transition matrices are already returned as float32 1-D tensor from build_transition_matrices
     matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
 
     if num_freq <= 0:
         return matrices
 
-    fft_magnitudes = compute_normalized_fft_magnitudes(q, num_freq=num_freq)
+    fft_magnitudes = compute_psd_welch(q, num_freq=num_freq) #compute_normalized_fft_magnitudes(q, num_freq=num_freq)
 
     return torch.cat((matrices, fft_magnitudes))
 

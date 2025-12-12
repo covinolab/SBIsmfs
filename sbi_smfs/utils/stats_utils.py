@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import scipy.stats as stats
+from scipy.signal import welch
 import numba as nb
 
 
@@ -207,3 +208,10 @@ def compute_normalized_fft_magnitudes(traj, num_freq=50):
     fft_traj = np.abs(np.fft.fft(traj)[1:num_freq+1])
     fft_traj = fft_traj / fft_traj.sum()
     return torch.from_numpy(fft_traj)
+
+
+def compute_psd_welch(traj, num_freq=15):
+    freqs, psd = welch(traj, nperseg=10000, window='hann')
+    psd = psd[0:num_freq]
+    psd = psd / (psd.sum() + 1e-12) 
+    return torch.from_numpy(psd.astype(np.float32))
