@@ -61,6 +61,7 @@ def featurize_trajectory(
     max_bin: float,
     num_bins: int,
     num_freq: int = 50,
+    window_size: int = 100,
 ) -> torch.Tensor:
     """
     Build a feature vector from transition matrices and optional FFT magnitudes.
@@ -85,9 +86,9 @@ def featurize_trajectory(
     """
     if isinstance(q, list):
         q = q[0]
-    # Transition matrices are already returned as float32 1-D tensor from build_transition_matrices
+    if window_size > 1:
+        q = np.convolve(q, np.ones(window_size)/window_size, mode='valid')
     matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
-
     if num_freq <= 0:
         return matrices
 
@@ -116,9 +117,11 @@ def compute_stats(
         config.getfloat("SUMMARY_STATS", "max_bin"),
         config.getint("SUMMARY_STATS", "num_bins"),
         config.getint("SUMMARY_STATS", "num_freq"),
+        config.getint("SUMMARY_STATS", "window_size", fallback=0),
     )
-    print(f"Computed summary statistics of shape: {summary_stats.shape}")
-    print(f"Using bins from {config.getfloat('SUMMARY_STATS', 'min_bin')} to {config.getfloat('SUMMARY_STATS', 'max_bin')} with {config.getint('SUMMARY_STATS', 'num_bins')} bins.")
+    print("window_size = ", config.getint("SUMMARY_STATS", "window_size", fallback=0))
+    #print(f"Computed summary statistics of shape: {summary_stats.shape}")
+    #print(f"Using bins from {config.getfloat('SUMMARY_STATS', 'min_bin')} to {config.getfloat('SUMMARY_STATS', 'max_bin')} with {config.getint('SUMMARY_STATS', 'num_bins')} bins.")
     return summary_stats
 
 

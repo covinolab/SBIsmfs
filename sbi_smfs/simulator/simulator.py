@@ -25,6 +25,7 @@ def smfe_simulator(
     num_bins: int,
     lag_times: list[int],
     num_freq: int = 0,
+    window_size: int = 100,
     return_q: bool = False,
 ) -> torch.Tensor:
     """
@@ -121,7 +122,7 @@ def smfe_simulator(
     if return_q:
         return torch.from_numpy(q)
 
-    features = featurize_trajectory(q, lag_times, min_bin, max_bin, num_bins, num_freq=num_freq)
+    features = featurize_trajectory(q, lag_times, min_bin, max_bin, num_bins, num_freq=num_freq, window_size=window_size)
     return features
 
 
@@ -168,5 +169,6 @@ def get_simulator_from_config(
         num_bins=config.getint("SUMMARY_STATS", "num_bins"),
         lag_times=config.getlistint("SUMMARY_STATS", "lag_times"),
         num_freq=config.getint("SUMMARY_STATS", "num_freq"),
+        window_size=config.getint("SUMMARY_STATS", "window_size", fallback=0),
         return_q=return_q,
     )
