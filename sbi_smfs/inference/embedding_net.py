@@ -65,49 +65,6 @@ class SingleLayerMLP(nn.Module):
         return x
     
 
-@add_embedding("single_layer_mlp_skip_freq")
-class SingleLayerMLP_skip(nn.Module):
-    """
-    Single layer MLP with ReLU activation
-
-    Parameters
-    ----------
-    num_bins : int
-        Number of bins for transition matrix.
-    num_lags : int
-        Number of lag times for which a transition matrix is generated.
-    num_features : int
-        Number of output features for the embedding.
-    activation : torch.nn.Module
-        Activation function.
-    """
-
-    def __init__(
-        self,
-        num_bins: int,
-        num_lags: int,
-        num_freq: int,
-        num_features: int,
-        activation: Callable[[], nn.Module] = nn.GELU,
-    ):
-        super(SingleLayerMLP_skip, self).__init__()
-
-        self.num_bins = num_bins
-        self.num_lags = num_lags
-        self.num_freq = num_freq
-        self.num_features = num_features
-        self.fc1 = nn.Linear((num_bins * num_bins * num_lags), num_features)
-        self.activation = activation()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        matrices = x[:, :-self.num_freq]  # transition matrices
-        freq = x[:, -self.num_freq:]  # frequency features
-        matrices = matrices.view((-1, (self.num_lags * self.num_bins * self.num_bins)))
-        x = self.activation(self.fc1(matrices))
-        x = torch.cat((x, freq), dim=1)
-        return x
-
-
 @add_embedding("single_layer_cnn")
 class SimpleCNN(nn.Module):
     """
@@ -157,85 +114,20 @@ class SimpleCNN(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Check the original matrix size and lag times!!!
-        transition_matrix = x[:, :-self.num_freq].view(
-            (-1, self.num_lags, self.num_bins, self.num_bins)
-        )
+        if self.num_freq > 0:
+            transition_matrix = x[:, :-self.num_freq].view(
+                (-1, self.num_lags, self.num_bins, self.num_bins)
+            )
+        else:
+            transition_matrix = x.view(
+                (-1, self.num_lags, self.num_bins, self.num_bins)
+            )
+        
         x1 = self.activation(self.conv1(transition_matrix))
 
         if self.num_freq == 0:
             return x1.flatten(start_dim=1)
         
-        elif self.num_freq > 0:
+        else:
             x2 = self.activation(self.fc1(x[:, -self.num_freq:]))
             return torch.cat((x1.flatten(start_dim=1), x2), dim=1)
-
-
-@add_embedding("multi_layer_cnn")
-class MultiLayerCNN(nn.Module):
-    """
-    Multi layer CNN with LeakyReLU activation
-
-    Parameters
-    ----------
-    num_bins : int
-        Number of bins for transition matrix.
-    num_lags : int
-        Number of lag times for which a transition matrix is generated.
-    num_features : int
-        Number of output features for the embedding.
-    """
-
-    def __init__(
-        self,
-        num_bins: int,
-        num_lags: int,
-        num_freq: int,
-        num_features: int,
-    ):
-        super(MultiLayerCNN, self).__init__()
-
-        self.num_bins = num_bins
-        self.num_lags = num_lags
-        self.num_features = num_features
-        self.num_freq = num_freq
-
-        self.cnn = nn.Sequential(
-            nn.Conv2d(num_lags, num_lags * 2, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 2, num_lags * 2, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 2, num_lags * 4, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.AvgPool2d(2),
-            nn.Conv2d(num_lags * 4, num_lags * 8, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 8, num_lags * 16, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 16, num_lags * 32, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.AvgPool2d(2),
-            nn.Conv2d(num_lags * 32, num_lags * 64, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 64, num_lags * 128, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.Conv2d(num_lags * 128, num_lags * 128, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.1),
-            nn.AdaptiveAvgPool2d(1),
-            nn.Flatten(),
-            nn.Linear(num_lags * 128, num_lags * 128),
-            nn.LeakyReLU(0.1),
-            nn.Linear(num_lags * 128, num_features),
-            nn.LeakyReLU(0.1),
-        )
-        self.fc1 = nn.Linear(num_freq, num_freq//2) if num_freq > 0 else None
-        self.activation = nn.ReLU(0.1)
-
-    def forward(self, x):
-        if self.num_freq > 0:
-            freq_features = self.activation(self.fc1(x[:, -self.num_freq:]))
-            transition_matrix = x[:, :-self.num_freq]
-            cnn_features = self.cnn(transition_matrix.view((-1, self.num_lags, self.num_bins, self.num_bins)))
-            return torch.cat((cnn_features, freq_features), dim=1)
-        elif self.num_freq == 0:
-            x = x.view((-1, self.num_lags, self.num_bins, self.num_bins))
-        return self.cnn(x)

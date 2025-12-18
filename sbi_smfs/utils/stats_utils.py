@@ -211,7 +211,23 @@ def compute_normalized_fft_magnitudes(traj, num_freq=50):
 
 
 def compute_psd_welch(traj, num_freq=15):
-    freqs, psd = welch(traj, nperseg=10000, window='hann')
+    """
+    Computes the normalized power spectral density (PSD) using Welch's method.
+
+    Parameters
+    ----------
+    traj : np.ndarray
+        Input trajectory.
+    n_freq : int, optional
+        Number of frequency components to consider. The default is 15.
+    
+    Returns
+    -------
+    np.ndarray
+        Normalized (by sum) power spectral density of the trajectory.
+    """ 
+
+    _ , psd = welch(traj, nperseg=10000, window='hann')
     psd = psd[0:num_freq]
     psd = psd / (psd.sum() + 1e-12) 
     return torch.from_numpy(psd.astype(np.float32))
