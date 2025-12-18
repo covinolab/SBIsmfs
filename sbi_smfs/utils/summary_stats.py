@@ -91,10 +91,11 @@ def featurize_trajectory(
     matrices = build_transition_matrices(q, lag_times, min_bin, max_bin, num_bins)
     if num_freq <= 0:
         return matrices
-
-    fft_magnitudes = compute_psd_welch(q, num_freq=num_freq) #compute_normalized_fft_magnitudes(q, num_freq=num_freq)
-
-    return torch.cat((matrices, fft_magnitudes))
+    
+    if num_freq > 0:
+        fft_magnitudes = compute_psd_welch(q, num_freq=num_freq) #compute_normalized_fft_magnitudes(q, num_freq=num_freq)
+        return torch.cat((matrices, fft_magnitudes))
+    return matrices
 
 
 def compute_stats(
